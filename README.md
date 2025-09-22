@@ -9,92 +9,91 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/pulls)
 [![Last commit](https://img.shields.io/github/last-commit/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/commits/main)
 
-Slóði is a Gilwell project managed by [Halldór Valberg Aðalbjargarson](https://github.com/halldorvalberg) and [Signý Kristín Sigurjónsdóttir](https://github.com/signyk). It is an open-source platform designed to make program planning easier for scout leaders. The system supports leaders and groups in creating, sharing, and managing activities while ensuring scouts experience a diverse and well-balanced program.
+Slóði er Gilwell-verkefni í umsjá [Halldór Valberg Aðalbjargarson](https://github.com/halldorvalberg) og [Signý Kristín Sigurjónsdóttir](https://github.com/signyk). Það er opinn hugbúnaður sem er hannaður til að auðvelda dagskrárgerð fyrir skátaforingja. Kerfið styður foringja og hópa við að búa til, deila og stjórna viðfangsefnum og tryggir um leið að skátar fái fjölbreytta og vel samsetta dagskrá.
 
-## Table of Contents
+## Efnisyfirlit
 
-- [Vision](#vision)
-- [Main Features](#main-features)
-- [Technology Stack](#technology-stack)
-- [Timeline](#timeline)
-- [Contributing](#contributing)
-- [Community](#community)
-- [Project Website](#project-website)
-- [License](#license)
+- [Framtíðarsýn](#framtíðarsýn)
+- [Helstu eiginleikar](#helstu-eiginleikar)
+- [Tæknistaflinn](#tæknistaflinn)
+- [Tímalína](#tímalína)
+- [Framlög](#framlög)
+- [Samfélag](#samfélag)
+- [Vefsíða verkefnisins](#vefsíða-verkefnisins)
+- [Leyfi](#leyfi)
 
-## Vision
+## Framtíðarsýn
 
-The project’s mission is to support scout leaders by providing tools that make program planning simpler, smarter, and more collaborative. By storing activities, enabling structured program creation, and providing insights into program diversity, Slóði ensures every scout benefits from a rich and varied experience.
+Markmið verkefnisins er að styðja við skátaforingja með því að bjóða upp á verkfæri sem gera dagskrárgerð einfaldari, snjallari og samvinnuþýðari. Með því að geyma viðfangsefni, gera kleift að búa til skipulagða dagskrá og veita innsýn í fjölbreytni dagskrárinnar tryggir Slóði að allir skátar njóti góðs af ríkulegri og fjölbreyttri reynslu.
 
-## Main Features
+## Helstu eiginleikar
 
-### Activity Library (Planned)
+### Dagksrárbankinn (fyrirhugað)
 
-A central collection of scouting activities with clear instructions, age suitability, required materials, time estimates, and tips from other leaders.
+Miðlægt safn verkefna og leikja með skýrum leiðbeiningum, aldursviðmiðum, nauðsynlegum búnaði, tímaáætlun og ábendingum frá öðrum foringjum.
 
-### Program Builder (Planned)
+### Dagskrárgerð (fyrirhugað)
 
-A drag-and-drop tool for assembling full programs (meetings, weekends, or camps) from activities. Programs can be organized by time, theme, or patrol.
+„Drag-and-drop“ verkfæri til að setja saman heildardagskrár (fundi, útilegur eða mót) úr viðfangsefnum. Hægt er að skipuleggja dagskrár eftir tíma, þema eða flokkum.
 
-### Templates and Examples (Planned)
+### Sniðmát og dæmi (fyrirhugað)
 
-Pre-built templates for common scouting events such as weekly meetings, badge programs, and camps. Leaders can use them directly or customize them to fit their needs.
+Tilbúin sniðmát fyrir algenga skátaviðburði eins og vikulega fundi, færnimerkjadagskrár og útilegur. Foringjar geta notað þau beint eða sérsniðið þau að sínum þörfum.
 
-### Collaboration Tools (Planned)
+### Samvinnuverkfæri (fyrirhugað)
 
-The ability to share programs and activities with other leaders, patrols, or units. Includes support for comments, suggestions, and reuse of shared plans.
+Möguleiki á að deila dagskrám og viðfangsefnum með öðrum foringjum, flokkum eða sveitum. Inniheldur stuðning við athugasemdir, tillögur og endurnotkun á sameiginlegum áætlunum.
 
-### Search and Tags (Planned)
+### Leit og merking (fyrirhugað)
 
-A robust search function with tags and filters, enabling leaders to find activities by age group, difficulty, location, materials, or theme.
+Ítarleg leitarverkfæri með töggum og síum sem gerir foringjum kleift að finna viðfangsefni eftir aldurshópi, erfiðleikastigi, staðsetningu, búnað eða þema.
 
-### Program Analysis Tool
+### Greiningartæki fyrir dagskrá
 
-A tool for reviewing past events and analyzing program diversity. Helps leaders ensure scouts experience a balanced mix of activities, such as outdoor adventure, creativity, teamwork, and reflection.
+Verkfæri til að fara yfir liðna viðburði og greina fjölbreytni dagskrár. Hjálpar foringjum að tryggja að skátar fái jafna blöndu af viðfangsefnum, svo sem eftir ÆSKA og þroskasviðum.
 
-## Technology Stack
+## Tæknistaflinn
 
-**Backend:** Python (FastAPI or Django REST, TBD)
+**Bakendi:** Python (FastAPI eða Django REST, óákveðið)
+**Framendi:** Next.js (React)
+**Gagnagrunnur:** PostgreSQL
+Við munum nota Docker fyrir uppsetningu og hýsa þetta á Azure.
 
-**Frontend:** Next.js (React)
+## Tímalína
 
-**Database:** PostgreSQL
+**Útgáfa lágmarksafurðar:** apríl 2026
+**Opinber útgáfa:** apríl 2027
 
-We will deploy with Docker and host this on Azure.
+## Framlög
 
-## Timeline
+Slóði er samfélagsdrifið verkefni. Framlög frá forriturum, hönnuðum og skátum sem vilja bæta verkfæri til dagskrárgerðar eru vel þegin.
 
-**MVP release:** April 2026
+1. Búðu til afrit (e. fork) af safninu (e. repository)
 
-**Public launch:** April 2027
+2. Búðu til nýja grein (e. feature branch)
 
-## Contributing
+3. Sendu inn sameiningarbeiðni (e. pull request)
 
-Slóði is a community-driven project. Contributions are welcome from developers, designers, and scouts who want to improve program planning tools.
+Ítarlegri leiðbeiningum fyrir framlög verður bætt við síðar.
 
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+## Samfélag
 
-A detailed contributing guide will be added later.
+Slóði er þróaður fyrir og með skátasamfélaginu.
 
-## Community
+- Taktu þátt í umræðunum á [GitHub Discussions](https://github.com/halldorvalberg/slodi/discussions)
+- Tilkynntu villur og óskaðu eftir nýjum eiginleikum í [Issues](https://github.com/halldorvalberg/slodi/issues)
+- Leggðu til hugmyndir, þýðingar eða dagskrárefni
 
-Slóði is built for and with the scouting community.
+## Vefsíða verkefnisins
 
-- Join the discussion in our [GitHub Discussions](https://github.com/halldorvalberg/slodi/discussions)
-- Report bugs and request features in [Issues](https://github.com/halldorvalberg/slodi/issues)
-- Contribute ideas, translations, or activity content
-
-## Project Website
-
-You can follow the project and access the live site at:
+Þú getur fylgst með verkefninu og nálgast vefsíðuna á:
 
 - [https://www.slodi.is](https://www.slodi.is)
+
 - [https://www.slóði.is](https://www.slóði.is)
 
-The website will host updates, documentation, and eventually the production deployment of Slóði.
+Á vefsíðunni verða birtar uppfærslur, leiðbeiningar og að lokum endanleg útgáfa af Slóða.
 
-## License
+## Leyfi
 
-This project is licensed under the GPLv3 License, ensuring that Slóði remains open and community-owned.
+Þetta verkefni er með GPLv3-leyfi, sem tryggir að Slóði verði áfram opinn og í eigu samfélagsins.
