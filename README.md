@@ -28,23 +28,23 @@ The project’s mission is to support scout leaders by providing tools that make
 
 ## Main Features
 
-### Activity Library
+### Activity Library (Planned)
 
 A central collection of scouting activities with clear instructions, age suitability, required materials, time estimates, and tips from other leaders.
 
-### Program Builder
+### Program Builder (Planned)
 
 A drag-and-drop tool for assembling full programs (meetings, weekends, or camps) from activities. Programs can be organized by time, theme, or patrol.
 
-### Templates and Examples
+### Templates and Examples (Planned)
 
 Pre-built templates for common scouting events such as weekly meetings, badge programs, and camps. Leaders can use them directly or customize them to fit their needs.
 
-### Collaboration Tools
+### Collaboration Tools (Planned)
 
 The ability to share programs and activities with other leaders, patrols, or units. Includes support for comments, suggestions, and reuse of shared plans.
 
-### Search and Tags
+### Search and Tags (Planned)
 
 A robust search function with tags and filters, enabling leaders to find activities by age group, difficulty, location, materials, or theme.
 
