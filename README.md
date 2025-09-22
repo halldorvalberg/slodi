@@ -9,7 +9,7 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/pulls)
 [![Last commit](https://img.shields.io/github/last-commit/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/commits/main)
 
-Slóði er Gilwell-verkefni í umsjá [Halldór Valberg Aðalbjargarson](https://github.com/halldorvalberg) og [Signý Kristín Sigurjónsdóttir](https://github.com/signyk). Það er opinn hugbúnaður sem er hannaður til að auðvelda dagskrárgerð fyrir skátaforingja. Kerfið styður foringja og hópa við að búa til, deila og stjórna viðfangsefnum og tryggir um leið að skátar fái fjölbreytta og vel samsetta dagskrá.
+Slóði er Gilwell-verkefni sem [Halldór Valberg Aðalbjargarson](https://github.com/halldorvalberg) og [Signý Kristín Sigurjónsdóttir](https://github.com/signyk) sjá um. Það er opinn hugbúnaður sem er hannaður til að auðvelda dagskrárgerð fyrir skátaforingja. Kerfið styður foringja og hópa við að búa til, deila og stjórna viðfangsefnum og tryggir um leið að skátar fái fjölbreytta og vel samsetta dagskrá.
 
 ## Efnisyfirlit
 
@@ -55,13 +55,17 @@ Verkfæri til að fara yfir liðna viðburði og greina fjölbreytni dagskrár. 
 ## Tæknistaflinn
 
 **Bakendi:** Python (FastAPI eða Django REST, óákveðið)
+
 **Framendi:** Next.js (React)
+
 **Gagnagrunnur:** PostgreSQL
+
 Við munum nota Docker fyrir uppsetningu og hýsa þetta á Azure.
 
 ## Tímalína
 
 **Útgáfa lágmarksafurðar:** apríl 2026
+
 **Opinber útgáfa:** apríl 2027
 
 ## Framlög
