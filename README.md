@@ -5,8 +5,22 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![GitHub issues](https://img.shields.io/github/issues/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/pulls)
+[![Last commit](https://img.shields.io/github/last-commit/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/commits/main)
 
-Slóði is a Gilwell project managed by Halldór Valberg Aðalbjargarson and Signý Kristín Sigurjónsdóttir. It is an open-source platform designed to make program planning easier for scout leaders. The system supports leaders and groups in creating, sharing, and managing activities while ensuring scouts experience a diverse and well-balanced program.
+Slóði is a Gilwell project managed by [Halldór Valberg Aðalbjargarson](https://github.com/halldorvalberg) and [Signý Kristín Sigurjónsdóttir](https://github.com/signyk). It is an open-source platform designed to make program planning easier for scout leaders. The system supports leaders and groups in creating, sharing, and managing activities while ensuring scouts experience a diverse and well-balanced program.
+
+## Table of Contents
+
+- [Vision](#vision)
+- [Main Features](#main-features)
+- [Technology Stack](#technology-stack)
+- [Timeline](#timeline)
+- [Contributing](#contributing)
+- [Community](#community)
+- [Project Website](#project-website)
+- [License](#license)
 
 ## Vision
 
@@ -64,7 +78,23 @@ Slóði is a community-driven project. Contributions are welcome from developers
 
 A detailed contributing guide will be added later.
 
+## Community
+
+Slóði is built for and with the scouting community.
+
+- Join the discussion in our [GitHub Discussions](https://github.com/halldorvalberg/slodi/discussions)
+- Report bugs and request features in [Issues](https://github.com/halldorvalberg/slodi/issues)
+- Contribute ideas, translations, or activity content
+
+## Project Website
+
+You can follow the project and access the live site at:
+
+- [https://www.slodi.is](https://www.slodi.is)
+- [https://www.slóði.is](https://www.slóði.is)
+
+The website will host updates, documentation, and eventually the production deployment of Slóði.
+
 ## License
 
 This project is licensed under the GPLv3 License, ensuring that Slóði remains open and community-owned.
-
