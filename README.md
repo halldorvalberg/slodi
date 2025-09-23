@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/badge/python-3.12+-brightgreen.svg)](https://www.python.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+<!-- [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/) -->
 [![GitHub issues](https://img.shields.io/github/issues/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/pulls)
 [![Last commit](https://img.shields.io/github/last-commit/halldorvalberg/slodi)](https://github.com/halldorvalberg/slodi/commits/main)
