@@ -35,8 +35,8 @@ export default function Home() {
   };
 
   return (
-    <div className="font-sans flex flex-col min-h-screen overflow-hidden relative">
-      <div className="flex-grow flex items-center justify-center min-h-[50vh] mt-8 z-10">
+    <div className="font-sans flex flex-col overflow-hidden relative min-h-[85vh] max-h-[85vh]">
+      <div className="flex-grow flex items-center justify-center min-h-[30vh] mt-8 z-10 max-h-[35vh]">
         <div className="text-center w-4/5 sm:w-3/5 flex items-center justify-center h-full">
           <div>
             <h1 className="text-6xl font-bold uppercase">Slóði</h1>
@@ -50,7 +50,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="flex-grow flex items-center justify-center bg-background text-text">
+      <div className="flex-grow flex items-center justify-center bg-background text-text max-h-[30vh]">
         <form
           onSubmit={handleSubmit}
           className="flex flex-col items-center w-4/5 sm:w-1/2"
