@@ -17,16 +17,6 @@ function sanitizeUrl(url: string): string {
     return "#";
 }
 
-// Create safe, readable ids for headings
-function slugify(s: string): string {
-    return s
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // strip accents
-        .replace(/[^a-z0-9\s-]/g, "")
-        .trim()
-        .replace(/\s+/g, "-");
-}
-
 // Inline formatting: runs on a text chunk that is NOT inside code spans.
 function renderInline(md: string): string {
     // Protect inline code by splitting on backticks
@@ -90,7 +80,7 @@ export function mdToHtmlLite(md: string): string {
 
   const closeAllLists = () => closeListsTo(0);
 
-  for (let raw of lines) {
+  for (const raw of lines) {
     const line = raw.replace(/\t/g, "    ");
 
     // Fenced code
