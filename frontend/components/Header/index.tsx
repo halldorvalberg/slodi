@@ -29,6 +29,7 @@ export default function Header() {
         <nav className="hidden md:flex gap-6">
           <Link className="inline-flex items-center gap-1 hover:underline" href="/">Heim</Link>
           <Link className="inline-flex items-center gap-1 hover:underline" href="/about">Um Slóða</Link>
+          <Link className="inline-flex items-center gap-1 hover:underline" href="/auth/login">Log in</Link>
           <Link
             href="https://github.com/halldorvalberg/slodi"
             target="_blank"
@@ -99,6 +100,13 @@ export default function Header() {
               className="px-3 py-2 rounded hover:bg-[var(--color-foreground)] hover:text-[var(--color-background)]"
             >
               Um Slóða
+            </Link>
+            <Link
+              href="/auth/login"
+              onClick={() => setOpen(false)}
+              className="px-3 py-2 rounded hover:bg-[var(--color-foreground)] hover:text-[var(--color-background)]"
+            >
+              Log in
             </Link>
             <Link
               href="https://github.com/halldorvalberg/slodi" target="_blank" rel="noopener noreferrer"
