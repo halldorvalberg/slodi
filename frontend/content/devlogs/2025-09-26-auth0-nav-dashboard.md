@@ -6,7 +6,7 @@ date: 2025-09-26
 
 author: "Halldór"
 
-tags: ["devlog"]
+tags: ["devlog", "auth"]
 
 summary: "Fínstillt auðkenning með Auth0 v4.10, betrumbætt UX í farsímavalmynd og ný /dev síða með óendanlegri flettingu."
 
