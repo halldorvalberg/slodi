@@ -1,6 +1,7 @@
 // app/(protected)/dashboard/page.tsx
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { auth0 } from "@/lib/auth0";
 
@@ -21,7 +22,7 @@ export default async function DashboardPage() {
     const session = await auth0.getSession();
 
     if (!session?.user) {
-        const base = getBaseUrl();
+        const base = await getBaseUrl();
         const returnTo = encodeURIComponent(`${base}/dashboard`);
         redirect(`/auth/login?returnTo=${returnTo}`);
     }
@@ -34,8 +35,6 @@ export default async function DashboardPage() {
         // If you add roles via a namespace, map it here:
         // "https://slodi.is/roles"?: string[];
     };
-
-    const base = getBaseUrl();
 
     return (
         <main className="mx-auto max-w-3xl px-6 py-10">
@@ -75,12 +74,12 @@ export default async function DashboardPage() {
                 <div className="rounded-xl border p-4">
                     <h2 className="text-lg font-medium">Aðgerðir</h2>
                     <div className="mt-4 flex flex-wrap gap-3">
-                        <a
+                        <Link
                             href="/"
                             className="inline-flex items-center justify-center rounded border px-4 py-2 text-sm hover:bg-muted"
                         >
                             Fara á forsíðu
-                        </a>
+                        </Link>
                         <a
                             href="/auth/logout"
                             className="inline-flex items-center justify-center rounded border px-4 py-2 text-sm text-red-600 hover:bg-red-50"

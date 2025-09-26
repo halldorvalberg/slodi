@@ -29,7 +29,7 @@ export default function Home() {
       } else {
         setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
       }
-    } catch (error) {
+    } catch {
       setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
     }
   };
