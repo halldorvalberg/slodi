@@ -7,11 +7,11 @@ import { auth0 } from "@/lib/auth0";
 // Prevent caching of sensitive content
 export const dynamic = "force-dynamic";
 
-function getBaseUrl() {
+async function getBaseUrl() {
     // Prefer env; fall back to request headers
     const env = process.env.APP_BASE_URL;
     if (env) return env.replace(/\/$/, "");
-    const h = headers();
+    const h = await headers();
     const proto = h.get("x-forwarded-proto") ?? "http";
     const host = h.get("x-forwarded-host") ?? h.get("host");
     return `${proto}://${host}`;
