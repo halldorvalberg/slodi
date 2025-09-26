@@ -30,3 +30,86 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer components {
+  .md-content {
+    @apply text-[var(--color-foreground,inherit)];
+  }
+
+  .md-content :where(p) {
+    @apply my-4 leading-7;
+  }
+
+  .md-content :where(h1) {
+    @apply mt-8 mb-4 text-3xl font-bold tracking-tight;
+  }
+  .md-content :where(h2) {
+    @apply mt-8 mb-3 text-2xl font-semibold;
+  }
+  .md-content :where(h3) {
+    @apply mt-6 mb-2 text-xl font-semibold;
+  }
+  .md-content :where(h4) {
+    @apply mt-5 mb-2 text-lg font-semibold;
+  }
+  .md-content :where(h5) {
+    @apply mt-4 mb-2 font-semibold;
+  }
+  .md-content :where(h6) {
+    @apply mt-4 mb-2 text-sm font-semibold uppercase tracking-wide;
+  }
+
+  /* Anchor links */
+  .md-content :where(h1, h2, h3, h4, h5, h6) a {
+    @apply underline;
+  }
+
+  /* Links */
+  .md-content a {
+    @apply underline hover:opacity-80;
+  }
+
+  /* Lists */
+  .md-content :where(ul) { @apply my-4 list-disc pl-6; }
+  .md-content :where(ol) { @apply my-4 list-decimal pl-6; }
+  .md-content :where(li) { @apply my-1 leading-7; }
+
+  /* Blockquote */
+  .md-content blockquote {
+    @apply my-6 border-l-4 pl-4 italic opacity-90;
+  }
+
+  /* Code inline */
+  .md-content :where(code) {
+    @apply rounded bg-[color:var(--code-bg,#0f172a0d)] px-1 py-0.5 text-[0.95em];
+  }
+
+  /* Code block */
+  .md-content pre {
+    @apply my-6 overflow-x-auto rounded border bg-[color:var(--code-bg,#0f172a0d)] p-4;
+  }
+  .md-content pre code {
+    @apply bg-transparent p-0;
+  }
+
+  /* Horizontal rule */
+  .md-content hr {
+    @apply my-8 border-t;
+  }
+
+  /* Images if you add them later */
+  .md-content img {
+    @apply my-6 rounded;
+  }
+
+  /* Tables (simple baseline if you add them later) */
+  .md-content table {
+    @apply my-6 w-full text-left border-collapse;
+  }
+  .md-content thead th {
+    @apply border-b py-2 font-semibold;
+  }
+  .md-content tbody td {
+    @apply border-b py-2 align-top;
+  }
+}
