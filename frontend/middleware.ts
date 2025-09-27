@@ -15,6 +15,7 @@ export const config = {
         // - api/auth (Auth0 callback/login/logout)
         // - the home page (/)
         // - about and optional subpaths (/about or /about/...)
-        "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap\\.xml|sitemap-.*\\.xml|api/auth|about(?:/.*)?|$).*)",
- ],
+        // - api/save-email (excluded to allow unauthenticated access)
+        "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap\\.xml|sitemap-.*\\.xml|api/auth|api/save-email|about(?:/.*)?|$).*)",
+    ],
 };

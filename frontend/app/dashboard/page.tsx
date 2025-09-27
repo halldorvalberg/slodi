@@ -83,11 +83,18 @@ export default async function DashboardPage() {
                         <a
                             href="/auth/logout"
                             className="inline-flex items-center justify-center rounded border px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        // If you later want a dedicated page after logout:
-                        // href={`/auth/logout?returnTo=${encodeURIComponent(`${base}/blessu`)}`}
                         >
                             Skrá út
                         </a>
+                        {user.email === "halldor@svanir.is" && (
+                            <a
+                                href="/emails.txt"
+                                download="emails.txt"
+                                className="inline-flex items-center justify-center rounded border px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                            >
+                                Sækja emails.txt
+                            </a>
+                        )}
                     </div>
                 </div>
             </section>
