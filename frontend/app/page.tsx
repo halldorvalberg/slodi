@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import z from "zod/v4";
+
+const EmailSchema = z.email();
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -8,30 +11,31 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setMessage("Vinsamlegast sláðu inn gilt netfang.");
-      return;
+
+    const { error: emailError } = await EmailSchema.safeParseAsync(email);
+    if (emailError) {
+      return setMessage("Vinsamlegast sláðu inn gilt netfang.");
     }
 
+    let response;
     try {
-      const response = await fetch("/api/save-email", {
+      response = await fetch("/api/save-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
       });
-
-      if (response.ok) {
-        setMessage("Takk fyrir að skrá þig á póstlistann!");
-        setEmail("");
-      } else {
-        setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
-      }
-    } catch {
-      setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
+    } catch (e) {
+      return setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
     }
+
+    if (!response.ok) {
+      return setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
+    }
+
+    setMessage("Takk fyrir að skrá þig á póstlistann!");
+    setEmail("");
   };
 
   return (
