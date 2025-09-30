@@ -16,7 +16,7 @@ export default async function Header() {
     : null;
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--color-background)] text-[var(--color-foreground)] border-b">
+    <header className="sticky top-0 z-50 bg-[var(--color-background)] text-[var(--color-foreground)] border-b font-sans">
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
         <Link href="/" className="font-medium">Slóði</Link>
 
