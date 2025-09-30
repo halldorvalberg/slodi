@@ -92,8 +92,6 @@ Slóði er þróaður fyrir og með skátasamfélaginu.
 
 Þú getur fylgst með verkefninu og nálgast vefsíðuna á:
 
-- [https://www.slodi.is](https://www.slodi.is)
-
 - [https://www.slóði.is](https://www.slóði.is)
 
 Á vefsíðunni verða birtar uppfærslur, leiðbeiningar og að lokum endanleg útgáfa af Slóða.
