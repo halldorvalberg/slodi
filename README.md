@@ -1,7 +1,7 @@
 # Slóði
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.12+-brightgreen.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.10+-brightgreen.svg)](https://www.python.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
 <!-- [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/) -->
