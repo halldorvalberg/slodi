@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth0 } from "@/lib/auth0";
-import AccountButton from "../AccountButton";
-import MobileNav from "../MobileNav";
+import AccountButton from "@/components/AccountButton";
+import MobileNav from "@/components/MobileNav";
 
 type LeanUser = { name: string; picture: string | null; email: string | null } | null;
 

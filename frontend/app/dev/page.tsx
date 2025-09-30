@@ -1,5 +1,5 @@
 // app/dev/page.tsx
-import DevlogClient from "./DevlogClient";
+import DevlogClient from "@/app/dev/DevlogClient";
 import { paginateDevlogs } from "@/lib/devlogs";
 
 export const dynamic = "force-static"; // list from filesystem; rebuild on deploy
