@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useState, useCallback } from "react";
+import { useUser } from "@auth0/nextjs-auth0";
 import styles from "./header.module.css";
 
 export default function Header() {
+  const { user } = useUser();
+
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = useCallback(() => {
@@ -37,6 +40,15 @@ export default function Header() {
             >
               Github
             </Link>
+            {user ? (
+              <Link href="/dashboard" className={styles.navLink}>
+                Stjórnborð
+              </Link>
+            ) : (
+              <Link href="/auth/login" className={styles.navLink}>
+                Innskráning
+              </Link>
+            )}
           </nav>
         </div>
 
