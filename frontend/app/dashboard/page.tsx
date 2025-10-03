@@ -1,15 +1,14 @@
-// app/(protected)/dashboard/page.tsx
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { auth0 } from "@/lib/auth0";
+import styles from "./dashboard.module.css";
 
 // Prevent caching of sensitive content
 export const dynamic = "force-dynamic";
 
 async function getBaseUrl() {
-    // Prefer env; fall back to request headers
     const env = process.env.APP_BASE_URL;
     if (env) return env.replace(/\/$/, "");
     const h = await headers();
@@ -32,65 +31,49 @@ export default async function DashboardPage() {
         email?: string;
         picture?: string;
         sub?: string;
-        // If you add roles via a namespace, map it here:
         // "https://slodi.is/roles"?: string[];
     };
 
     return (
-        <main className="mx-auto max-w-3xl px-6 py-10">
-            <h1 className="text-3xl font-semibold">Stjórnborð</h1>
+        <main className={styles.main}>
+            <h1 className={styles.title}>Stjórnborð</h1>
 
-            <section className="mt-8 space-y-6" aria-label="Yfirlit aðgangs">
+            <section className={styles.section} aria-label="Yfirlit aðgangs">
                 {/* Account card */}
-                <div className="rounded-xl border p-4">
-                    <h2 className="text-lg font-medium">Aðgangurinn þinn</h2>
-                    <div className="mt-4 flex items-center gap-4">
+                <div className={styles.card}>
+                    <h2 className={styles.cardTitle}>Aðgangurinn þinn</h2>
+
+                    <div className={styles.accountRow}>
                         <Avatar src={user.picture} alt={user.name ?? "Notandi"} />
                         <div>
-                            <div className="text-base font-medium">{user.name ?? "—"}</div>
-                            <div className="text-sm text-muted-foreground">{user.email ?? "—"}</div>
+                            <p className={styles.accountName}>{user.name ?? "—"}</p>
+                            <p className={styles.accountEmail}>{user.email ?? "—"}</p>
                         </div>
                     </div>
 
-                    <dl className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        {/* <div>
-                            <dt className="text-sm text-muted-foreground">Auðkenni (sub)</dt>
-                            <dd className="text-sm break-all">{user.sub ?? "—"}</dd>
-                        </div> */}
-                        {/* Example: show roles if you add them later
-                        <div>
-                        <dt className="text-sm text-muted-foreground">Hlutverk</dt>
-                        <dd className="text-sm">
-                            {Array.isArray((user as any)["https://slodi.is/roles"]) && (user as any)["https://slodi.is/roles"].length
-                            ? (user as any)["https://slodi.is/roles"].join(", ")
-                            : "—"}
-                        </dd>
-                        </div>
-                      */}
+                    <dl className={styles.dl}>
+                        {/* Reserved for future fields like sub or roles */}
                     </dl>
                 </div>
 
                 {/* Quick actions */}
-                <div className="rounded-xl border p-4">
-                    <h2 className="text-lg font-medium">Aðgerðir</h2>
-                    <div className="mt-4 flex flex-wrap gap-3">
-                        <Link
-                            href="/"
-                            className="inline-flex items-center justify-center rounded border px-4 py-2 text-sm hover:bg-muted"
-                        >
+                <div className={styles.card}>
+                    <h2 className={styles.cardTitle}>Aðgerðir</h2>
+
+                    <div className={styles.actions}>
+                        <Link href="/" className={styles.btn}>
                             Fara á forsíðu
                         </Link>
-                        <a
-                            href="/auth/logout"
-                            className="inline-flex items-center justify-center rounded border px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        >
+
+                        <a href="/auth/logout" className={`${styles.btn} ${styles.btnDanger}`}>
                             Skrá út
                         </a>
+
                         {user.email === "halldor@svanir.is" && (
                             <a
                                 href="/emails.txt"
                                 download="emails.txt"
-                                className="inline-flex items-center justify-center rounded border px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                                className={`${styles.btn} ${styles.btnInfo}`}
                             >
                                 Sækja emails.txt
                             </a>
@@ -103,25 +86,28 @@ export default async function DashboardPage() {
 }
 
 function Avatar({ src, alt }: { src?: string; alt: string }) {
-    // Fixed size, rounded, graceful fallback
     const size = 56;
+
     if (!src) {
         return (
             <div
-                className="rounded-full bg-muted"
+                className={styles.avatarFallback}
                 style={{ width: size, height: size }}
                 aria-label="Engin mynd"
             />
         );
     }
+
     return (
-        <Image
-            src={src}
-            alt={alt}
-            width={size}
-            height={size}
-            className="rounded-full object-cover"
-            referrerPolicy="no-referrer"
-        />
+        <div className={styles.avatar} aria-label="Notendamynd">
+            <Image
+                src={src}
+                alt={alt}
+                width={size}
+                height={size}
+                className={styles.avatarImg}
+                referrerPolicy="no-referrer"
+            />
+        </div>
     );
 }
