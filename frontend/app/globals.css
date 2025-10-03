@@ -39,7 +39,7 @@
   /* #333333 */
 
   /* Accents (Scout Patrols) */
-  --accent-dreka: 51 100% 68%;
+  --accent-dreka: 51 100% 58%;
   /* #FFE75C  Yellow */
   --accent-falka: 347 79% 57%;
   /* #E93860 */
@@ -68,6 +68,55 @@
   color-scheme: light;
 }
 
+/* Dark theme tokens */
+:root.dark {
+  /* Surfaces */
+  --background: 24 28% 11%;
+  /* deep bark-like base */
+  --foreground: 36 41% 92%;
+  /* birch-tinted text on dark */
+  --muted: 205 35% 18%;
+  /* dimmed sky-mist for cards */
+  --border: 24 25% 32%;
+  /* warm outline on dark */
+
+  /* Brand / actions - keep hues, nudge lightness for contrast */
+  --primary: 92 39% 33%;
+  /* Moss, a touch brighter on dark */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 154 43% 22%;
+  /* Pine, lifted for contrast */
+  --secondary-foreground: 0 0% 100%;
+
+  /* Semantic */
+  --success: 92 39% 33%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 35 100% 64%;
+  --warning-foreground: 36 41% 10%;
+  /* dark text on warm warning */
+
+  --error: 0 79% 62%;
+  --error-foreground: 0 0% 100%;
+
+  --info: 195 83% 64%;
+  --info-foreground: 36 41% 10%;
+
+  /* Patrol accents stay brand-correct, foreground stays white for badges */
+  --accent-dreka: 51 100% 58%;
+  --accent-falka: 347 79% 57%;
+  --accent-drott: 168 74% 41%;
+  --accent-rekka: 195 83% 66%;
+  --accent-rover: 33 100% 62%;
+  --accent-adrir: 275 100% 66%;
+
+  /* Text helpers */
+  --text-strong: 36 41% 96%;
+  --text-muted: 24 20% 70%;
+
+  color-scheme: dark;
+}
 /* ── Minimal base (Tailwind-first, no leaks) ─────────────────────────────── */
 @layer base {
   html {

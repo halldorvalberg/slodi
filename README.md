@@ -66,13 +66,23 @@ Við munum nota Docker fyrir uppsetningu og hýsa þetta á Azure.
 
 **Kynning á verkefni:** janúar 2026 á viðburðinum Neista.
 
-**Kynning á lágmarksafurð:** mars 2026 á Skátaþingi. Fyrsta endurnýjun vinnuhópa fer fram.
+- Smiðja um dagskrárgerð og safna endurgjöf frá foringjum.
 
-**Kynning á verkefni:** ágúst 2026 á Kveikju. Önnur endurnýjun vinnuhópa fer fram.
+**Kynning og útgáfa á lágmarksafurð:** mars 2026 á Skátaþingi.
 
-**Útgáfa lágmarksafurðar:** apríl 2026 á Skátaþingi.
+- Markmiðið er að kynna lágmarksafurðina fyrir sjálfboðaliðum skátahreyfingarinnar.
+
+- Vinnuópar endurnýjaðir.
+
+**Kynning á verkefni:** ágúst 2026 á Kveikju.
+
+- Kynna verkfærið fyrir stjórnum og foringjum félagas.
+
+- Vinnuópar endurnýjaðir.
 
 **Opinber útgáfa:** apríl 2027.
+
+- Vinnuhópar ljúka störfum.
 
 ## Framlög
 
@@ -97,8 +107,6 @@ Slóði er þróaður fyrir og með skátasamfélaginu.
 ## Vefsíða verkefnisins
 
 Þú getur fylgst með verkefninu og nálgast vefsíðuna á:
-
-- [https://www.slodi.is](https://www.slodi.is)
 
 - [https://www.slóði.is](https://www.slóði.is)
 

@@ -1,16 +1,6 @@
-/* Footer.module.css */
-
-:root {
-  --color-background: hsl(36, 41%, 83%); /* Birch */
-  --color-foreground: hsl(0, 0%, 20%); /* Charcoal */
-  --font-sans: "Roboto Condensed", ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", "Helvetica Neue", Arial, "Noto Sans",
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-}
-
 .footer {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+  background-color: var(--background);
+    color: var(--foreground);
   padding: 1rem;
   margin-top: auto;
   -webkit-font-smoothing: antialiased;
