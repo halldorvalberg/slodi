@@ -27,10 +27,10 @@ export default function Home() {
         setMessage("Takk fyrir að skrá þig á póstlistann!");
         setEmail("");
       } else {
-        setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
+        setMessage("Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró.");
       }
     } catch {
-      setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
+      setMessage("Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró.");
     }
   };
 
