@@ -1,0 +1,142 @@
+/* Page shell */
+.page {
+    font-family: var(--font-sans);
+    position: relative;
+    min-height: 85vh;
+    max-height: 85vh;
+    /* matches your original */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+}
+
+/* Hero */
+.hero {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30vh;
+    max-height: 35vh;
+    margin-top: 2rem;
+    z-index: 10;
+}
+
+.heroInner {
+    text-align: center;
+    width: 80%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+}
+
+@media (min-width: 640px) {
+    .heroInner {
+        width: 60%;
+    }
+}
+
+.title {
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    letter-spacing: 0.02em;
+    margin: 0;
+    color: hsl(var(--text-strong));
+}
+
+.subtitle {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    text-align: justify;
+    color: hsl(var(--foreground));
+}
+
+/* Signup section */
+.signup {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 30vh;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+}
+
+.form {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media (min-width: 640px) {
+    .form {
+        width: 50%;
+    }
+}
+
+.formLead {
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    text-align: center;
+}
+
+/* Input + button combo */
+.inputWrap {
+    position: relative;
+    width: 100%;
+}
+
+.input {
+    width: 100%;
+    padding: 0.6rem 3rem 0.6rem 0.75rem;
+    /* space for the button on the right */
+    border: 1px solid hsl(var(--border) / 0.35);
+    border-radius: 0.5rem;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font: inherit;
+}
+
+.input::placeholder {
+    color: hsl(var(--text-muted));
+}
+
+.input:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--primary));
+}
+
+/* Submit button sits inside the input wrap */
+.submit {
+    position: absolute;
+    inset-block: 0;
+    /* top and bottom = 0 */
+    right: 0;
+    padding: 0 0.9rem;
+    border: 1px solid hsl(var(--primary));
+    border-left: none;
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: transparent;
+    color: hsl(var(--primary));
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.submit:hover {
+    background: hsl(var(--primary) / 0.08);
+}
+
+.submit:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--primary));
+}
+
+.message {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: hsl(var(--secondary));
+}
