@@ -1,6 +1,5 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { auth0 } from "@/lib/auth0";
 import styles from "./dashboard.module.css";
