@@ -36,13 +36,15 @@ export default function Button({
         .join(" ");
 
     return (
-        <Comp
-            {...(as === "a" ? { href } : { type: rest.type ?? "button" })}
-            {...rest}
-            className={classes}
-        >
-            {children}
-        </Comp>
+        as === "a" ? (
+            <a href={href} {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)} className={classes}>
+                {children}
+            </a>
+        ) : (
+            <button {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)} type={rest.type ?? "button"} className={classes}>
+                {children}
+            </button>
+        )
     );
 }
 
