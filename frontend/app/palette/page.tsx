@@ -43,7 +43,7 @@ const Swatch: React.FC<{ name: string; bgToken: string; note?: string }> = ({ na
                 id={id}
                 className={styles.swatchBlock}
                 style={{ background: `hsl(var(${bgToken}))` }}
-                aria-label={`${name} swatch`}
+                aria-label={`${name} litasýni`}
             />
             <div className={styles.swatchMeta}>
                 <div className={styles.swatchRow}>
@@ -108,39 +108,39 @@ const ToggleDark: React.FC = () => {
     };
     return (
         <button onClick={toggle} className={cx(styles.btn, styles.btnOutline)}>
-            {isDark ? "Switch to Light" : "Switch to Dark"}
+            {isDark ? "Skipta í ljóst" : "Skipta í dökkt"}
         </button>
     );
 };
 
 export default function PalettePage() {
     const forest = [
-        { name: "Moss", token: "--primary" }, // maps to your Moss
-        { name: "Pine", token: "--secondary" }, // Pine as secondary
-        { name: "Bark", token: "--border" },
-        { name: "Birch", token: "--background" },
-        { name: "Charcoal", token: "--foreground" },
+        { name: "Mosi", token: "--primary" },
+        { name: "Fura", token: "--secondary" },
+        { name: "Börkur", token: "--border" },
+        { name: "Birki", token: "--background" },
+        { name: "Kol", token: "--foreground" },
     ];
 
     const playful = [
-        { name: "Sky Mist", token: "--muted" },
-        { name: "Campfire", token: "--warning" },
-        { name: "Mint", token: "--info" }, // repurposed to show another playful hue
+        { name: "Skýmóða", token: "--muted" },
+        { name: "Bál", token: "--warning" },
+        { name: "Mynta", token: "--info" },
     ];
 
     const scouts = [
-        { name: "Dreka", token: "--accent-dreka", note: "Patrol accent" },
-        { name: "Fálka", token: "--accent-falka", note: "Patrol accent" },
-        { name: "Drótt", token: "--accent-drott", note: "Patrol accent" },
-        { name: "Rekka", token: "--accent-rekka", note: "Patrol accent" },
-        { name: "Róver", token: "--accent-rover", note: "Patrol accent" },
-        { name: "Adrir", token: "--accent-adrir", note: "Patrol accent" },
+        { name: "Drekar", token: "--accent-dreka", note: "Sveitarlitur" },
+        { name: "Fálkar", token: "--accent-falka", note: "Sveitarlitur" },
+        { name: "Drótt", token: "--accent-drott", note: "Sveitarlitur" },
+        { name: "Rekkar", token: "--accent-rekka", note: "Sveitarlitur" },
+        { name: "Róver", token: "--accent-rover", note: "Sveitarlitur" },
+        { name: "Aðrir", token: "--accent-adrir", note: "Sveitarlitur" },
     ];
 
     const systemRoles = [
-        { title: "Background", bg: "--background", fg: "--foreground" },
-        { title: "Primary", bg: "--primary", fg: "--primary-foreground" },
-        { title: "Secondary", bg: "--secondary", fg: "--secondary-foreground" },
+        { title: "Bakgrunnur", bg: "--background", fg: "--foreground" },
+        { title: "Aðallitur", bg: "--primary", fg: "--primary-foreground" },
+        { title: "Aukalitur", bg: "--secondary", fg: "--secondary-foreground" },
     ];
 
     const comboBackgrounds = ["--background", "--background", "--muted", "--primary", "--secondary", "--border", "--foreground"];
@@ -150,7 +150,7 @@ export default function PalettePage() {
         <div className={styles.page}>
             <header className={styles.header}>
                 <div className={styles.headerInner}>
-                    <h1 className={styles.pageTitle}>Palette Showcase</h1>
+                    <h1 className={styles.pageTitle}>Litir og samsetningar</h1>
                     <div className={styles.headerActions}>
                         <ToggleDark />
                     </div>
@@ -158,7 +158,7 @@ export default function PalettePage() {
             </header>
 
             <main className={styles.main}>
-                <Section title="System Roles" subtitle="Base surfaces and action colors derived from forest palette">
+                <Section title="Kerfislitir" subtitle="Grunnyfirborð og aðgerðarlitir út frá skógarpallettu">
                     <div className={styles.grid3}>
                         {systemRoles.map((r) => (
                             <Card key={r.title}>
@@ -172,20 +172,20 @@ export default function PalettePage() {
                                     <div className={styles.roleLabel}>{r.title}</div>
                                     <div className={styles.roleGlyph}>Aa</div>
                                     <div className={styles.roleButtons}>
-                                        <UIButton variant="primary">Primary</UIButton>
-                                        <UIButton variant="secondary">Secondary</UIButton>
-                                        <UIButton variant="outline">Outline</UIButton>
+                                        <UIButton variant="primary">Aðgerð</UIButton>
+                                        <UIButton variant="secondary">Aukaaðgerð</UIButton>
+                                        <UIButton variant="outline">Útlína</UIButton>
                                     </div>
                                 </div>
                                 <div className={styles.roleBody}>
-                                    <p className={styles.muted}>Use for {r.title.toLowerCase()} surfaces and components.</p>
+                                    <p className={styles.muted}>Nota fyrir {r.title.toLowerCase()} yfirborð og íhluti.</p>
                                 </div>
                             </Card>
                         ))}
                     </div>
                 </Section>
 
-                <Section title="Forest Neutrals">
+                <Section title="Skógarhlutlausir" subtitle="Nota fyrir bakgrunn, kort, töflur og aðra hlutlausa flöt">
                     <div className={styles.grid5}>
                         {forest.map((c) => (
                             <Swatch key={c.name} name={c.name} bgToken={c.token} />
@@ -193,7 +193,7 @@ export default function PalettePage() {
                     </div>
                 </Section>
 
-                <Section title="Playful Neutrals">
+                <Section title="Skemmtilegir litir" subtitle="Nota fyrir ábendingar, tilkynningar og áherslur">
                     <div className={styles.grid6}>
                         {playful.map((c) => (
                             <Swatch key={c.name} name={c.name} bgToken={c.token} />
@@ -201,7 +201,7 @@ export default function PalettePage() {
                     </div>
                 </Section>
 
-                <Section title="Scout Patrol Accents" subtitle="Use for teams, badges, status ribbons, and gamified UI">
+                <Section title="Skátasveitarlitir" subtitle="Notað til að greina sveitir út frá litum þeirra. Byggir á litastaðli Bandalagsins">
                     <div className={styles.grid6}>
                         {scouts.map((c) => (
                             <Swatch key={c.name} name={c.name} bgToken={c.token} note={c.note} />
@@ -209,16 +209,16 @@ export default function PalettePage() {
                     </div>
                 </Section>
 
-                <Section title="Semantic Banners">
+                <Section title="Túlkun skilaboða">
                     <div className={styles.grid2}>
-                        <UIBanner tone="success" title="Success" body="Action completed successfully." />
-                        <UIBanner tone="warning" title="Warning" body="Heads up: check this before proceeding." />
-                        <UIBanner tone="error" title="Error" body="Something went wrong. Please retry." />
-                        <UIBanner tone="info" title="Info" body="This is additional context for users." />
+                        <UIBanner tone="success" title="Tókst" body="Aðgerð kláraðist án vandræða." />
+                        <UIBanner tone="warning" title="Aðvörun" body="Athugaðu þetta áður en þú heldur áfram." />
+                        <UIBanner tone="error" title="Villa" body="Eitthvað fór úrskeiðis. Reyndu aftur." />
+                        <UIBanner tone="info" title="Upplýsingar" body="Hér eru viðbótarupplýsingar fyrir notendur." />
                     </div>
                 </Section>
 
-                <Section title="Combinations Matrix" subtitle="Common background and text pairings to inspect readability">
+                <Section title="Samsetningar" subtitle="Algengar samsetningar bakgrunns og texta til að meta læsileika">
                     <div className={styles.grid2}>
                         {comboBackgrounds.map((bg, i) => (
                             <Card key={i}>
@@ -233,20 +233,22 @@ export default function PalettePage() {
                                                 <div className={styles.comboLabel}>
                                                     {bg.replace("--", "")} / {txt.replace("--", "")}
                                                 </div>
-                                                <p className={styles.comboSample}>Sphinx of black quartz, judge my vow.</p>
+                                                <p className={styles.comboSample}>Kæmi ný öxi hér, ykist þjófum nú bæði víl og ádrepa.</p>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <div className={styles.cardNote}>Background: {bg}</div>
+                                <div className={styles.cardNote}>Bakgrunnur: {bg}</div>
                             </Card>
                         ))}
                     </div>
                 </Section>
 
-                <Section title="Patrol on Neutrals" subtitle="How accents behave on neutral surfaces">
+
+
+                <Section title="Sveitarlitir á aðallitum" subtitle="Hvernig sveitalitir hegða sér á aðallitum">
                     <div className={styles.grid2}>
-                        {["--background", "--muted", "--background"].map((bg) => (
+                        {["--primary", "--secondary", "--background", "--muted"].map((bg) => (
                             <Card key={bg}>
                                 <div className={styles.patrolHead} style={{ background: `hsl(var(${bg}))` }}>
                                     <div className={styles.patrolGrid}>
@@ -260,20 +262,22 @@ export default function PalettePage() {
                                                 }}
                                             >
                                                 <div className={styles.patrolName}>{s.name}</div>
-                                                <p className={styles.patrolDesc}>Badge or CTA or Tag</p>
+                                                <p className={styles.patrolDesc}>Merki eða aðgerðahnappur</p>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <div className={styles.cardNote}>Background: {bg}</div>
+                                <div className={styles.cardNote}>Bakgrunnur: {bg.replace("--", "")}</div>
                             </Card>
                         ))}
                     </div>
                 </Section>
             </main>
 
+
+
             <footer className={styles.footer}>
-                Built with tokenized HSL variables. Toggle dark mode to preview both themes.
+                Byggt á litaspilsbreytum í HSL. Prófaðu myrkan ham til að skoða bæði þemu.
             </footer>
         </div>
     );
