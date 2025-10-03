@@ -1,7 +1,9 @@
+import styles from "./Footer.module.css";
+
 export default function Footer() {
   return (
-    <footer className="bg-[var(--color-background)] text-[var(--color-foreground)] p-4 mt-auto antialiased">
-      <p className="text-center text-sm font-[var(--font-sans)]">
+    <footer className={styles.footer}>
+      <p>
         &copy; 2025 Slóði. All rights reserved.
       </p>
     </footer>
