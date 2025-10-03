@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { auth0 } from "@/lib/auth0";
 import styles from "./dashboard.module.css";
+import Button from "@/components/Button/Button";
 
 // Prevent caching of sensitive content
 export const dynamic = "force-dynamic";
@@ -61,23 +62,14 @@ export default async function DashboardPage() {
                     <h2 className={styles.cardTitle}>Aðgerðir</h2>
 
                     <div className={styles.actions}>
-                        <Link href="/" className={styles.btn}>
+
+                        <Button href="/" variant="secondary">
                             Fara á forsíðu
-                        </Link>
+                        </Button>
 
-                        <a href="/auth/logout" className={`${styles.btn} ${styles.btnDanger}`}>
+                        <Button as="a" href="/auth/logout" variant="danger">
                             Skrá út
-                        </a>
-
-                        {user.email === "halldor@svanir.is" && (
-                            <a
-                                href="/emails.txt"
-                                download="emails.txt"
-                                className={`${styles.btn} ${styles.btnInfo}`}
-                            >
-                                Sækja emails.txt
-                            </a>
-                        )}
+                        </Button>
                     </div>
                 </div>
             </section>
