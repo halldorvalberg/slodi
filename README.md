@@ -48,7 +48,7 @@ Möguleiki á að deila dagskrám og viðfangsefnum með öðrum foringjum, flok
 
 Ítarleg leitarverkfæri með töggum og síum sem gerir foringjum kleift að finna viðfangsefni eftir aldurshópi, erfiðleikastigi, staðsetningu, búnað eða þema.
 
-### Greiningartæki fyrir dagskrá
+### Greiningartæki fyrir dagskrá (fyrirhugað)
 
 Verkfæri til að fara yfir liðna viðburði og greina fjölbreytni dagskrár. Hjálpar foringjum að tryggja að skátar fái jafna blöndu af viðfangsefnum, svo sem eftir ÆSKA og þroskasviðum.
 
@@ -64,9 +64,15 @@ Við munum nota Docker fyrir uppsetningu og hýsa þetta á Azure.
 
 ## Tímalína
 
-**Útgáfa lágmarksafurðar:** apríl 2026
+**Kynning á verkefni:** janúar 2026 á viðburðinum Neista.
 
-**Opinber útgáfa:** apríl 2027
+**Kynning á lágmarksafurð:** mars 2026 á Skátaþingi. Fyrsta endurnýjun vinnuhópa fer fram.
+
+**Kynning á verkefni:** ágúst 2026 á Kveikju. Önnur endurnýjun vinnuhópa fer fram.
+
+**Útgáfa lágmarksafurðar:** apríl 2026 á Skátaþingi.
+
+**Opinber útgáfa:** apríl 2027.
 
 ## Framlög
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./page.module.css";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!emailRegex.test(email)) {
       setMessage("Vinsamlegast sláðu inn gilt netfang.");
       return;
@@ -17,9 +19,7 @@ export default function Home() {
     try {
       const response = await fetch("/api/save-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
@@ -29,18 +29,18 @@ export default function Home() {
       } else {
         setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
       }
-    } catch (error) {
+    } catch {
       setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
     }
   };
 
   return (
-    <div className="font-sans flex flex-col overflow-hidden relative min-h-[85vh] max-h-[85vh]">
-      <div className="flex-grow flex items-center justify-center min-h-[30vh] mt-8 z-10 max-h-[35vh]">
-        <div className="text-center w-4/5 sm:w-3/5 flex items-center justify-center h-full">
+    <div className={styles.page}>
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
           <div>
-            <h1 className="text-6xl font-bold uppercase">Slóði</h1>
-            <p className="text-sm text-justify mt-4">
+            <h1 className={styles.title}>Slóði</h1>
+            <p className={styles.subtitle}>
               Markmið Slóða er að styðja við foringja í skátastarfi með því að gera
               dagskrárgerð einfaldari, markvissari og skipulagðari. Með því að safna
               saman dagskrárhugmyndum, bjóða upp á verkfæri til að setja saman
@@ -49,48 +49,41 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </div>
-      <div className="flex-grow flex items-center justify-center bg-background text-text max-h-[30vh]">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center w-4/5 sm:w-1/2"
-          aria-label="Email subscription form"
-        >
-          <p
-            className="text-lg mb-4 text-center"
-            aria-live="polite"
-          >
+      </section>
+
+      <section className={styles.signup}>
+        <form onSubmit={handleSubmit} className={styles.form} aria-label="Email subscription form">
+          <p className={styles.formLead} aria-live="polite">
             Skráðu þig á póstlista til að fá nýjustu upplýsingar um verkefnið
           </p>
-          <div className="relative w-full">
+
+          <div className={styles.inputWrap}>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Netfang"
-              className="border border-text rounded p-2 w-full pr-12 bg-background text-text"
+              className={styles.input}
               required
               aria-label="Email address"
             />
             <button
               type="submit"
-              className="absolute inset-y-0 right-0 flex items-center px-4 border border-primary text-primary bg-transparent rounded-r hover:cursor-pointer"
+              className={styles.submit}
               title="Submit"
               aria-label="Submit email"
             >
               Skrá mig
             </button>
           </div>
+
           {message && (
-            <p
-              className="mt-4 text-sm text-secondary"
-              aria-live="assertive"
-            >
+            <p className={styles.message} aria-live="assertive">
               {message}
             </p>
           )}
         </form>
-      </div>
+      </section>
     </div>
   );
 }
