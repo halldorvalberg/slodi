@@ -1,0 +1,51 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic-settings>=2.11.0",
+    "sqlalchemy>=2.0.25",
+    "pydantic[email]>=2.4",
+    "psycopg[binary]>=3.2.10",
+    "fastapi>=0.117.1",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=0.23",
+    "alembic>=1.13",
+    "uvicorn[standard]>=0.37.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "sqlalchemy[mypy]>=2.0.25",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+  "ignore::DeprecationWarning:pydantic.*:",
+  "ignore::DeprecationWarning:sqlalchemy.*:",
+]
+
+[tool.ruff]
+line-length = 100
+lint.select = ["E","F","I","UP","B","SIM","PGH"]
+lint.ignore = ["E501"]
+target-version = "py310"
+exclude = [
+    "alembic/versions/*",
+    "__pycache__",
+    "*.pyc",
+    ".venv/*"
+]
+
+[tool.mypy]
+python_version = "3.10"
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+no_implicit_optional = true
