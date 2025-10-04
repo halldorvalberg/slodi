@@ -16,10 +16,9 @@ The frontend is responsible for delivering a modern, responsive, and user-friend
 
 - **Framework:** Next.js (React)
 - **Language:** TypeScript
-- **Styling:** Tailwind CSS (planned)
-- **State Management:** React Query / Context API (TBD)
+- **Styling:** CSS
 - **Testing:** Jest + React Testing Library
-- **Deployment:** Docker & Azure
+- **Deployment:** Vercel
 
 ## Getting Started
 
