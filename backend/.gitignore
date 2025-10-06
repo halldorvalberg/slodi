@@ -1,0 +1,7 @@
+.mypy_cache/
+.venv/
+__pycache__/
+uv.lock
+.pytest_cache/
+.ruff_cache/
+TODO.md
