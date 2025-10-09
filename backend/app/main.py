@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.logging import configure_logging
 from app.routers import (
@@ -20,6 +21,15 @@ from app.routers import (
 def create_app() -> FastAPI:
     configure_logging()
     app = FastAPI(title="Backend API")
+
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000"],  # Frontend origin
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     app.include_router(users_router.router)
     app.include_router(groups_router.router)
