@@ -4,6 +4,5 @@ from .event import EventCreate  # noqa: F401
 from .program import ProgramCreate  # noqa: F401
 from .tag import TagCreate  # noqa: F401
 from .task import TaskCreate  # noqa: F401
-from .troop import TroopCreate, TroopParticipationCreate  # noqa: F401
 from .user import UserCreate  # noqa: F401
 from .workspace import WorkspaceCreate  # noqa: F401
