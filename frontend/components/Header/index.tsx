@@ -1,75 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useCallback } from "react";
-import { useUser } from "@auth0/nextjs-auth0";
-import styles from "./header.module.css";
+import { auth0 } from "@/lib/auth0";
+import AccountButton from "@/components/AccountButton";
+import MobileNav from "@/components/MobileNav";
 
-export default function Header() {
-  const { user } = useUser();
+type LeanUser = { name: string; picture: string | null; email: string | null } | null;
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const toggleDrawer = useCallback(() => {
-    setDrawerOpen((prev) => !prev);
-  }, []);
-
-  const closeDrawer = useCallback(() => {
-    setDrawerOpen(false);
-  }, []);
+export default async function Header() {
+  const session = await auth0.getSession();
+  const user: LeanUser = session?.user
+    ? {
+      name: session.user.name ?? session.user.nickname ?? "Account",
+      picture: session.user.picture ?? null,
+      email: session.user.email ?? null,
+    }
+    : null;
 
   return (
-    <header className={styles.header}>
-      <div className={styles.container}>
-        <Link href="/" className={styles.logo}>
-          Slóði
-        </Link>
-        <div className={styles.desktopNav}>
-          <nav className={styles.nav}>
-            <Link href="/" className={styles.navLink}>
-              Heim
-            </Link>
-            <Link href="/about" className={styles.navLink}>
-              Um Slóða
-            </Link>
-            <Link
-              href="https://github.com/halldorvalberg/slodi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.navLink}
-            >
-              Github
-            </Link>
-            {user ? (
-              <Link href="/dashboard" className={styles.navLink}>
-                Stjórnborð
-              </Link>
-            ) : (
-              <Link href="/auth/login" className={styles.navLink}>
-                Innskráning
-              </Link>
-            )}
-          </nav>
-        </div>
-
-        <button
-          className={styles.hamburger}
-          onClick={toggleDrawer}
-          aria-label={drawerOpen ? "Close menu" : "Open menu"}
-          aria-expanded={drawerOpen}
-          aria-controls="menu-drawer"
-        >
-          {drawerOpen ? "✕" : "☰"}
-        </button>
-      </div>
-
-      {drawerOpen && (
-        <div
-          className={styles.overlay}
-          onClick={closeDrawer}
-          aria-hidden="true"
-        />
-      )}
+    <header className="sticky top-0 z-50 bg-[var(--color-background)] text-[var(--color-foreground)] border-b font-sans">
+      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
+        <Link href="/" className="font-medium">Slóði</Link>
 
       <aside
         id="menu-drawer"
