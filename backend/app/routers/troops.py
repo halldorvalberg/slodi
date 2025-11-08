@@ -3,69 +3,84 @@ from __future__ import annotations
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
+from app.core.pagination import Limit, Offset, add_pagination_headers
 from app.schemas.troop import (
     TroopCreate,
     TroopOut,
-    TroopParticipationCreate,
     TroopParticipationOut,
     TroopUpdate,
 )
 from app.services.troops import TroopService
 
-router = APIRouter(prefix="/troops", tags=["troops"])
+router = APIRouter(tags=["troops"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
-DEFAULT_LIMIT = Query(50, ge=1, le=200)
-DEFAULT_OFFSET = Query(0, ge=0)
 
 # ----- troops (workspace-scoped collection) -----
 
 
-@router.get("/workspaces/{workspace_id}", response_model=list[TroopOut])
-async def list_troops_for_workspace(
+@router.get("/workspaces/{workspace_id}/troops", response_model=list[TroopOut])
+async def list_workspace_troops(
     session: SessionDep,
+    request: Request,
+    response: Response,
     workspace_id: UUID,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = TroopService(session)
-    return await svc.list_for_workspace(workspace_id, limit=limit, offset=offset)
+    total = await svc.count_troops_for_workspace(workspace_id)
+    items = await svc.list_for_workspace(workspace_id, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
 @router.post(
-    "/workspaces/{workspace_id}",
+    "/workspaces/{workspace_id}/troops",
     response_model=TroopOut,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_troop_under_workspace(
+async def create_workspace_troop(
     session: SessionDep,
     workspace_id: UUID,
     body: TroopCreate,
+    response: Response,
 ):
     svc = TroopService(session)
-    return await svc.create_under_workspace(workspace_id, body)
+    troop = await svc.create_under_workspace(workspace_id, body)
+    response.headers["Location"] = f"/troops/{troop.id}"
+    return troop
 
 
 # ----- troop item -----
 
 
-@router.get("/{troop_id}", response_model=TroopOut)
+@router.get("/troops/{troop_id}", response_model=TroopOut)
 async def get_troop(session: SessionDep, troop_id: UUID):
     svc = TroopService(session)
     return await svc.get(troop_id)
 
 
-@router.patch("/{troop_id}", response_model=TroopOut)
+@router.patch("/troops/{troop_id}", response_model=TroopOut)
 async def update_troop(session: SessionDep, troop_id: UUID, body: TroopUpdate):
     svc = TroopService(session)
     return await svc.update(troop_id, body)
 
 
-@router.delete("/{troop_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/troops/{troop_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_troop(session: SessionDep, troop_id: UUID):
     svc = TroopService(session)
     await svc.delete(troop_id)
@@ -75,47 +90,77 @@ async def delete_troop(session: SessionDep, troop_id: UUID):
 # ----- participations -----
 
 
-@router.get("/events/{event_id}/participants", response_model=list[TroopOut])
-async def list_troops_participating_in_event(
+@router.get("/events/{event_id}/troops", response_model=list[TroopOut])
+async def list_event_troops(
     session: SessionDep,
+    request: Request,
+    response: Response,
     event_id: UUID,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = TroopService(session)
-    return await svc.list_troops_for_event(event_id, limit=limit, offset=offset)
+    total = await svc.count_event_troops(event_id)
+    items = await svc.list_event_troops(event_id, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
-@router.get("/{troop_id}/events", response_model=list[UUID])
-async def list_events_for_troop(
+@router.get("/troops/{troop_id}/events", response_model=list[UUID])
+async def list_troop_events(
     session: SessionDep,
+    request: Request,
+    response: Response,
     troop_id: UUID,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = TroopService(session)
-    return await svc.list_events_for_troop(troop_id, limit=limit, offset=offset)
+    total = await svc.count_troop_events(troop_id)
+    items = await svc.list_troop_events(troop_id, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
-@router.post(
-    "/participation",
+@router.put(
+    "/events/{event_id}/troops/{troop_id}",
     response_model=TroopParticipationOut,
     status_code=status.HTTP_201_CREATED,
 )
-async def add_troop_participation(
+async def add_participation(
     session: SessionDep,
-    body: TroopParticipationCreate,
-):
-    svc = TroopService(session)
-    return await svc.add_participation(body)
-
-
-@router.delete("/{troop_id}/events/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_troop_participation(
-    session: SessionDep,
-    troop_id: UUID,
     event_id: UUID,
+    troop_id: UUID,
+    response: Response,
 ):
     svc = TroopService(session)
-    await svc.remove_participation(troop_id, event_id)
+    created, participation = await svc.add_participation(event_id, troop_id)
+    if not created:
+        response.status_code = status.HTTP_200_OK
+    response.headers["Location"] = f"/events/{event_id}/troops/{troop_id}"
+    return participation
+
+
+@router.delete(
+    "/events/{event_id}/troops/{troop_id}", status_code=status.HTTP_204_NO_CONTENT
+)
+async def remove_participation(
+    session: SessionDep,
+    event_id: UUID,
+    troop_id: UUID,
+):
+    svc = TroopService(session)
+    await svc.remove_participation(event_id, troop_id)
     return None

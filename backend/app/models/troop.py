@@ -63,6 +63,3 @@ class TroopParticipation(Base):
     # Relationships
     troop: Mapped[Troop] = relationship(back_populates="troop_participations")
     event: Mapped[Event] = relationship(back_populates="troop_participations")
-
-
-# and in Troop similarly for troop_id

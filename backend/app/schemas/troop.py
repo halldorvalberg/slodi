@@ -22,8 +22,9 @@ class TroopBase(BaseModel):
     workspace_id: UUID
 
 
-class TroopCreate(TroopBase):
-    pass
+class TroopCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    name: NameStr
 
 
 class TroopUpdate(BaseModel):
@@ -43,10 +44,6 @@ class TroopOut(TroopBase):
 class TroopParticipationBase(BaseModel):
     troop_id: UUID
     event_id: UUID
-
-
-class TroopParticipationCreate(TroopParticipationBase):
-    pass
 
 
 class TroopParticipationOut(TroopParticipationBase):
