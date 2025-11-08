@@ -61,13 +61,9 @@ class GroupRepository(Repository):
         )
         return await self.scalars(stmt)
 
-    async def get_membership(
-        self, group_id: UUID, user_id: UUID
-    ) -> GroupMembership | None:
+    async def get_membership(self, group_id: UUID, user_id: UUID) -> GroupMembership | None:
         stmt = select(GroupMembership).where(
-            and_(
-                GroupMembership.group_id == group_id, GroupMembership.user_id == user_id
-            )
+            and_(GroupMembership.group_id == group_id, GroupMembership.user_id == user_id)
         )
         res = await self.session.execute(stmt)
         return res.scalars().first()

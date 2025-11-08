@@ -31,17 +31,13 @@ class CommentService:
     async def get(self, comment_id: UUID) -> CommentOut:
         row = await self.repo.get(comment_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
         return CommentOut.model_validate(row)
 
     async def update(self, comment_id: UUID, data: CommentUpdate) -> CommentOut:
         row = await self.repo.get(comment_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
 
         # Only body is updatable per schema
         patch = data.model_dump(exclude_unset=True)
@@ -55,7 +51,5 @@ class CommentService:
     async def delete(self, comment_id: UUID) -> None:
         deleted = await self.repo.delete(comment_id)
         if not deleted:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
         await self.session.commit()

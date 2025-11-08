@@ -24,27 +24,21 @@ class TagService:
 
     # ----- tags -----
 
-    async def list(
-        self, *, q: str | None, limit: int = 50, offset: int = 0
-    ) -> list[TagOut]:
+    async def list(self, *, q: str | None, limit: int = 50, offset: int = 0) -> list[TagOut]:
         rows = await self.repo.list(q=q, limit=limit, offset=offset)
         return [TagOut.model_validate(r) for r in rows]
 
     async def get(self, tag_id: UUID) -> TagOut:
         row = await self.repo.get(tag_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
         return TagOut.model_validate(row)
 
     async def create(self, data: TagCreate) -> TagOut:
         # Optional uniqueness check by name; if you add a DB UniqueConstraint, you can rely on IntegrityError instead
         existing = await self.repo.get_by_name(data.name)
         if existing:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Tag already exists"
-            )
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Tag already exists")
         tag = Tag(**data.model_dump())
         await self.repo.create(tag)
         await self.session.commit()
@@ -54,9 +48,7 @@ class TagService:
     async def update(self, tag_id: UUID, data: TagUpdate) -> TagOut:
         tag = await self.repo.get(tag_id)
         if not tag:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
         patch = data.model_dump(exclude_unset=True)
         for k, v in patch.items():
             setattr(tag, k, v)
@@ -74,9 +66,7 @@ class TagService:
     async def delete(self, tag_id: UUID) -> None:
         tag = await self.repo.get(tag_id)
         if not tag:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
         await self.repo.delete(tag_id)
         await self.session.commit()
 
@@ -85,9 +75,7 @@ class TagService:
     async def list_tags_for_content(
         self, content_id: UUID, *, limit: int = 100, offset: int = 0
     ) -> list[TagOut]:
-        rows = await self.repo.list_tags_for_content(
-            content_id, limit=limit, offset=offset
-        )
+        rows = await self.repo.list_tags_for_content(content_id, limit=limit, offset=offset)
         return [TagOut.model_validate(r) for r in rows]
 
     async def add_tag_to_content(self, data: ContentTagCreate) -> ContentTagOut:
@@ -115,6 +103,4 @@ class TagService:
     async def list_content_for_tag(
         self, tag_id: UUID, *, limit: int = 50, offset: int = 0
     ) -> list[UUID]:
-        return list(
-            await self.repo.list_content_for_tag(tag_id, limit=limit, offset=offset)
-        )
+        return list(await self.repo.list_content_for_tag(tag_id, limit=limit, offset=offset))

@@ -25,18 +25,14 @@ class GroupService:
 
     # ----- groups -----
 
-    async def list(
-        self, *, q: str | None, limit: int = 50, offset: int = 0
-    ) -> list[GroupOut]:
+    async def list(self, *, q: str | None, limit: int = 50, offset: int = 0) -> list[GroupOut]:
         rows = await self.repo.list(q=q, limit=limit, offset=offset)
         return [GroupOut.model_validate(r) for r in rows]
 
     async def get(self, group_id: UUID) -> GroupOut:
         row = await self.repo.get(group_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Group not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
         return GroupOut.model_validate(row)
 
     async def create(self, data: GroupCreate) -> GroupOut:
@@ -56,9 +52,7 @@ class GroupService:
     async def update(self, group_id: UUID, data: GroupUpdate) -> GroupOut:
         g = await self.repo.get(group_id)
         if not g:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Group not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
 
         patch = data.model_dump(exclude_unset=True)
         for k, v in patch.items():
@@ -78,9 +72,7 @@ class GroupService:
     async def delete(self, group_id: UUID) -> None:
         g = await self.repo.get(group_id)
         if not g:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Group not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
         await self.repo.delete(group_id)
         await self.session.commit()
 
@@ -91,15 +83,11 @@ class GroupService:
     ) -> list[GroupMembershipOut]:
         # ensure group exists for better UX
         if not await self.repo.get(group_id):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Group not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
         rows = await self.repo.list_members(group_id, limit=limit, offset=offset)
         return [GroupMembershipOut.model_validate(r) for r in rows]
 
-    async def add_member(
-        self, group_id: UUID, data: GroupMembershipCreate
-    ) -> GroupMembershipOut:
+    async def add_member(self, group_id: UUID, data: GroupMembershipCreate) -> GroupMembershipOut:
         if data.group_id != group_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -107,9 +95,7 @@ class GroupService:
             )
         # optional: check group exists
         if not await self.repo.get(group_id):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Group not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
 
         gm = GroupMembership(**data.model_dump())
         try:

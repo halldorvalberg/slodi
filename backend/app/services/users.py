@@ -70,7 +70,6 @@ class UserService:
     async def delete(self, user_id: UUID) -> None:
         row = await self.repo.get(user_id)
         if not row:
-            # 404 to be explicit
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )

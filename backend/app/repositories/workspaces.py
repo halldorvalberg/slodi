@@ -47,9 +47,7 @@ class WorkspaceRepository(Repository):
         self, user_id: UUID, ws: Workspace
     ) -> tuple[Workspace, WorkspaceMembership]:
         await self.add(ws)
-        membership = WorkspaceMembership(
-            user_id=user_id, workspace=ws, role=WorkspaceRole.owner
-        )
+        membership = WorkspaceMembership(user_id=user_id, workspace=ws, role=WorkspaceRole.owner)
         await self.add(membership)
         return ws, membership
 

@@ -48,7 +48,5 @@ class CommentRepository(Repository):
         return comment
 
     async def delete(self, comment_id: UUID) -> int:
-        res = await self.session.execute(
-            delete(Comment).where(Comment.id == comment_id)
-        )
+        res = await self.session.execute(delete(Comment).where(Comment.id == comment_id))
         return res.rowcount or 0

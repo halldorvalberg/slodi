@@ -37,25 +37,19 @@ class TaskService:
     async def get(self, task_id: UUID) -> TaskOut:
         row = await self.repo.get(task_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
         return TaskOut.model_validate(row)
 
     async def get_in_event(self, task_id: UUID, event_id: UUID) -> TaskOut:
         row = await self.repo.get_in_event(task_id, event_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
         return TaskOut.model_validate(row)
 
     async def update(self, task_id: UUID, data: TaskUpdate) -> TaskOut:
         row = await self.repo.get(task_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
         patch = data.model_dump(exclude_unset=True)
         for k, v in patch.items():
             setattr(row, k, v)
@@ -66,8 +60,6 @@ class TaskService:
     async def delete(self, task_id: UUID) -> None:
         row = await self.repo.get(task_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
         await self.repo.delete(task_id)
         await self.session.commit()
