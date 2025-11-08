@@ -41,6 +41,7 @@ def create_app() -> FastAPI:
     app.include_router(tasks_router.router)
     app.include_router(tags_router.router)
     app.include_router(comments_router.router)
+    app.include_router(email_list_router.router)
 
     @app.get("/healthz")
     async def healthz():
