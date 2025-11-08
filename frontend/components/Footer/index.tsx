@@ -1,3 +1,5 @@
+import styles from "./Footer.module.css";
+
 export default function Footer() {
   return (
     <footer className="bg-[var(--color-background)] text-[var(--color-foreground)] p-4 mt-auto antialiased font-sans">

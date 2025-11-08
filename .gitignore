@@ -140,3 +140,5 @@ vite.config.ts.timestamp-*
 
 # vscode workspace configuration
 .vscode/
+# npm package lock
+package-lock.json

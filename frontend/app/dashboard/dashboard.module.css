@@ -1,0 +1,172 @@
+.main {
+    max-width: 48rem;
+    /* ≈ max-w-3xl */
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    /* py-10 px-6 */
+    color: hsl(var(--foreground));
+    background: transparent;
+}
+
+.title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.875rem;
+    /* text-3xl */
+    line-height: 1.2;
+    font-weight: 600;
+    /* font-semibold */
+    color: hsl(var(--text-strong, var(--foreground)));
+}
+
+/* Section spacing */
+.section {
+    margin-top: 2rem;
+    /* mt-8 */
+}
+
+/* Card */
+.card {
+    border: 1px solid hsl(var(--border) / 0.35);
+    border-radius: 0.75rem;
+    /* rounded-xl */
+    padding: 1rem;
+    /* p-4 */
+    background: hsl(var(--background));
+}
+
+.card+.card {
+    margin-top: 1.5rem;
+    /* space-y-6 equivalent */
+}
+
+.cardTitle {
+    margin: 0;
+    font-size: 1.125rem;
+    /* text-lg */
+    font-weight: 500;
+    /* font-medium */
+    color: hsl(var(--text-strong, var(--foreground)));
+}
+
+/* Account row */
+.accountRow {
+    margin-top: 1rem;
+    /* mt-4 */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* gap-4 */
+}
+
+.accountName {
+    font-size: 1rem;
+    /* text-base */
+    font-weight: 500;
+    /* font-medium */
+    margin: 0;
+}
+
+.accountEmail {
+    font-size: 0.875rem;
+    /* text-sm */
+    color: hsl(var(--text-muted, var(--foreground)));
+    margin: 0.1rem 0 0 0;
+}
+
+/* Definition list grid stub kept for future fields */
+.dl {
+    margin-top: 1rem;
+    /* mt-4 */
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    /* gap-2 */
+}
+
+@media (min-width: 640px) {
+    .dl {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* sm:grid-cols-2 */
+    }
+}
+
+/* Actions */
+.actions {
+    margin-top: 1rem;
+    /* mt-4 */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    /* gap-3 */
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font: inherit;
+    font-size: 0.875rem;
+    /* text-sm */
+    padding: 0.5rem 1rem;
+    /* px-4 py-2 */
+    border-radius: 0.5rem;
+    border: 1px solid hsl(var(--border) / 0.35);
+    background: hsl(var(--muted) / 0.25);
+    color: hsl(var(--foreground));
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.btn:hover {
+    background: hsl(var(--muted) / 0.45);
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--primary));
+}
+
+/* Semantic button accents */
+.btnDanger {
+    color: hsl(var(--error));
+}
+
+.btnDanger:hover {
+    background: hsl(var(--error) / 0.12);
+    /* like red-50 */
+}
+
+.btnInfo {
+    color: hsl(var(--info-foreground, 0 0% 20%));
+    /* safe default if token absent */
+}
+
+.btnInfo:hover {
+    background: hsl(var(--info) / 0.12);
+    /* like blue-50 */
+}
+
+/* Avatar */
+.avatar {
+    inline-size: 56px;
+    block-size: 56px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: hsl(var(--muted));
+    /* fallback bg */
+}
+
+.avatarImg {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    border-radius: 999px;
+}
+
+.avatarFallback {
+    inline-size: 56px;
+    block-size: 56px;
+    border-radius: 999px;
+    background: hsl(var(--muted) / 0.6);
+}

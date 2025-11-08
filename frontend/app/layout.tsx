@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     "Markmið Slóða er að styðja við foringja í skátastarfi með því að gera dagskrárgerð einfaldari, markvissari og skipulagðari.",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{

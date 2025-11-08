@@ -1,0 +1,373 @@
+/* Page shell */
+.page {
+    min-height: 100vh;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+}
+
+/* Header */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: hsl(var(--background) / 0.7);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid hsl(var(--border) / 0.3);
+}
+
+.headerInner {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pageTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Main */
+.main {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 3rem;
+    display: grid;
+    gap: 3rem;
+}
+
+/* Sections */
+.section {
+    display: grid;
+    gap: 1rem;
+}
+
+.sectionTitle {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 700;
+}
+
+.sectionSubtitle {
+    color: hsl(var(--foreground) / 0.7);
+    font-size: 0.95rem;
+}
+
+/* Card */
+.card {
+    border: 1px solid hsl(var(--border) / 0.3);
+    border-radius: 1rem;
+    background: hsl(var(--background));
+    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.06);
+}
+
+/* Role demo */
+.roleHead {
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.25rem;
+}
+
+.roleLabel {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.roleGlyph {
+    margin-top: 0.25rem;
+    font-weight: 800;
+    font-size: 1.75rem;
+}
+
+.roleButtons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.roleBody {
+    padding: 1rem;
+}
+
+.muted {
+    color: hsl(var(--foreground) / 0.7);
+    font-size: 0.9rem;
+}
+
+/* Swatch */
+.swatch {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border) / 0.3);
+    border-radius: 0.75rem;
+}
+
+.swatchBlock {
+    height: 5rem;
+    width: 100%;
+}
+
+.swatchMeta {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.swatchRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.swatchName {
+    font-weight: 600;
+}
+
+.swatchCode {
+    background: hsl(var(--foreground) / 0.05);
+    color: hsl(var(--foreground) / 0.8);
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.35rem;
+    font-family: var(--font-mono);
+}
+
+.swatchNote {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: hsl(var(--foreground) / 0.6);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.6rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btnPrimary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.btnPrimary:hover {
+    background: hsl(var(--primary) / 0.9);
+}
+
+.btnSecondary {
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+}
+
+.btnSecondary:hover {
+    background: hsl(var(--secondary) / 0.9);
+}
+
+.btnOutline {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+}
+
+.btnOutline:hover {
+    background: hsl(var(--foreground) / 0.05);
+}
+
+.btnGhost {
+    background: transparent;
+    color: hsl(var(--foreground));
+}
+
+.btnGhost:hover {
+    background: hsl(var(--foreground) / 0.05);
+}
+
+/* Banners */
+.banner {
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    padding: 0.75rem;
+}
+
+.bannerTitle {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.bannerBody {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-top: 0.15rem;
+}
+
+.bannerSuccess {
+    background: hsl(var(--success) / 0.1);
+    border-color: hsl(var(--success) / 0.3);
+    color: hsl(var(--success));
+}
+
+.bannerWarning {
+    background: hsl(var(--warning) / 0.1);
+    border-color: hsl(var(--warning) / 0.3);
+    color: hsl(var(--warning));
+}
+
+.bannerError {
+    background: hsl(var(--error) / 0.1);
+    border-color: hsl(var(--error) / 0.3);
+    color: hsl(var(--error));
+}
+
+.bannerInfo {
+    background: hsl(var(--info) / 0.1);
+    border-color: hsl(var(--info) / 0.3);
+    color: hsl(var(--info));
+}
+
+/* Grids */
+.grid3 {
+    display: grid;
+    gap: 1rem;
+}
+
+.grid5 {
+    display: grid;
+    gap: 1rem;
+}
+
+.grid6 {
+    display: grid;
+    gap: 1rem;
+}
+
+.grid2 {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .grid3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid5 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid6 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .grid6 {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}
+
+/* Combinations */
+.comboHead {
+    border-radius: 1rem 1rem 0 0;
+    padding: 1rem;
+}
+
+.comboGrid {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+    .comboGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.comboCell {
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.comboLabel {
+    font-weight: 600;
+}
+
+.comboSample {
+    opacity: 0.8;
+    margin-top: 0.25rem;
+}
+
+.cardNote {
+    padding: 0.6rem 0.75rem 0.9rem;
+    font-size: 0.8rem;
+    color: hsl(var(--foreground) / 0.7);
+}
+
+/* Patrol on neutrals */
+.patrolHead {
+    border-radius: 1rem 1rem 0 0;
+    padding: 1rem;
+}
+
+.patrolGrid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+    .patrolGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.patrolCell {
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.patrolName {
+    font-weight: 700;
+}
+
+.patrolDesc {
+    opacity: 0.85;
+    margin-top: 0.15rem;
+}
+
+/* Footer */
+.footer {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 2.5rem;
+    font-size: 0.9rem;
+    color: hsl(var(--foreground) / 0.7);
+}

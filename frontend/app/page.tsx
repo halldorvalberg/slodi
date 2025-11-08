@@ -21,9 +21,7 @@ export default function Home() {
     try {
       response = await fetch("/api/save-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
     } catch (e) {
@@ -75,14 +73,14 @@ export default function Home() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Netfang"
-              className="border border-text rounded p-2 w-full pr-12 bg-background text-text"
+              className={styles.input}
               required
               aria-label="Email address"
             />
 
             <button
               type="submit"
-              className="absolute inset-y-0 right-0 flex items-center px-4 border border-primary text-primary bg-transparent rounded-r hover:cursor-pointer"
+              className={styles.submit}
               title="Submit"
               aria-label="Submit email"
             >
@@ -91,15 +89,12 @@ export default function Home() {
           </div>
 
           {message && (
-            <p
-              className="mt-4 text-sm text-secondary"
-              aria-live="assertive"
-            >
+            <p className={styles.message} aria-live="assertive">
               {message}
             </p>
           )}
         </form>
-      </div>
+      </section>
     </div>
   );
 }

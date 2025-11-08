@@ -1,115 +1,202 @@
-@import "tailwindcss";
-
+/* ── Design tokens as HSL components (enable /opacity utilities) ─────────── */
 :root {
-  --foreground: #19140b;
-  --background: #d6c1a3;
-  --primary: #d99d3b;
-  --secondary: #aae785;
-  --accent: #60df5d;
+  /* Base surfaces */
+  --background: 36 41% 83%;
+  /* #e6d8c3 Birch */
+  --foreground: 0 0% 20%;
+  /* #333333 Charcoal */
+  --muted: 205 89% 93%;
+  /* #dceffd Sky Mist */
+  --border: 24 35% 26%;
+  /* #5a3e2b Bark */
+
+  /* Brand / Actions */
+  --primary: 92 39% 30%;
+  /* #4b6b2f Moss */
+  --primary-foreground: 0 0% 100%;
+  /* #ffffff */
+  --secondary: 154 43% 18%;
+  /* #1b4332 Pine */
+  --secondary-foreground: 0 0% 100%;
+  /* #ffffff */
+
+  /* Semantic states */
+  --success: 92 39% 30%;
+  /* #4b6b2f Moss */
+  --success-foreground: 0 0% 100%;
+  /* #ffffff */
+  --warning: 35 100% 64%;
+  /* #ffb347 Campfire */
+  --warning-foreground: 0 0% 20%;
+  /* #333333 */
+  --error: 0 79% 65%;
+  /* #ec6060 Drótt Red */
+  --error-foreground: 0 0% 100%;
+  /* #ffffff */
+  --info: 195 83% 66%;
+  /* #62ccf0 Rekka Light */
+  --info-foreground: 0 0% 20%;
+  /* #333333 */
+
+  /* Accents (Scout Patrols) */
+  --accent-dreka: 51 100% 58%;
+  /* #FFE75C  Yellow */
+  --accent-falka: 347 79% 57%;
+  /* #E93860 */
+  --accent-drott: 168 74% 41%;
+  /* #1BB89B */
+  --accent-rekka: 195 83% 66%;
+  /* #62ccf0 */
+  --accent-rover: 33 100% 62%;
+  /* #FFAF3C */
+  --accent-adrir: 275 100% 66%;
+  /* #ba52ff */
+
+  /* Text helpers */
+  --text-strong: 154 43% 18%;
+  /* #1b4332 Pine */
+  --text-muted: 24 35% 26%;
+  /* #5a3e2b Bark */
+
+  /* Typography (your preference: Roboto Condensed) */
+  --font-sans: "Roboto Condensed", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", "Helvetica Neue", Arial, "Noto Sans",
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Dark theme tokens */
+:root.dark {
+  /* Surfaces */
+  --background: 24 28% 11%;
+  /* deep bark-like base */
+  --foreground: 36 41% 92%;
+  /* birch-tinted text on dark */
+  --muted: 205 35% 18%;
+  /* dimmed sky-mist for cards */
+  --border: 24 25% 32%;
+  /* warm outline on dark */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground:#fff2db;
-    --background: #5b4629;
-    --primary: #c58826;
-    --secondary: #3e7b18;
-    --accent: #22a220;
+  /* Brand / actions - keep hues, nudge lightness for contrast */
+  --primary: 92 39% 33%;
+  /* Moss, a touch brighter on dark */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 154 43% 22%;
+  /* Pine, lifted for contrast */
+  --secondary-foreground: 0 0% 100%;
+
+  /* Semantic */
+  --success: 92 39% 33%;
+  --success-foreground: 0 0% 100%;
+
+  --warning: 35 100% 64%;
+  --warning-foreground: 36 41% 10%;
+  /* dark text on warm warning */
+
+  --error: 0 79% 62%;
+  --error-foreground: 0 0% 100%;
+
+  --info: 195 83% 64%;
+  --info-foreground: 36 41% 10%;
+
+  /* Patrol accents stay brand-correct, foreground stays white for badges */
+  --accent-dreka: 51 100% 58%;
+  --accent-falka: 347 79% 57%;
+  --accent-drott: 168 74% 41%;
+  --accent-rekka: 195 83% 66%;
+  --accent-rover: 33 100% 62%;
+  --accent-adrir: 275 100% 66%;
+
+  /* Text helpers */
+  --text-strong: 36 41% 96%;
+  --text-muted: 24 20% 70%;
+
+  color-scheme: dark;
+}
+/* ── Minimal base (Tailwind-first, no leaks) ─────────────────────────────── */
+@layer base {
+  html {
+    @apply bg-background text-foreground font-sans;
   }
+
+  /* sensible defaults */
+  body {
+    @apply antialiased;
+  }
+
+  hr {
+    @apply border-border/30;
+  }
+
+  /* selection matches brand */
+  ::selection {
+    background: hsl(var(--primary) / 0.22);
+    color: hsl(var(--primary-foreground));
+  }
+}
+
+/* ── Ready for future dark mode (override tokens under .dark) ───────────── */
+/* 
+:root.dark {
+  --background: ...;
+  --foreground: ...;
+  ...etc
+  color-scheme: dark;
+}
+*/
+
+/* ── Example helpers (optional) ─────────────────────────────────────────── */
+/* Focus ring using brand color */
+@layer utilities {
+  .focus-ring {
+    @apply outline-none ring-2 ring-primary/40 focus-visible:ring-primary;
+  }
+}
+
+/* Removed Tailwind-specific @apply and @theme rules */
+
+/* Reset styles */
+html {
+  box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+    padding: 0;
+    font-family: var(--font-geist-sans, system-ui, sans-serif);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Utility classes replaced with standard CSS */
+  .antialiased {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .border {
+    border: 1px solid hsl(var(--border) / 30%);
+  }
+  
+  .outline-none {
+    outline: none;
+  }
+  
+  .focus-visible {
+    outline: 2px solid hsl(var(--primary) / 40%);
 }
 
-@layer components {
-  .md-content {
-    @apply text-[var(--color-foreground,inherit)];
-  }
-
-  .md-content :where(p) {
-    @apply my-4 leading-7;
-  }
-
-  .md-content :where(h1) {
-    @apply mt-8 mb-4 text-3xl font-bold tracking-tight;
-  }
-  .md-content :where(h2) {
-    @apply mt-8 mb-3 text-2xl font-semibold;
-  }
-  .md-content :where(h3) {
-    @apply mt-6 mb-2 text-xl font-semibold;
-  }
-  .md-content :where(h4) {
-    @apply mt-5 mb-2 text-lg font-semibold;
-  }
-  .md-content :where(h5) {
-    @apply mt-4 mb-2 font-semibold;
-  }
-  .md-content :where(h6) {
-    @apply mt-4 mb-2 text-sm font-semibold uppercase tracking-wide;
-  }
-
-  /* Anchor links */
-  .md-content :where(h1, h2, h3, h4, h5, h6) a {
-    @apply underline;
-  }
-
-  /* Links */
-  .md-content a {
-    @apply underline hover:opacity-80;
-  }
-
-  /* Lists */
-  .md-content :where(ul) { @apply my-4 list-disc pl-6; }
-  .md-content :where(ol) { @apply my-4 list-decimal pl-6; }
-  .md-content :where(li) { @apply my-1 leading-7; }
-
-  /* Blockquote */
-  .md-content blockquote {
-    @apply my-6 border-l-4 pl-4 italic opacity-90;
-  }
-
-  /* Code inline */
-  .md-content :where(code) {
-    @apply rounded bg-[color:var(--code-bg,#0f172a0d)] px-1 py-0.5 text-[0.95em];
-  }
-
-  /* Code block */
-  .md-content pre {
-    @apply my-6 overflow-x-auto rounded border bg-[color:var(--code-bg,#0f172a0d)] p-4;
-  }
-  .md-content pre code {
-    @apply bg-transparent p-0;
-  }
-
-  /* Horizontal rule */
-  .md-content hr {
-    @apply my-8 border-t;
-  }
-
-  /* Images if you add them later */
-  .md-content img {
-    @apply my-6 rounded;
-  }
-
-  /* Tables (simple baseline if you add them later) */
-  .md-content table {
-    @apply my-6 w-full text-left border-collapse;
-  }
-  .md-content thead th {
-    @apply border-b py-2 font-semibold;
-  }
-  .md-content tbody td {
-    @apply border-b py-2 align-top;
-  }
+.focus-visible:focus {
+  outline-color: hsl(var(--primary));
 }
