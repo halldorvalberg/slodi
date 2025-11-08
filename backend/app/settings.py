@@ -34,4 +34,4 @@ class Settings(BaseSettings):
         self.test_db_url = f"postgresql+psycopg://{self.test_db_user}:{self.test_db_password}@{self.test_db_host}:{self.test_db_port}/{self.test_db_name}"
 
 
-settings = Settings()
+settings: Settings = Settings()  # type: ignore[call-arg]

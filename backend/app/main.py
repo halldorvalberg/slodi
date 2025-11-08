@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.logging import configure_logging
 from app.routers import (
     comments_router,
+    email_list_router,
     events_router,
     groups_router,
     programs_router,

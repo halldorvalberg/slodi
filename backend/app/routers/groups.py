@@ -82,9 +82,7 @@ async def list_group_memberships(
     response_model=GroupMembershipOut,
     status_code=status.HTTP_201_CREATED,
 )
-async def add_group_member(
-    session: SessionDep, group_id: UUID, body: GroupMembershipCreate
-):
+async def add_group_member(session: SessionDep, group_id: UUID, body: GroupMembershipCreate):
     svc = GroupService(session)
     return await svc.add_member(group_id, body)
 

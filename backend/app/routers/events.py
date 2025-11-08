@@ -37,9 +37,7 @@ async def list_events_for_workspace(
     )
 
 
-@router.get(
-    "/workspaces/{workspace_id}/programs/{program_id}", response_model=list[EventOut]
-)
+@router.get("/workspaces/{workspace_id}/programs/{program_id}", response_model=list[EventOut])
 async def list_events_for_program(
     session: SessionDep,
     workspace_id: UUID,

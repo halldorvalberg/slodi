@@ -18,9 +18,7 @@ class WorkspaceService:
     async def get(self, workspace_id: UUID) -> WorkspaceOut:
         ws = await self.repo.get(workspace_id)
         if not ws:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found")
         return WorkspaceOut.model_validate(ws)
 
     async def list_for_user(
@@ -29,9 +27,7 @@ class WorkspaceService:
         rows = await self.repo.list_for_user(user_id, limit=limit, offset=offset)
         return [WorkspaceOut.model_validate(r) for r in rows]
 
-    async def create_for_user(
-        self, user_id: UUID, data: WorkspaceCreate
-    ) -> WorkspaceOut:
+    async def create_for_user(self, user_id: UUID, data: WorkspaceCreate) -> WorkspaceOut:
         ws = Workspace(**data.model_dump())
         await self.repo.create_for_user(user_id, ws)
         await self.session.commit()
@@ -41,9 +37,7 @@ class WorkspaceService:
     async def update(self, workspace_id: UUID, data: WorkspaceUpdate) -> WorkspaceOut:
         ws = await self.repo.get(workspace_id)
         if not ws:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found")
 
         # patch fields
         patch = data.model_dump(exclude_unset=True)
@@ -57,8 +51,6 @@ class WorkspaceService:
     async def delete(self, workspace_id: UUID) -> None:
         ws = await self.repo.get(workspace_id)
         if not ws:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workspace not found")
         await self.repo.delete(workspace_id)
         await self.session.commit()

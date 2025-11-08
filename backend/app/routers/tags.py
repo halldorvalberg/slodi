@@ -76,9 +76,7 @@ async def list_tags_for_content(
     return await svc.list_tags_for_content(content_id, limit=limit, offset=offset)
 
 
-@router.post(
-    "/content", response_model=ContentTagOut, status_code=status.HTTP_201_CREATED
-)
+@router.post("/content", response_model=ContentTagOut, status_code=status.HTTP_201_CREATED)
 async def add_tag_to_content(session: SessionDep, body: ContentTagCreate):
     svc = TagService(session)
     return await svc.add_tag_to_content(body)

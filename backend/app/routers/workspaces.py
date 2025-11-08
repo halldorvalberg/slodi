@@ -28,9 +28,7 @@ async def list_workspaces_for_user(
 
 
 @router.post("/", response_model=WorkspaceOut, status_code=status.HTTP_201_CREATED)
-async def create_workspace_for_user(
-    session: SessionDep, user_id: UUID, body: WorkspaceCreate
-):
+async def create_workspace_for_user(session: SessionDep, user_id: UUID, body: WorkspaceCreate):
     svc = WorkspaceService(session)
     return await svc.create_for_user(user_id, body)
 
@@ -42,9 +40,7 @@ async def get_workspace(session: SessionDep, workspace_id: UUID):
 
 
 @router.patch("/{workspace_id}", response_model=WorkspaceOut)
-async def update_workspace(
-    session: SessionDep, workspace_id: UUID, body: WorkspaceUpdate
-):
+async def update_workspace(session: SessionDep, workspace_id: UUID, body: WorkspaceUpdate):
     svc = WorkspaceService(session)
     return await svc.update(workspace_id, body)
 
