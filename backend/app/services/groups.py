@@ -6,10 +6,11 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.group import Group, GroupMembership
+from app.models.group import Group
 from app.repositories.groups import GroupRepository
 from app.schemas.group import (
     GroupCreate,
+    GroupMemberOut,
     GroupMembershipCreate,
     GroupMembershipOut,
     GroupMembershipUpdate,
@@ -24,6 +25,9 @@ class GroupService:
         self.repo = GroupRepository(session)
 
     # ----- groups -----
+
+    async def count(self, *, q: str | None = None) -> int:
+        return await self.repo.count(q=q)
 
     async def list(self, *, q: str | None, limit: int = 50, offset: int = 0) -> list[GroupOut]:
         rows = await self.repo.list(q=q, limit=limit, offset=offset)
@@ -78,41 +82,43 @@ class GroupService:
 
     # ----- memberships -----
 
-    async def list_members(
+    async def count_group_members(self, group_id: UUID) -> int:
+        return await self.repo.count_group_members(group_id)
+
+    async def list_group_members(
         self, group_id: UUID, *, limit: int = 50, offset: int = 0
-    ) -> list[GroupMembershipOut]:
+    ) -> list[GroupMemberOut]:
         # ensure group exists for better UX
         if not await self.repo.get(group_id):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
-        rows = await self.repo.list_members(group_id, limit=limit, offset=offset)
-        return [GroupMembershipOut.model_validate(r) for r in rows]
+        rows = await self.repo.list_group_members(group_id, limit=limit, offset=offset)
+        return [GroupMemberOut.model_validate(r) for r in rows]
 
-    async def add_member(self, group_id: UUID, data: GroupMembershipCreate) -> GroupMembershipOut:
-        if data.group_id != group_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="group_id in body does not match path parameter",
-            )
-        # optional: check group exists
-        if not await self.repo.get(group_id):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
+    async def count_user_groups(self, user_id: UUID) -> int:
+        return await self.repo.count_groups_for_user(user_id)
 
-        gm = GroupMembership(**data.model_dump())
+    async def list_user_groups(
+        self, user_id: UUID, *, limit: int = 50, offset: int = 0
+    ) -> list[GroupOut]:
+        rows = await self.repo.list_groups_for_user(user_id, limit=limit, offset=offset)
+        return [GroupOut.model_validate(r) for r in rows]
+
+    async def add_membership(
+        self, group_id: UUID, data: GroupMembershipCreate
+    ) -> tuple[bool, GroupMembershipOut]:
         try:
-            await self.repo.add_member(gm)
+            created, gs = await self.repo.add_membership(group_id, data.user_id, data.role)
             await self.session.commit()
         except IntegrityError:
             await self.session.rollback()
-            # duplicate composite PK (user already member)
+            # duplicate composite PK (user already member) or missing FK
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="User is already a member of this group",
+                detail="Membership already exists or violates constraints",
             ) from None
-        # composite PK; refresh not strictly needed, but harmless
-        await self.session.refresh(gm)
-        return GroupMembershipOut.model_validate(gm)
+        return created, GroupMembershipOut.model_validate(gs)
 
-    async def update_member(
+    async def update_membership(
         self, group_id: UUID, user_id: UUID, data: GroupMembershipUpdate
     ) -> GroupMembershipOut:
         gm = await self.repo.get_membership(group_id, user_id)
@@ -129,7 +135,7 @@ class GroupService:
         await self.session.refresh(gm)
         return GroupMembershipOut.model_validate(gm)
 
-    async def remove_member(self, group_id: UUID, user_id: UUID) -> None:
+    async def remove_membership(self, group_id: UUID, user_id: UUID) -> None:
         deleted = await self.repo.remove_member(group_id, user_id)
         if not deleted:
             raise HTTPException(

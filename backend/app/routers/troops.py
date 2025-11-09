@@ -153,9 +153,7 @@ async def add_participation(
     return participation
 
 
-@router.delete(
-    "/events/{event_id}/troops/{troop_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/events/{event_id}/troops/{troop_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_participation(
     session: SessionDep,
     event_id: UUID,

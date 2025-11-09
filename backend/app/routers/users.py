@@ -3,36 +3,48 @@ from __future__ import annotations
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
+from app.core.pagination import Limit, Offset, add_pagination_headers
 from app.schemas.user import UserCreate, UserOut, UserUpdate
 from app.services.users import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
-DEFAULT_Q = Query(None, description="Search in name/email/auth0_id")
-DEFAULT_LIMIT = Query(50, ge=1, le=200)
-DEFAULT_OFFSET = Query(0, ge=0)
+DEFAULT_Q = Query(None, min_length=2, description="Case-insensitive search in name/email/auth0_id")
 
 
-@router.get("/", response_model=list[UserOut])
+@router.get("", response_model=list[UserOut])
 async def list_users(
     session: SessionDep,
+    request: Request,
+    response: Response,
     q: str | None = DEFAULT_Q,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = UserService(session)
-    return await svc.list(q=q, limit=limit, offset=offset)
+    total = await svc.count(q=q)
+    items = await svc.list(q=q, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
-@router.post("/", response_model=UserOut, status_code=status.HTTP_201_CREATED)
-async def create_user(session: SessionDep, body: UserCreate):
+@router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+async def create_user(session: SessionDep, body: UserCreate, response: Response):
     svc = UserService(session)
-    return await svc.create(body)
+    user = await svc.create(body)
+    response.headers["Location"] = f"/users/{user.id}"
+    return user
 
 
 @router.get("/{user_id}", response_model=UserOut)

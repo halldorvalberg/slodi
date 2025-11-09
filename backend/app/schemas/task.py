@@ -13,7 +13,6 @@ from .content import ContentCreate, ContentOut, ContentUpdate
 class TaskCreate(ContentCreate):
     content_type: Literal[ContentType.task] = ContentType.task
 
-    event_id: UUID
     equipment: dict[str, Any] | None = None
     media: dict[str, Any] | None = None
     estimated_duration: int | None = None

@@ -3,10 +3,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import Select, and_, delete, select
+from sqlalchemy import Select, and_, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.models.content import Content
 from app.models.tag import ContentTag, Tag
 from app.repositories.base import Repository
 
@@ -29,6 +30,14 @@ class TagRepository(Repository):
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
+    async def count(self, *, q: str | None = None) -> int:
+        stmt = select(func.count()).select_from(Tag)
+        if q:
+            ilike = f"%{q.strip()}%"
+            stmt = stmt.where(Tag.name.ilike(ilike))
+        res = await self.session.execute(stmt)
+        return res.scalar_one()
+
     async def list(
         self, *, q: str | None = None, limit: int = 50, offset: int = 0
     ) -> Sequence[Tag]:
@@ -49,7 +58,13 @@ class TagRepository(Repository):
 
     # ----- associations -----
 
-    async def list_tags_for_content(
+    async def count_content_tags(self, content_id: UUID) -> int:
+        result = await self.session.scalar(
+            select(func.count()).select_from(ContentTag).where(ContentTag.content_id == content_id)
+        )
+        return result or 0
+
+    async def list_content_tags(
         self, content_id: UUID, *, limit: int = 100, offset: int = 0
     ) -> Sequence[Tag]:
         stmt = (
@@ -62,25 +77,41 @@ class TagRepository(Repository):
         )
         return await self.scalars(stmt)
 
-    async def list_content_for_tag(
+    async def count_tagged_content(self, tag_id: UUID) -> int:
+        result = await self.session.scalar(
+            select(func.count()).select_from(ContentTag).where(ContentTag.tag_id == tag_id)
+        )
+        return result or 0
+
+    async def list_tagged_content(
         self, tag_id: UUID, *, limit: int = 50, offset: int = 0
-    ) -> Sequence[UUID]:
-        # return only content IDs here; adjust to join Content if you want full rows
+    ) -> Sequence[Content]:
         stmt = (
-            select(ContentTag.content_id)
+            select(Content)
+            .join(ContentTag, ContentTag.content_id == Content.id)
             .where(ContentTag.tag_id == tag_id)
+            .order_by(Content.created_at.desc())
             .limit(limit)
             .offset(offset)
         )
-        res = await self.session.execute(stmt)
-        return [row[0] for row in res.fetchall()]
+        return await self.scalars(stmt)
 
-    async def add_tag_to_content(self, content_id: UUID, tag_id: UUID) -> ContentTag:
+    async def get_content_tag(self, content_id: UUID, tag_id: UUID) -> ContentTag | None:
+        return await self.session.scalar(
+            select(ContentTag).where(
+                and_(ContentTag.content_id == content_id, ContentTag.tag_id == tag_id)
+            )
+        )
+
+    async def add_content_tag(self, content_id: UUID, tag_id: UUID) -> tuple[bool, ContentTag]:
+        existing = await self.get_content_tag(content_id, tag_id)
+        if existing:
+            return False, existing
         ct = ContentTag(content_id=content_id, tag_id=tag_id)
         await self.add(ct)
-        return ct
+        return True, ct
 
-    async def remove_tag_from_content(self, content_id: UUID, tag_id: UUID) -> int:
+    async def remove_content_tag(self, content_id: UUID, tag_id: UUID) -> int:
         res = await self.session.execute(
             delete(ContentTag).where(
                 and_(ContentTag.content_id == content_id, ContentTag.tag_id == tag_id)

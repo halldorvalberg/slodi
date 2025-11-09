@@ -7,7 +7,6 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
 from app.domain.content_constraints import DESC_MAX, NAME_MAX, NAME_MIN
-from app.models.content import ContentType
 from app.utils import get_current_datetime
 
 NameStr = Annotated[
@@ -22,7 +21,6 @@ DescStr = Annotated[
 class ContentBase(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    content_type: ContentType
     name: NameStr
     description: DescStr | None = None
     public: bool = False

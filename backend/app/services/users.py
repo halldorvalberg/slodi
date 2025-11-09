@@ -19,14 +19,13 @@ class UserService:
     async def get(self, user_id: UUID) -> UserOut:
         row = await self.repo.get(user_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         return UserOut.model_validate(row)
 
-    async def list(
-        self, *, q: str | None, limit: int = 50, offset: int = 0
-    ) -> list[UserOut]:
+    async def count(self, *, q: str | None) -> int:
+        return await self.repo.count(q=q)
+
+    async def list(self, *, q: str | None, limit: int = 50, offset: int = 0) -> list[UserOut]:
         rows = await self.repo.list(q=q, limit=limit, offset=offset)
         return [UserOut.model_validate(r) for r in rows]
 
@@ -35,22 +34,20 @@ class UserService:
         try:
             await self.repo.create(user)
             await self.session.commit()
-        except IntegrityError:
+        except IntegrityError as e:
             await self.session.rollback()
             # Email or auth0_id unique violation
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="User with this email or auth0_id already exists",
-            ) from None
+            ) from e
         await self.session.refresh(user)
         return UserOut.model_validate(user)
 
     async def update(self, user_id: UUID, data: UserUpdate) -> UserOut:
         row = await self.repo.get(user_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         patch = data.model_dump(exclude_unset=True)
         for k, v in patch.items():
@@ -70,8 +67,6 @@ class UserService:
     async def delete(self, user_id: UUID) -> None:
         row = await self.repo.get(user_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         await self.repo.delete(user_id)
         await self.session.commit()

@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -19,7 +19,7 @@ class TaskRepository(Repository):
         stmt = (
             select(Task)
             .options(
-                selectinload(Task.event),  # common for UI
+                selectinload(Task.event),
             )
             .where(Task.id == task_id)
         )
@@ -30,6 +30,12 @@ class TaskRepository(Repository):
         stmt = select(Task).where(Task.id == task_id, Task.event_id == event_id)
         res = await self.session.execute(stmt)
         return res.scalars().first()
+
+    async def count_tasks_for_event(self, event_id: UUID) -> int:
+        result = await self.session.scalar(
+            select(func.count()).select_from(Task).where(Task.event_id == event_id)
+        )
+        return result or 0
 
     async def list_for_event(
         self,

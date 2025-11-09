@@ -23,7 +23,11 @@ class CommentBase(BaseModel):
     content_id: UUID
 
 
-class CommentCreate(CommentBase):
+class CommentCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    body: BodyStr
+    user_id: UUID
     created_at: dt.datetime = Field(default_factory=get_current_datetime)
 
 

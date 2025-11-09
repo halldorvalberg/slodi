@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, ForeignKey, String
+from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -17,7 +17,10 @@ if TYPE_CHECKING:
 
 class Tag(Base):
     __tablename__ = "tags"
-    __table_args__ = (CheckConstraint(f"char_length(name) >= {NAME_MIN}", name="ck_tag_name_min"),)
+    __table_args__ = (
+        CheckConstraint(f"char_length(name) >= {NAME_MIN}", name="ck_tag_name_min"),
+        UniqueConstraint("name", name="uq_tag_name"),
+    )
 
     # Columns
     id: Mapped[UUID] = mapped_column(

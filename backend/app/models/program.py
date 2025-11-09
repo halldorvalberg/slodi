@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,6 +19,9 @@ if TYPE_CHECKING:
 class Program(Content):
     __tablename__ = "programs"
     __mapper_args__ = {"polymorphic_identity": ContentType.program}
+    __table_args__ = (
+        UniqueConstraint("workspace_id", "id", name="uq_program_workspace_id_id"),
+    )
 
     # Columns
     id: Mapped[UUID] = mapped_column(

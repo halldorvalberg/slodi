@@ -22,7 +22,5 @@ class EmailListRepository(Repository):
         return email_entry
 
     async def delete(self, email: str) -> int:
-        res = await self.session.execute(
-            delete(EmailList).where(EmailList.email == email)
-        )
+        res = await self.session.execute(delete(EmailList).where(EmailList.email == email))
         return res.rowcount or 0

@@ -48,7 +48,6 @@ class GroupMembershipBase(BaseModel):
 
 class GroupMembershipCreate(GroupMembershipBase):
     user_id: UUID
-    group_id: UUID
 
 
 class GroupMembershipUpdate(BaseModel):
@@ -59,3 +58,10 @@ class GroupMembershipOut(GroupMembershipBase):
     model_config = ConfigDict(from_attributes=True)
     user_id: UUID
     group_id: UUID
+
+
+class GroupMemberOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    user_id: UUID
+    name: str
+    role: GroupRole

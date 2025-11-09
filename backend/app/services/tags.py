@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.tag import Tag
 from app.repositories.tags import TagRepository
+from app.schemas.content import ContentOut
 from app.schemas.tag import (
-    ContentTagCreate,
     ContentTagOut,
     TagCreate,
     TagOut,
@@ -24,6 +24,9 @@ class TagService:
 
     # ----- tags -----
 
+    async def count(self, *, q: str | None) -> int:
+        return await self.repo.count(q=q)
+
     async def list(self, *, q: str | None, limit: int = 50, offset: int = 0) -> list[TagOut]:
         rows = await self.repo.list(q=q, limit=limit, offset=offset)
         return [TagOut.model_validate(r) for r in rows]
@@ -35,13 +38,16 @@ class TagService:
         return TagOut.model_validate(row)
 
     async def create(self, data: TagCreate) -> TagOut:
-        # Optional uniqueness check by name; if you add a DB UniqueConstraint, you can rely on IntegrityError instead
-        existing = await self.repo.get_by_name(data.name)
-        if existing:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Tag already exists")
         tag = Tag(**data.model_dump())
-        await self.repo.create(tag)
-        await self.session.commit()
+        try:
+            await self.repo.create(tag)
+            await self.session.commit()
+        except IntegrityError as e:
+            await self.session.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Tag with this name already exists",
+            ) from e
         await self.session.refresh(tag)
         return TagOut.model_validate(tag)
 
@@ -72,16 +78,27 @@ class TagService:
 
     # ----- associations -----
 
-    async def list_tags_for_content(
+    async def count_content_tags(self, content_id: UUID) -> int:
+        return await self.repo.count_content_tags(content_id)
+
+    async def list_content_tags(
         self, content_id: UUID, *, limit: int = 100, offset: int = 0
     ) -> list[TagOut]:
-        rows = await self.repo.list_tags_for_content(content_id, limit=limit, offset=offset)
+        rows = await self.repo.list_content_tags(content_id, limit=limit, offset=offset)
         return [TagOut.model_validate(r) for r in rows]
 
-    async def add_tag_to_content(self, data: ContentTagCreate) -> ContentTagOut:
-        # If composite PK exists, duplicate add will raise IntegrityError
+    async def count_tagged_content(self, tag_id: UUID) -> int:
+        return await self.repo.count_tagged_content(tag_id)
+
+    async def list_tagged_content(
+        self, tag_id: UUID, *, limit: int = 50, offset: int = 0
+    ) -> list[ContentOut]:
+        rows = await self.repo.list_tagged_content(tag_id, limit=limit, offset=offset)
+        return [ContentOut.model_validate(r) for r in rows]
+
+    async def add_content_tag(self, content_id: UUID, tag_id: UUID) -> tuple[bool, ContentTagOut]:
         try:
-            ct = await self.repo.add_tag_to_content(data.content_id, data.tag_id)
+            created, ct = await self.repo.add_content_tag(content_id, tag_id)
             await self.session.commit()
         except IntegrityError:
             await self.session.rollback()
@@ -89,18 +106,13 @@ class TagService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Tag is already attached to this content",
             ) from None
-        return ContentTagOut.model_validate(ct)
+        return created, ContentTagOut.model_validate(ct)
 
-    async def remove_tag_from_content(self, content_id: UUID, tag_id: UUID) -> None:
-        deleted = await self.repo.remove_tag_from_content(content_id, tag_id)
+    async def remove_content_tag(self, content_id: UUID, tag_id: UUID) -> None:
+        deleted = await self.repo.remove_content_tag(content_id, tag_id)
         if not deleted:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Tag not attached to content",
             )
         await self.session.commit()
-
-    async def list_content_for_tag(
-        self, tag_id: UUID, *, limit: int = 50, offset: int = 0
-    ) -> list[UUID]:
-        return list(await self.repo.list_content_for_tag(tag_id, limit=limit, offset=offset))

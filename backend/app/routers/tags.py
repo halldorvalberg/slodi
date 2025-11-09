@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
+from app.core.pagination import Limit, Offset, add_pagination_headers
+from app.schemas.content import ContentOut
 from app.schemas.tag import (
-    ContentTagCreate,
     ContentTagOut,
     TagCreate,
     TagOut,
@@ -16,46 +17,57 @@ from app.schemas.tag import (
 )
 from app.services.tags import TagService
 
-router = APIRouter(prefix="/tags", tags=["tags"])
+router = APIRouter(tags=["tags"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
-DEFAULT_Q = Query(None, description="Search by tag name")
-DEFAULT_LIMIT = Query(50, ge=1, le=200)
-DEFAULT_OFFSET = Query(0, ge=0)
+DEFAULT_Q = Query(None, min_length=2, description="Case-insensitive search in tag names")
 
 # ----- tags -----
 
 
-@router.get("/", response_model=list[TagOut])
+@router.get("/tags", response_model=list[TagOut])
 async def list_tags(
     session: SessionDep,
+    request: Request,
+    response: Response,
     q: str | None = DEFAULT_Q,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = TagService(session)
-    return await svc.list(q=q, limit=limit, offset=offset)
+    total = await svc.count(q=q)
+    items = await svc.list(q=q, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
-@router.post("/", response_model=TagOut, status_code=status.HTTP_201_CREATED)
-async def create_tag(session: SessionDep, body: TagCreate):
+@router.post("/tags", response_model=TagOut, status_code=status.HTTP_201_CREATED)
+async def create_tag(session: SessionDep, body: TagCreate, response: Response):
     svc = TagService(session)
-    return await svc.create(body)
+    tag = await svc.create(body)
+    response.headers["Location"] = f"/tags/{tag.id}"
+    return tag
 
 
-@router.get("/{tag_id}", response_model=TagOut)
+@router.get("/tags/{tag_id}", response_model=TagOut)
 async def get_tag(session: SessionDep, tag_id: UUID):
     svc = TagService(session)
     return await svc.get(tag_id)
 
 
-@router.patch("/{tag_id}", response_model=TagOut)
+@router.patch("/tags/{tag_id}", response_model=TagOut)
 async def update_tag(session: SessionDep, tag_id: UUID, body: TagUpdate):
     svc = TagService(session)
     return await svc.update(tag_id, body)
 
 
-@router.delete("/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_tag(session: SessionDep, tag_id: UUID):
     svc = TagService(session)
     await svc.delete(tag_id)
@@ -65,36 +77,66 @@ async def delete_tag(session: SessionDep, tag_id: UUID):
 # ----- associations -----
 
 
-@router.get("/content/{content_id}", response_model=list[TagOut])
-async def list_tags_for_content(
+@router.get("/content/{content_id}/tags", response_model=list[TagOut])
+async def list_content_tags(
     session: SessionDep,
+    request: Request,
+    response: Response,
     content_id: UUID,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = TagService(session)
-    return await svc.list_tags_for_content(content_id, limit=limit, offset=offset)
+    total = await svc.count_content_tags(content_id)
+    items = await svc.list_content_tags(content_id, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
-@router.post("/content", response_model=ContentTagOut, status_code=status.HTTP_201_CREATED)
-async def add_tag_to_content(session: SessionDep, body: ContentTagCreate):
-    svc = TagService(session)
-    return await svc.add_tag_to_content(body)
-
-
-@router.delete("/content/{content_id}/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_tag_from_content(session: SessionDep, content_id: UUID, tag_id: UUID):
-    svc = TagService(session)
-    await svc.remove_tag_from_content(content_id, tag_id)
-    return None
-
-
-@router.get("/{tag_id}/contents", response_model=list[UUID])
-async def list_content_for_tag(
+@router.get("/tags/{tag_id}/content", response_model=list[ContentOut])
+async def list_tagged_content(
     session: SessionDep,
+    request: Request,
+    response: Response,
     tag_id: UUID,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = TagService(session)
-    return await svc.list_content_for_tag(tag_id, limit=limit, offset=offset)
+    total = await svc.count_tagged_content(tag_id)
+    items = await svc.list_tagged_content(tag_id, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
+
+
+@router.put(
+    "/content/{content_id}/tags/{tag_id}",
+    response_model=ContentTagOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_content_tag(session: SessionDep, content_id: UUID, tag_id: UUID, response: Response):
+    svc = TagService(session)
+    created, tag = await svc.add_content_tag(content_id, tag_id)
+    if not created:
+        response.status_code = status.HTTP_200_OK
+    response.headers["Location"] = f"/content/{content_id}/tags/{tag_id}"
+    return tag
+
+
+@router.delete("/content/{content_id}/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_content_tag(session: SessionDep, content_id: UUID, tag_id: UUID):
+    svc = TagService(session)
+    await svc.remove_content_tag(content_id, tag_id)
+    return None

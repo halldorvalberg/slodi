@@ -3,63 +3,76 @@ from __future__ import annotations
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
+from app.core.pagination import Limit, Offset, add_pagination_headers
 from app.schemas.task import TaskCreate, TaskOut, TaskUpdate
 from app.services.tasks import TaskService
 
-router = APIRouter(prefix="/tasks", tags=["tasks"])
+router = APIRouter(tags=["tasks"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
-DEFAULT_LIMIT = Query(50, ge=1, le=200)
-DEFAULT_OFFSET = Query(0, ge=0)
 
 # ----- collection under event -----
 
 
-@router.get("/events/{event_id}", response_model=list[TaskOut])
-async def list_tasks_for_event(
+@router.get("/events/{event_id}/tasks", response_model=list[TaskOut])
+async def list_event_tasks(
     session: SessionDep,
+    request: Request,
+    response: Response,
     event_id: UUID,
-    limit: int = DEFAULT_LIMIT,
-    offset: int = DEFAULT_OFFSET,
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = TaskService(session)
-    return await svc.list_for_event(event_id, limit=limit, offset=offset)
+    total = await svc.count_tasks_for_event(event_id)
+    items = await svc.list_for_event(event_id, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
 @router.post(
-    "/events/{event_id}",
+    "/events/{event_id}/tasks",
     response_model=TaskOut,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_task_under_event(
+async def create_event_task(
     session: SessionDep,
     event_id: UUID,
     body: TaskCreate,
+    response: Response,
 ):
     svc = TaskService(session)
-    return await svc.create_under_event(event_id, body)
+    task = await svc.create_under_event(event_id, body)
+    response.headers["Location"] = f"/tasks/{task.id}"
+    return task
 
 
 # ----- item endpoints -----
 
 
-@router.get("/{task_id}", response_model=TaskOut)
+@router.get("/tasks/{task_id}", response_model=TaskOut)
 async def get_task(session: SessionDep, task_id: UUID):
     svc = TaskService(session)
     return await svc.get(task_id)
 
 
-@router.patch("/{task_id}", response_model=TaskOut)
+@router.patch("/tasks/{task_id}", response_model=TaskOut)
 async def update_task(session: SessionDep, task_id: UUID, body: TaskUpdate):
     svc = TaskService(session)
     return await svc.update(task_id, body)
 
 
-@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(session: SessionDep, task_id: UUID):
     svc = TaskService(session)
     await svc.delete(task_id)

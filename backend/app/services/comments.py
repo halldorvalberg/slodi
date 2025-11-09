@@ -15,14 +15,22 @@ class CommentService:
         self.session = session
         self.repo = CommentRepository(session)
 
+    async def count_content_comments(self, content_id: UUID) -> int:
+        return await self.repo.count_content_comments(content_id)
+
     async def list_for_content(
         self, content_id: UUID, *, limit: int = 50, offset: int = 0
     ) -> list[CommentOut]:
         rows = await self.repo.list_for_content(content_id, limit=limit, offset=offset)
         return [CommentOut.model_validate(r) for r in rows]
 
-    async def create_under_content(self, data: CommentCreate) -> CommentOut:
-        comment = Comment(**data.model_dump())
+    async def create_under_content(self, content_id: UUID, data: CommentCreate) -> CommentOut:
+        comment = Comment(
+            body=data.body,
+            content_id=content_id,
+            user_id=data.user_id,
+            created_at=data.created_at,
+        )
         await self.repo.create(comment)
         await self.session.commit()
         await self.session.refresh(comment)
@@ -38,12 +46,9 @@ class CommentService:
         row = await self.repo.get(comment_id)
         if not row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
-
-        # Only body is updatable per schema
         patch = data.model_dump(exclude_unset=True)
         for k, v in patch.items():
             setattr(row, k, v)
-
         await self.session.commit()
         await self.session.refresh(row)
         return CommentOut.model_validate(row)

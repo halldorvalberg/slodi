@@ -34,7 +34,6 @@ class TagOut(TagBase):
 
 # -------- ContentTag --------
 class ContentTagCreate(BaseModel):
-    content_id: UUID
     tag_id: UUID
 
 
