@@ -15,6 +15,9 @@ class TaskService:
         self.session = session
         self.repo = TaskRepository(session)
 
+    async def count_tasks_for_event(self, event_id: UUID) -> int:
+        return await self.repo.count_tasks_for_event(event_id)
+
     async def list_for_event(
         self, event_id: UUID, *, limit: int = 50, offset: int = 0
     ) -> list[TaskOut]:
@@ -22,13 +25,7 @@ class TaskService:
         return [TaskOut.model_validate(r) for r in rows]
 
     async def create_under_event(self, event_id: UUID, data: TaskCreate) -> TaskOut:
-        # Guard: body must match path
-        if data.event_id != event_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="event_id in body does not match path parameter",
-            )
-        task = Task(**data.model_dump())
+        task = Task(event_id=event_id, **data.model_dump())
         await self.repo.create(task)
         await self.session.commit()
         await self.session.refresh(task)
@@ -58,8 +55,7 @@ class TaskService:
         return TaskOut.model_validate(row)
 
     async def delete(self, task_id: UUID) -> None:
-        row = await self.repo.get(task_id)
-        if not row:
+        deleted = await self.repo.delete(task_id)
+        if deleted == 0:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
-        await self.repo.delete(task_id)
         await self.session.commit()

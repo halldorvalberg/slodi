@@ -4,7 +4,7 @@ import datetime as dt
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import and_, asc, delete, select
+from sqlalchemy import and_, asc, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -40,6 +40,24 @@ class EventRepository(Repository):
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
+    async def count_for_workspace(
+        self,
+        workspace_id: UUID,
+        *,
+        date_from: dt.datetime | None = None,
+        date_to: dt.datetime | None = None,
+    ) -> int:
+        conds = [Event.workspace_id == workspace_id]
+        if date_from is not None:
+            conds.append(Event.start_dt >= date_from)
+        if date_to is not None:
+            conds.append(Event.start_dt <= date_to)
+
+        result = await self.session.scalar(
+            select(func.count()).select_from(Event).where(and_(*conds))
+        )
+        return result or 0
+
     async def list_for_workspace(
         self,
         workspace_id: UUID,
@@ -63,6 +81,28 @@ class EventRepository(Repository):
             .offset(offset)
         )
         return await self.scalars(stmt)
+
+    async def count_for_program(
+        self,
+        workspace_id: UUID,
+        program_id: UUID,
+        *,
+        date_from: dt.datetime | None = None,
+        date_to: dt.datetime | None = None,
+    ) -> int:
+        conds = [
+            Event.workspace_id == workspace_id,
+            Event.program_id == program_id,
+        ]
+        if date_from is not None:
+            conds.append(Event.start_dt >= date_from)
+        if date_to is not None:
+            conds.append(Event.start_dt <= date_to)
+
+        result = await self.session.scalar(
+            select(func.count()).select_from(Event).where(and_(*conds))
+        )
+        return result or 0
 
     async def list_for_program(
         self,

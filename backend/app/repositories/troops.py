@@ -117,13 +117,13 @@ class TroopRepository(Repository):
 
     async def add_participation(
         self, event_id: UUID, troop_id: UUID
-    ) -> tuple[TroopParticipation, bool]:
+    ) -> tuple[bool, TroopParticipation]:
         existing = await self.get_participation(event_id, troop_id)
         if existing:
-            return existing, False
+            return False, existing
         tp = TroopParticipation(troop_id=troop_id, event_id=event_id)
         await self.add(tp)
-        return tp, True
+        return True, tp
 
     async def remove_participation(self, event_id: UUID, troop_id: UUID) -> int:
         res = await self.session.execute(

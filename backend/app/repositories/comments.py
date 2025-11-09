@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import delete, desc, select
+from sqlalchemy import delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -26,6 +26,12 @@ class CommentRepository(Repository):
         )
         res = await self.session.execute(stmt)
         return res.scalars().first()
+
+    async def count_content_comments(self, content_id: UUID) -> int:
+        result = await self.session.scalar(
+            select(func.count()).select_from(Comment).where(Comment.content_id == content_id)
+        )
+        return result or 0
 
     async def list_for_content(
         self,

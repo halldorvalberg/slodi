@@ -17,7 +17,6 @@ ImageStr = Annotated[
 
 class ProgramCreate(ContentCreate):
     content_type: Literal[ContentType.program] = ContentType.program
-    workspace_id: UUID
     image: ImageStr | None = None
 
 

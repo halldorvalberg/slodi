@@ -4,7 +4,7 @@ import datetime as dt
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, String
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import DateTime as SADateTime
@@ -23,6 +23,16 @@ if TYPE_CHECKING:
 class Event(Content):
     __tablename__ = "events"
     __mapper_args__ = {"polymorphic_identity": ContentType.event}
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["workspace_id", "program_id"],
+            ["programs.workspace_id", "programs.id"],
+            name="fk_event_program_workspace_program",
+            ondelete="RESTRICT",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
+    )
 
     # Columns
     id: Mapped[UUID] = mapped_column(
@@ -32,17 +42,21 @@ class Event(Content):
         nullable=False,
     )
 
-    start_dt: Mapped[dt.datetime] = mapped_column(SADateTime(timezone=True), nullable=False)
-    end_dt: Mapped[dt.datetime | None] = mapped_column(SADateTime(timezone=True), nullable=True)
+    start_dt: Mapped[dt.datetime] = mapped_column(
+        SADateTime(timezone=True), nullable=False
+    )
+    end_dt: Mapped[dt.datetime | None] = mapped_column(
+        SADateTime(timezone=True), nullable=True
+    )
 
     location: Mapped[str | None] = mapped_column(String(LOCATION_MAX), nullable=True)
 
     workspace_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("workspaces.id"), nullable=False
+        PGUUID(as_uuid=True),
+        ForeignKey("workspaces.id", ondelete="RESTRICT"),
+        nullable=False,
     )
-    program_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("programs.id"), nullable=False
-    )
+    program_id: Mapped[UUID | None] = mapped_column(PGUUID(as_uuid=True), nullable=True)
 
     # Relationships
     tasks: Mapped[list[Task]] = relationship(

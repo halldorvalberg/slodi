@@ -38,6 +38,20 @@ class UserRepository(Repository):
         res = await self.session.execute(stmt)
         return res.scalars().first()
 
+    async def count(self, *, q: str | None = None) -> int:
+        stmt = select(func.count()).select_from(User)
+        if q:
+            ilike = f"%{q.strip()}%"
+            stmt = stmt.where(
+                or_(
+                    User.name.ilike(ilike),
+                    User.email.ilike(ilike),
+                    User.auth0_id.ilike(ilike),
+                )
+            )
+        res = await self.session.execute(stmt)
+        return res.scalar_one()
+
     async def list(
         self,
         *,

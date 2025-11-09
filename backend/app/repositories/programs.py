@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -31,6 +31,12 @@ class ProgramRepository(Repository):
         stmt = select(Program).where(Program.id == program_id, Program.workspace_id == workspace_id)
         res = await self.session.execute(stmt)
         return res.scalars().first()
+
+    async def count_programs_for_workspace(self, workspace_id: UUID) -> int:
+        result = await self.session.scalar(
+            select(func.count()).select_from(Program).where(Program.workspace_id == workspace_id)
+        )
+        return result or 0
 
     async def list_by_workspace(
         self, workspace_id: UUID, *, limit: int = 50, offset: int = 0

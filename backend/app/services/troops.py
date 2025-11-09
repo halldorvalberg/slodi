@@ -36,7 +36,7 @@ class TroopService:
         troop = Troop(
             name=data.name,
             workspace_id=workspace_id,
-        )  # id default from ORM
+        )
         await self.repo.create(troop)
         await self.session.commit()
         await self.session.refresh(troop)
@@ -89,7 +89,7 @@ class TroopService:
         self, event_id: UUID, troop_id: UUID
     ) -> tuple[bool, TroopParticipationOut]:
         try:
-            tp, created = await self.repo.add_participation(event_id, troop_id)
+            created, tp = await self.repo.add_participation(event_id, troop_id)
             await self.session.commit()
         except IntegrityError:
             await self.session.rollback()

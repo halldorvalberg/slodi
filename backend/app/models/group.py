@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
@@ -75,3 +76,10 @@ class GroupMembership(Base):
     # Relationships
     user: Mapped[User] = relationship(back_populates="group_memberships")
     group: Mapped[Group] = relationship(back_populates="group_memberships")
+
+
+@dataclass
+class GroupMemberRow:
+    user_id: UUID
+    name: str
+    role: GroupRole

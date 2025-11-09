@@ -1,51 +1,70 @@
-# app/routers/workspaces.py
 from __future__ import annotations
 
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
+from app.core.pagination import Limit, Offset, add_pagination_headers
 from app.schemas.workspace import WorkspaceCreate, WorkspaceOut, WorkspaceUpdate
 from app.services.workspaces import WorkspaceService
 
-router = APIRouter(prefix="/workspaces", tags=["workspaces"])
+router = APIRouter(tags=["workspaces"])
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
-@router.get("/", response_model=list[WorkspaceOut])
-async def list_workspaces_for_user(
+@router.get("/users/{user_id}/workspaces", response_model=list[WorkspaceOut])
+async def list_user_workspaces(
     session: SessionDep,
+    request: Request,
+    response: Response,
     user_id: UUID,
-    limit: int = Query(50, ge=1, le=200),
-    offset: int = Query(0, ge=0),
+    limit: Limit = 50,
+    offset: Offset = 0,
 ):
     svc = WorkspaceService(session)
-    return await svc.list_for_user(user_id, limit=limit, offset=offset)
+    total = await svc.count_user_workspaces(user_id)
+    items = await svc.list_user_workspaces(user_id, limit=limit, offset=offset)
+    add_pagination_headers(
+        response=response,
+        request=request,
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
+    return items
 
 
-@router.post("/", response_model=WorkspaceOut, status_code=status.HTTP_201_CREATED)
-async def create_workspace_for_user(session: SessionDep, user_id: UUID, body: WorkspaceCreate):
+@router.post(
+    "/users/{user_id}/workspaces",
+    response_model=WorkspaceOut,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_user_workspace(
+    session: SessionDep, user_id: UUID, body: WorkspaceCreate, response: Response
+):
     svc = WorkspaceService(session)
-    return await svc.create_for_user(user_id, body)
+    workspace = await svc.create_user_workspace(user_id, body)
+    response.headers["Location"] = f"/workspaces/{workspace.id}"
+    return workspace
 
 
-@router.get("/{workspace_id}", response_model=WorkspaceOut)
+@router.get("/workspaces/{workspace_id}", response_model=WorkspaceOut)
 async def get_workspace(session: SessionDep, workspace_id: UUID):
     svc = WorkspaceService(session)
     return await svc.get(workspace_id)
 
 
-@router.patch("/{workspace_id}", response_model=WorkspaceOut)
+@router.patch("/workspaces/{workspace_id}", response_model=WorkspaceOut)
 async def update_workspace(session: SessionDep, workspace_id: UUID, body: WorkspaceUpdate):
     svc = WorkspaceService(session)
     return await svc.update(workspace_id, body)
 
 
-@router.delete("/{workspace_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/workspaces/{workspace_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_workspace(session: SessionDep, workspace_id: UUID):
     svc = WorkspaceService(session)
     await svc.delete(workspace_id)
