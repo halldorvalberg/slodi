@@ -38,19 +38,36 @@
   --info-foreground: 0 0% 20%;
   /* #333333 */
 
-  /* Accents (Scout Patrols) */
-  --accent-dreka: 51 100% 58%;
-  /* #FFE75C  Yellow */
-  --accent-falka: 347 79% 57%;
-  /* #E93860 */
-  --accent-drott: 168 74% 41%;
-  /* #1BB89B */
-  --accent-rekka: 195 83% 66%;
-  /* #62ccf0 */
-  --accent-rover: 33 100% 62%;
-  /* #FFAF3C */
-  --accent-adrir: 275 100% 66%;
-  /* #ba52ff */
+  /* primary colours for the scout patrols. */
+ --drekar: #E3CB54;
+  --falkar: #C65C72;
+  --drott:  #399E8F;
+  --rekkar: #67C9C3;
+  --rover:  #D89255;
+  --adrir: #A27ACF;
+
+
+  /* text colours for scout patrols */
+  --on-drekar: #1a1a1a;
+  --on-falkar: #ffffff;
+  --on-drott: #ffffff;
+  --on-rekkar: #0f172a;
+  --on-rover: #1a1a1a;
+  --on-adrir: #ffffff;
+  /* dekkri útgáfa af patrol litum (t.d. buttons, darkmode, hover) */
+  --drekar-600: #C7B446;
+  --falkar-600: #A54C60;
+  --drott-600:  #2E857F;
+  --rekkar-600: #57B4AF;
+  --rover-600:  #C17F47;
+  --adrir-600: #8D68B5;
+  /* Mjög dauf útgáfa af patrol litum (t.d. background, cards) */
+  --drekar-50: #F9F5E3;
+  --falkar-50: #F7ECEF;
+  --drott-50:  #EAF5F3;
+  --rekkar-50: #ECF8F7;
+  --rover-50:  #F8F0E8;
+  --adrir-50:  #F2ECFA;
 
   /* Text helpers */
   --text-strong: 154 43% 18%;
@@ -60,8 +77,8 @@
 
   /* Typography (your preference: Roboto Condensed) */
   --font-sans: "Roboto Condensed", ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", "Helvetica Neue", Arial, "Noto Sans",
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol";
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
 
@@ -171,30 +188,30 @@ html {
 
 body {
   margin: 0;
-    padding: 0;
-    font-family: var(--font-geist-sans, system-ui, sans-serif);
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  /* Utility classes replaced with standard CSS */
-  .antialiased {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  
-  .border {
-    border: 1px solid hsl(var(--border) / 30%);
-  }
-  
-  .outline-none {
-    outline: none;
-  }
-  
-  .focus-visible {
-    outline: 2px solid hsl(var(--primary) / 40%);
+  padding: 0;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility classes replaced with standard CSS */
+.antialiased {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.border {
+  border: 1px solid hsl(var(--border) / 30%);
+}
+
+.outline-none {
+  outline: none;
+}
+
+.focus-visible {
+  outline: 2px solid hsl(var(--primary) / 40%);
 }
 
 .focus-visible:focus {
