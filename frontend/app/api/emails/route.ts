@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import z4 from 'zod/v4';
 
 const API_BASE_URL = process.env.API_BASE_URL;
 
@@ -8,104 +7,94 @@ if (!API_BASE_URL) {
     throw new Error('Missing API_BASE_URL');
 }
 
-const JSON_HEADERS = { 'Content-Type': 'application/json' } as const;
-
-const EmailBodySchema = z4.object({
-    email: z4.email(),
-});
-
-function jsonResponse(body: unknown, status = 200) {
-    return NextResponse.json(body, { status, headers: JSON_HEADERS });
+function json(body: unknown, status = 200) {
+    return NextResponse.json(body, { status });
 }
 
-export async function GET(req: NextRequest) {
-    try {
-        // You can inspect URL parameters if needed:
-        // const searchParams = req.nextUrl.searchParams;
-        // const limit = searchParams.get('limit');
 
-        const res = await fetch(`${API_BASE_URL}/emails`, {
-            method: 'GET',
-            cache: 'no-store',
-        });
+function isValidEmail(value: unknown): value is string {
+    if (typeof value !== "string") return false;
+    if (value.length < 3 || value.length > 320) return false;
 
-        let data: unknown = null;
-        try {
-            data = await res.json();
-        } catch {
-            data = null;
-        }
-
-        if (!res.ok) {
-            return jsonResponse(
-                {
-                    message: 'Failed to fetch emails from upstream API',
-                    status: res.status,
-                    upstream: data,
-                },
-                res.status,
-            );
-        }
-
-        return jsonResponse(data, 200);
-    } catch (error) {
-        console.error('GET emails failed:', error);
-        return jsonResponse({ message: 'Internal server error while fetching emails' }, 500);
-    }
+    // Simple but decent pattern, good enough for a signup form
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(value);
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
     let body: unknown;
     try {
-        body = await req.json();
-    } catch {
-        return jsonResponse({ message: 'Invalid JSON payload' }, 400);
+        // We expect the request body to be JSON with an "email" field
+        body = await request.json();
+    } catch (error) {
+        return json({ error: 'Invalid JSON body' }, 400);
     }
 
-    const parsed = await EmailBodySchema.safeParseAsync(body);
-    if (!parsed.success) {
-        return jsonResponse(
-            {
-                message: 'Invalid email payload',
-                errors: parsed.error.flatten(),
-            },
-            400,
-        );
+    const email = (body as { email?: unknown })?.email;
+    if (!isValidEmail(email)) {
+        return json({ message: "Invalid email format" }, 400);
     }
-
-    const { email } = parsed.data;
 
     try {
-        const res = await fetch(`${API_BASE_URL}/emails`, {
+        const response = await fetch(`${API_BASE_URL}/emaillist/`, {
             method: 'POST',
-            headers: JSON_HEADERS,
-            body: JSON.stringify({ email }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
         });
 
         let data: unknown = null;
         try {
-            data = await res.json();
-        } catch {
-            data = null;
+            data = await response.json();
+        }
+        catch (error) {
+        // Ignore JSON parsing errors
         }
 
-        if (!res.ok) {
-            return jsonResponse(
-                {
-                    message: 'Failed to add email to upstream list',
-                    status: res.status,
-                    upstream: data,
-                },
-                res.status,
+        if (!response.ok) {
+            return json(
+                { message: 'Failed to save email', details: data || response.statusText, status: response.status, upstream: data },
+                response.status
             );
         }
 
-        return jsonResponse(data ?? { message: 'Email added successfully' }, 201);
+        return json(
+            data ?? { message: 'Email saved successfully' },
+            201
+        );
     } catch (error) {
-        console.error('POST emails failed:', error);
-        return jsonResponse({ message: 'Internal server error while adding email' }, 500);
+        console.error('Error connecting to backend API:', error);
+        return json(
+            { message: 'Error connecting to backend API', details: (error as Error).message },
+        );
     }
 }
+
+// the get function returns a list of all emails in the emaillist
+export async function GET(_req: NextRequest) {
+    try {
+        console.log("API URL: ", `${API_BASE_URL}/emaillist/`);
+        const url = new URL("/emaillist", API_BASE_URL);
+
+        const res = await fetch(url.toString());
+
+
+        console.log('Received response from backend API with status', res.status);
+
+        // If backend is up but returns error, propagate status + body as-is
+        const data = await res.json();
+
+        return NextResponse.json(data, {
+            status: res.status,
+        });
+    } catch (err) {
+        console.error("Error fetching email list:", err);
+        return NextResponse.json(
+            { message: "Failed to fetch email list" },
+            { status: 500 },
+        );
+    }
+}
+
 
 // Run this route on the Node runtime
 export const runtime = 'nodejs';
