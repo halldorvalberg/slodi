@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = process.env.API_BASE_URL;
+// Allow a sensible default during local development/build so the route
+// doesn't throw at build time when env vars aren't provided.
+const API_BASE_URL = process.env.API_BASE_URL ?? 'http://127.0.0.1:8000';
 
-if (!API_BASE_URL) {
-    console.error('API_BASE_URL is not set. Check your environment configuration.');
-    throw new Error('Missing API_BASE_URL');
+if (!process.env.API_BASE_URL) {
+    // Not fatal — warn so developers know they should set it for non-dev envs.
+    // Using console.warn avoids failing the build while still surfacing the issue.
+    // eslint-disable-next-line no-console
+    console.warn('API_BASE_URL is not set; defaulting to http://127.0.0.1:8000');
 }
 
 function json(body: unknown, status = 200) {
