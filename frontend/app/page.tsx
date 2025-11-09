@@ -5,6 +5,13 @@ import styles from "./page.module.css";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
+function isValidEmail(value: string): boolean {
+  if (typeof value !== "string") return false;
+  if (value.length < 3 || value.length > 320) return false;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(value);
+}
+
 export default function Home() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -37,13 +44,10 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email)) {
-      setMessage("Vinsamlegast sláðu inn gilt netfang.");
-      return;
+    if (!isValidEmail(email)) {
+      return setMessage("Vinsamlegast sláðu inn gilt netfang.");
     }
-
     try {
       const response = await fetch("/api/emails", {
         method: "POST",
@@ -59,7 +63,7 @@ export default function Home() {
           "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
         );
       }
-    } catch {
+    } catch (err) {
       setMessage(
         "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
       );
@@ -67,12 +71,13 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.page}>
-      <section className={styles.hero}>
-        <div className={styles.heroInner}>
+    <div className="font-sans flex flex-col overflow-hidden relative min-h-[85dvh] max-h-[85dvh]">
+      <div className="flex-grow flex items-center justify-center min-h-[30dvh] mt-8 z-10 max-h-[35dvh]">
+        <div className="text-center w-4/5 sm:w-3/5 flex items-center justify-center h-full">
           <div>
-            <h1 className={styles.title}>Slóði</h1>
-            <p className={styles.subtitle}>
+            <h1 className="text-6xl font-bold uppercase">Slóði</h1>
+            
+            <p className="text-sm text-justify mt-4">
               Markmið Slóða er að styðja við foringja í skátastarfi með því að gera
               dagskrárgerð einfaldari, markvissari og skipulagðari. Með því að safna
               saman dagskrárhugmyndum, bjóða upp á verkfæri til að setja saman
@@ -81,19 +86,22 @@ export default function Home() {
             </p>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className={styles.signup}>
+      <div className="flex-grow flex items-center justify-center bg-background text-text max-h-[30dvh]">
         <form
           onSubmit={handleSubmit}
-          className={styles.form}
+          className="flex flex-col items-center w-4/5 sm:w-1/2"
           aria-label="Email subscription form"
         >
-          <p className={styles.formLead} aria-live="polite">
+          <p
+            className="text-lg mb-4 text-center"
+            aria-live="polite"
+          >
             Skráðu þig á póstlista til að fá nýjustu upplýsingar um verkefnið
           </p>
 
-          <div className={styles.inputWrap}>
+          <div className="relative w-full">
             <input
               type="email"
               value={email}
@@ -103,6 +111,7 @@ export default function Home() {
               required
               aria-label="Email address"
             />
+
             <button
               type="submit"
               className={styles.submit}
@@ -119,7 +128,7 @@ export default function Home() {
             </p>
           )}
         </form>
-      </section>
+      </div>
     </div>
   );
 }

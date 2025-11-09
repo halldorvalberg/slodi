@@ -1,5 +1,5 @@
 // app/dev/page.tsx
-import DevlogClient from "./DevlogClient";
+import DevlogClient from "@/app/dev/DevlogClient";
 import { paginateDevlogs } from "@/lib/devlogs";
 import styles from "./dev.module.css";
 
