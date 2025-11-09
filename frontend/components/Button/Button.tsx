@@ -25,7 +25,6 @@ export default function Button({
     children,
     ...rest
 }: ButtonProps) {
-  const Comp: React.ElementType = as === "a" ? "a" : "button";
     const classes = [
         styles.btn,
         styles[`btn--${variant}`],

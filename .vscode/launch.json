@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      "name": "Launch Frontend",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/frontend"
+    },
+    {
+      "name": "Launch Backend",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "make run",
+      "cwd": "${workspaceFolder}/backend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Launch System (Frontend & Backend)",
+      "configurations": ["Launch Frontend", "Launch Backend"]
+    }
+  ]
+}
