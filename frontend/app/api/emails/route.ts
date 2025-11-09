@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     try {
         // We expect the request body to be JSON with an "email" field
         body = await request.json();
-    } catch (error) {
+    } catch (_err) {
         return json({ error: 'Invalid JSON body' }, 400);
     }
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         try {
             data = await response.json();
         }
-        catch (error) {
+        catch (_err) {
         // Ignore JSON parsing errors
         }
 

@@ -26,7 +26,7 @@ export default function Home() {
         }
       } catch (error) {
         console.log(
-          "%c[Omnissiah Status]: API is not reachable. Invoke the Rites of Debugging.",
+          "%c[Omnissiah Status]: API is not reachable. Invoke the Rites of Debugging." + String(error),
           "color: red; font-weight: bold;"
         );
       }
