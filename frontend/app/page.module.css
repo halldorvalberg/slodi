@@ -2,14 +2,16 @@
 .page {
     font-family: var(--font-sans);
     position: relative;
-    min-height: 85vh;
-    max-height: 85vh;
-    /* matches your original */
+    min-height: 85dvh;
+    max-height: 85dvh;
+    /* matches your original Tailwind min-h-[85dvh] / max-h-[85dvh] */
     display: flex;
     flex-direction: column;
     overflow: hidden;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
+    /* reserve space for the sticky header so content isn't hidden underneath it */
+    padding-top: 4rem;
 }
 
 /* Hero */
@@ -18,8 +20,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 30vh;
-    max-height: 35vh;
+    min-height: 30dvh;
+    max-height: 35dvh;
     margin-top: 2rem;
     z-index: 10;
 }
@@ -39,20 +41,24 @@
 }
 
 .title {
-    font-weight: 800;
+    /* Tailwind: text-6xl font-bold uppercase */
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-size: 3.75rem; /* text-6xl */
     letter-spacing: 0.02em;
     margin: 0;
     color: hsl(var(--text-strong));
+    z-index: -1 ;
 }
 
 .subtitle {
     margin-top: 1rem;
-    font-size: 0.95rem;
+    font-size: 0.875rem; /* text-sm */
     text-align: justify;
     color: hsl(var(--foreground));
+    z-index: -1;
 }
+
 
 /* Signup section */
 .signup {
@@ -60,7 +66,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    max-height: 30vh;
+    max-height: 30dvh;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
 }
@@ -79,7 +85,7 @@
 }
 
 .formLead {
-    font-size: 1.1rem;
+    font-size: 1.125rem; /* text-lg */
     margin: 0 0 1rem 0;
     text-align: center;
 }
@@ -92,7 +98,7 @@
 
 .input {
     width: 100%;
-    padding: 0.6rem 3rem 0.6rem 0.75rem;
+    padding: 0.5rem 3rem 0.5rem 0.75rem; /* py-2 equivalent */
     /* space for the button on the right */
     border: 1px solid hsl(var(--border) / 0.35);
     border-radius: 0.5rem;
@@ -107,16 +113,16 @@
 
 .input:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.25);
 }
 
 /* Submit button sits inside the input wrap */
 .submit {
     position: absolute;
-    inset-block: 0;
-    /* top and bottom = 0 */
+    top: 0;
+    bottom: 0;
     right: 0;
-    padding: 0 0.9rem;
+    padding: 0 1rem; /* px-4 */
     border: 1px solid hsl(var(--primary));
     border-left: none;
     border-radius: 0 0.5rem 0.5rem 0;
@@ -124,6 +130,9 @@
     color: hsl(var(--primary));
     font-weight: 600;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .submit:hover {
@@ -137,6 +146,6 @@
 
 .message {
     margin-top: 1rem;
-    font-size: 0.9rem;
+    font-size: 0.875rem; /* text-sm */
     color: hsl(var(--secondary));
 }

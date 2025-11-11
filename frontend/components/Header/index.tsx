@@ -1,51 +1,132 @@
 "use client";
 
 import Link from "next/link";
-import { auth0 } from "@/lib/auth0";
-import AccountButton from "@/components/AccountButton";
-import MobileNav from "@/components/MobileNav";
+import { useState } from "react";
+import styles from "./header.module.css";
+import { useUser } from "@auth0/nextjs-auth0";
 
-type LeanUser = { name: string; picture: string | null; email: string | null } | null;
 
-export default async function Header() {
-  const session = await auth0.getSession();
-  const user: LeanUser = session?.user
-    ? {
-      name: session.user.name ?? session.user.nickname ?? "Account",
-      picture: session.user.picture ?? null,
-      email: session.user.email ?? null,
-    }
-    : null;
+export default function Header() {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const openDrawer = () => setIsDrawerOpen(true);
+  const closeDrawer = () => setIsDrawerOpen(false);
+  const { user, error, isLoading } = useUser();
+
+  if (isLoading) console.log("Loading user...");
+  else if (error) console.log("Error loading user:", error);
+  else if (user) console.log("User logged in:", user);
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--color-background)] text-[var(--color-foreground)] border-b font-sans">
-      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
-        <Link href="/" className="font-medium">Slóði</Link>
+    <header className={styles.headerRoot}>
+      <div className={styles.headerContent}>
+        <Link href="/" className={styles.brandLink}>
+          Slóði
+        </Link>
 
-      <aside
-        id="menu-drawer"
-        className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
-        aria-hidden={!drawerOpen}
-      >
-        <nav className={styles.drawerNav}>
-          <Link href="/" className={styles.drawerLink} onClick={closeDrawer}>
+        {/* Desktop navigation */}
+        <nav className={`${styles.primaryNav} ${styles.primaryNavDesktop}`}>
+          <Link href="/" className={styles.primaryNavLink}>
             Heim
           </Link>
-          <Link href="/about" className={styles.drawerLink} onClick={closeDrawer}>
+          <Link href="/about" className={styles.primaryNavLink}>
             Um Slóða
           </Link>
-          <Link
+          <a
             href="https://github.com/halldorvalberg/slodi"
             target="_blank"
             rel="noopener noreferrer"
-            className={styles.drawerLink}
-            onClick={closeDrawer}
+            className={styles.primaryNavLink}
           >
             Github
-          </Link>
+          </a>
+
+          {user ? (
+            <Link
+              href="/dashboard"
+              className={styles.primaryNavLink}
+            >
+              Stjórnborð
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className={styles.primaryNavLink}
+            >
+              Innskráning
+            </Link>
+          )
+          }
         </nav>
-      </aside>
+
+        {/* Mobile menu toggle */}
+        <button
+          type="button"
+          className={styles.menuToggleButton}
+          onClick={openDrawer}
+          aria-label="Opna valmynd"
+          aria-haspopup="true"
+          aria-expanded={isDrawerOpen}
+          aria-controls="main-menu-drawer"
+        >
+          ☰
+        </button>
+
+        {/* Drawer overlay */}
+        {isDrawerOpen && (
+          <div
+            className={styles.drawerOverlay}
+            onClick={closeDrawer}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Mobile drawer */}
+        <aside
+          id="main-menu-drawer"
+          className={`${styles.drawerPanel} ${isDrawerOpen ? styles.drawerPanelOpen : ""
+            }`}
+          aria-hidden={!isDrawerOpen}
+        >
+          <nav className={styles.drawerNav}>
+            <Link href="/" className={styles.drawerNavLink} onClick={closeDrawer}>
+              Heim
+            </Link>
+            <Link href="/about" className={styles.drawerNavLink} onClick={closeDrawer}>
+              Um Slóða
+            </Link>
+            <a
+              href="https://github.com/halldorvalberg/slodi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.drawerNavLink}
+              onClick={closeDrawer}
+            >
+              Github
+            </a>
+
+            {user ? (
+              <Link
+                href="/dashboard"
+                className={styles.drawerNavLink}
+                onClick={closeDrawer}
+              >
+                Stjórnborð
+              </Link>
+            ) : (
+              <Link
+                href="/auth/login"
+                className={styles.drawerNavLink}
+                onClick={closeDrawer}
+              >
+                Innskráning
+              </Link>
+            )
+            }
+
+          </nav>
+        </aside>
+      </div>
     </header>
   );
 }
-

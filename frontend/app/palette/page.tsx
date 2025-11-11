@@ -129,12 +129,12 @@ export default function PalettePage() {
     ];
 
     const scouts = [
-        { name: "Drekar", token: "--accent-dreka", note: "Sveitarlitur" },
-        { name: "Fálkar", token: "--accent-falka", note: "Sveitarlitur" },
-        { name: "Drótt", token: "--accent-drott", note: "Sveitarlitur" },
-        { name: "Rekkar", token: "--accent-rekka", note: "Sveitarlitur" },
-        { name: "Róver", token: "--accent-rover", note: "Sveitarlitur" },
-        { name: "Aðrir", token: "--accent-adrir", note: "Sveitarlitur" },
+        { name: "Drekar", token: "--drekar", fg: "--on-drekar", note: "Sveitarlitur" },
+        { name: "Fálkar", token: "--falkar", fg: "--on-falkar", note: "Sveitarlitur" },
+        { name: "Drótt", token: "--drott", fg: "--on-drott", note: "Sveitarlitur" },
+        { name: "Rekkar", token: "--rekkar", fg: "--on-rekkar", note: "Sveitarlitur" },
+        { name: "Róver", token: "--rover", fg: "--on-rover", note: "Sveitarlitur" },
+        { name: "Aðrir", token: "--adrir", fg: "--on-adrir", note: "Sveitarlitur" },
     ];
 
     const systemRoles = [
@@ -204,7 +204,22 @@ export default function PalettePage() {
                 <Section title="Skátasveitarlitir" subtitle="Notað til að greina sveitir út frá litum þeirra. Byggir á litastaðli Bandalagsins">
                     <div className={styles.grid6}>
                         {scouts.map((c) => (
-                            <Swatch key={c.name} name={c.name} bgToken={c.token} note={c.note} />
+                            <Card key={c.name} className={styles.swatch}>
+                                <div
+                                    className={styles.swatchBlock}
+                                    style={{ background: `var(${c.token})` }}
+                                    aria-label={`${c.name} litasýni`}
+                                />
+                                <div className={styles.swatchMeta}>
+                                    <div className={styles.swatchRow}>
+                                        <span className={styles.swatchName}>{c.name}</span>
+                                        <code className={styles.swatchCode}>
+                                            {`var(${c.token})`}
+                                        </code>
+                                    </div>
+                                    {c.note && <div className={styles.swatchNote}>{c.note}</div>}
+                                </div>
+                            </Card>
                         ))}
                     </div>
                 </Section>
@@ -253,14 +268,10 @@ export default function PalettePage() {
                                 <div className={styles.patrolHead} style={{ background: `hsl(var(${bg}))` }}>
                                     <div className={styles.patrolGrid}>
                                         {scouts.map((s) => (
-                                            <div
-                                                key={s.name}
-                                                className={styles.patrolCell}
-                                                style={{
-                                                    background: `hsl(var(${s.token}))`,
-                                                    color: `hsl(var(--primary-foreground))`,
-                                                }}
-                                            >
+                                            <div key={s.name} className={styles.patrolCell} style={{
+                                                background: `var(${s.token})`,
+                                                color: `var(${s.fg})`,
+                                            }}>
                                                 <div className={styles.patrolName}>{s.name}</div>
                                                 <p className={styles.patrolDesc}>Merki eða aðgerðahnappur</p>
                                             </div>

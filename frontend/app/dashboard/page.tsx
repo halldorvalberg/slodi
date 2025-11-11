@@ -4,9 +4,16 @@ import Image from "next/image";
 import { auth0 } from "@/lib/auth0";
 import styles from "./dashboard.module.css";
 import Button from "@/components/Button/Button";
+import EmailListDownloadButton from "./email-download-service";
 
 // Prevent caching of sensitive content
 export const dynamic = "force-dynamic";
+
+// We create a temporary list of emails that are allowed access to the emails button
+const EMAIL_LIST = [
+    "halldor@svanir.is",
+    "signy.kristin8@gmail.com"
+];
 
 async function getBaseUrl() {
     const env = process.env.APP_BASE_URL;
@@ -61,6 +68,11 @@ export default async function DashboardPage() {
                     <h2 className={styles.cardTitle}>Aðgerðir</h2>
 
                     <div className={styles.actions}>
+
+                        {/* A button only visible to certain users (client component handles the click) */}
+                        {EMAIL_LIST.includes(user.email ?? "") && (
+                            <EmailListDownloadButton allowed={true} />
+                        )}
 
                         <Button href="/" variant="secondary">
                             Fara á forsíðu
