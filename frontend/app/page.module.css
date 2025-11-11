@@ -10,6 +10,8 @@
     overflow: hidden;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
+    /* reserve space for the sticky header so content isn't hidden underneath it */
+    padding-top: 4rem;
 }
 
 /* Hero */
@@ -46,6 +48,7 @@
     letter-spacing: 0.02em;
     margin: 0;
     color: hsl(var(--text-strong));
+    z-index: -1 ;
 }
 
 .subtitle {
@@ -53,7 +56,9 @@
     font-size: 0.875rem; /* text-sm */
     text-align: justify;
     color: hsl(var(--foreground));
+    z-index: -1;
 }
+
 
 /* Signup section */
 .signup {
