@@ -6,7 +6,7 @@ tags: ["devlog"]
 summary: "Markmiðasetning og niðurstöður eftir vinnuhelgi á ÚSÚ"
 ---
 
-Helgina 7. - 9. nóvember var haldið annað skref grunnnámskeiðs Gilwell og af því tilefni
+Helgina 7.–9. nóvember var haldið grunnnámskeiðs Gilwell og af því tilefni nýttum við tækifærið til að vinna markvisst að verkefnum Slóða í samvinnu við aðra framhaldsnemendur. Við fengum aðstöðu á Úlfljótsvatni, þar sem við gátum unnið í ró og næði að þróun og stefnumótun verkefnisins. Helgin var nýtt bæði til hagnýtrar vinnu við forritun og uppsetningu, sem og til umræðna um framtíðarsýn og skipulag verkefnisins í heild. Þetta var frábært tækifæri til að festa niður seinustu óvissu atriðin um verkefnið, skerpa á markmiðum og leggja traustan grunn að næstu skrefum í þróun Slóða.
 
 ## Markmið
 
@@ -26,7 +26,7 @@ Við viljum vinna markvisst að því að tengja saman framenda og bakenda kerfi
 
 ### Samræmt og heildstætt viðmót
 
-Á sama tíma verður unnið að því að samhæfa útlit og hegðun kerfisins. Við viljum byggja upp samheildarkerfi framenda sem að byggir á endurnýtingu og erfðum kompónenta til að sameina stíl og virkni þannig að kerfið hafi heilt yfir samræmt útlit og notendaupplifun. Þetta felur í sér vinnu að grunnþemu, litakerfi og hönnunarstaðla sem verða notaðir í öllum einingum framendas.
+Á sama tíma verður unnið að því að samhæfa útlit og hegðun kerfisins. Við viljum byggja upp samheildarkerfi framenda sem byggir á endurnýtingu og erfðum kompónenta til að sameina stíl og virkni þannig að kerfið hafi heilt yfir samræmt útlit og notendaupplifun. Þetta felur í sér vinnu að grunnþemum, litakerfi og hönnunarstaðlum sem verða notaðir í öllum einingum framendas.
 
 ### Gagnagrunnur og auðkenning
 
@@ -65,4 +65,4 @@ Helgin reyndist afkastamikil og markviss. Við náðum að ljúka helstu grunnve
 
 - **Vettvangur fyrir vinnuhópa**: Netvettvangur (Discord) var settur upp og þátttakendum boðið inn. Hóparnir geta nú nýtt hann til samráðs og skipulagningar.
 
-- **Fjárhagsáætlun og styrktarumsókn**: Unnið var drög að fjárhagsáætlun fyrir næstu 12 mánuði og samin styrktarumsókn sem verður send á styrktarsjóð skáta.
+- **Fjárhagsáætlun og styrktarumsókn**: Unnin voru drög að fjárhagsáætlun fyrir næstu 12 mánuði og samin styrktarumsókn sem verður send á styrktarsjóð skáta.
