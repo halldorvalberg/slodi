@@ -13,13 +13,13 @@ router = APIRouter(prefix="/emaillist", tags=["emaillist"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
-@router.get("/", response_model=list[EmailListOut])
+@router.get("", response_model=list[EmailListOut])
 async def list_email_list(session: SessionDep):
     svc = EmailListService(session)
     return await svc.list()
 
 
-@router.post("/", response_model=EmailListOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=EmailListOut, status_code=status.HTTP_201_CREATED)
 async def create_email_entry(session: SessionDep, body: EmailListCreate):
     svc = EmailListService(session)
     return await svc.create(body)

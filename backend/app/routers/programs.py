@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
 from app.core.pagination import Limit, Offset, add_pagination_headers
+from app.models.content import ContentType
 from app.schemas.program import ProgramCreate, ProgramOut, ProgramUpdate
 from app.services.programs import ProgramService
 
@@ -50,6 +51,7 @@ async def create_program_under_workspace(
     body: ProgramCreate,
     response: Response,
 ):
+    assert body.content_type == ContentType.program, "Content type must be 'program'"
     svc = ProgramService(session)
     program = await svc.create_under_workspace(workspace_id, body)
     response.headers["Location"] = f"/programs/{program.id}"

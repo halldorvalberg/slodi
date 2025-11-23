@@ -23,7 +23,6 @@ class ContentBase(BaseModel):
 
     name: NameStr
     description: DescStr | None = None
-    public: bool = False
     like_count: int = 0
     created_at: dt.datetime = Field(default_factory=get_current_datetime)
     author_id: UUID
@@ -45,7 +44,6 @@ class ContentUpdate(BaseModel):
 
     name: NameStr | None = None
     description: DescStr | None = None
-    public: bool | None = None
     like_count: int | None = None
 
     @field_validator("like_count")

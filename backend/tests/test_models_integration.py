@@ -40,11 +40,9 @@ async def test_user_workspace_program_event_task_flow(session):
     p_in = s.ProgramCreate(
         name="Fall Skills",
         description=None,
-        public=False,
         like_count=0,
         created_at=get_current_datetime(),
         author_id=user.id,
-        workspace_id=workspace.id,
     )
     program = m.Program(**p_in.model_dump())
     session.add(program)
@@ -58,12 +56,9 @@ async def test_user_workspace_program_event_task_flow(session):
     e_in = s.EventCreate(
         name="Campout",
         description="Overnight",
-        public=False,
         like_count=0,
         created_at=get_current_datetime(),
         author_id=user.id,
-        workspace_id=workspace.id,
-        program_id=program.id,
     )
     event = m.Event(**e_in.model_dump())
     session.add(event)
@@ -73,11 +68,9 @@ async def test_user_workspace_program_event_task_flow(session):
     t_in = s.TaskCreate(
         name="Setup tents",
         description=None,
-        public=False,
         like_count=0,
         created_at=get_current_datetime(),
         author_id=user.id,
-        event_id=event.id,
     )
     task = m.Task(**t_in.model_dump())
     session.add(task)
@@ -118,7 +111,6 @@ async def test_tags_and_comments_and_cascade(session):
     p = m.Program(
         name="Prog",
         description=None,
-        public=False,
         like_count=0,
         created_at=get_current_datetime(),
         author_id=u.id,
@@ -137,7 +129,7 @@ async def test_tags_and_comments_and_cascade(session):
     session.add(ct)
 
     # Comment
-    c_in = s.CommentCreate(body="Nice idea!", user_id=u.id, content_id=p.id)
+    c_in = s.CommentCreate(body="Nice idea!", user_id=u.id)
     comment = m.Comment(**c_in.model_dump())
     session.add(comment)
     await session.commit()
@@ -194,7 +186,6 @@ async def test_group_membership_and_troops(session):
     p = m.Program(
         name="Prog2",
         description=None,
-        public=False,
         like_count=0,
         created_at=get_current_datetime(),
         author_id=u.id,
@@ -204,7 +195,6 @@ async def test_group_membership_and_troops(session):
     e = m.Event(
         name="Hike",
         description=None,
-        public=False,
         like_count=0,
         created_at=get_current_datetime(),
         author_id=u.id,

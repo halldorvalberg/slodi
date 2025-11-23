@@ -13,8 +13,8 @@ from sqlalchemy import (
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.types import Boolean, Integer
 from sqlalchemy.types import DateTime as SADateTime
+from sqlalchemy.types import Integer
 
 from app.domain.content_constraints import (
     DESC_MAX,
@@ -61,7 +61,6 @@ class Content(Base):
     )
     name: Mapped[str] = mapped_column(String(NAME_MAX), nullable=False)
     description: Mapped[str | None] = mapped_column(String(DESC_MAX), nullable=True)
-    public: Mapped[bool] = mapped_column(Boolean, nullable=False)
     like_count: Mapped[int] = mapped_column(
         Integer,
         nullable=False,

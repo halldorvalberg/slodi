@@ -9,6 +9,7 @@ from app.routers import (
     email_list_router,
     events_router,
     groups_router,
+    likes_router,
     programs_router,
     tags_router,
     tasks_router,
@@ -32,6 +33,7 @@ def create_app() -> FastAPI:
     app.include_router(tasks_router.router)
     app.include_router(tags_router.router)
     app.include_router(comments_router.router)
+    app.include_router(likes_router.router)
 
     @app.get("/healthz")
     async def healthz():
