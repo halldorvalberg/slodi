@@ -66,7 +66,7 @@ When you modify models, create a new migration with:
 ## 🧪 Testing
 
 We use pytest with async SQLAlchemy.
-Note: Tests should be run in a test database defined in `.env`
+Note: Tests should never run against a production database!
 
 **Run all tests:**
    ```bash
