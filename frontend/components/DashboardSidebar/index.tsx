@@ -34,6 +34,7 @@ import {
     PanelLeftClose, // Collapse sidebar icon
     PanelLeftOpen,  // Expand sidebar icon
 } from "lucide-react";
+import Image from "next/image";
 
 /**
  * Navigation item configuration
@@ -278,7 +279,7 @@ export default function DashboardSidebar({
                             title={isCollapsed ? userName : undefined}
                         >
                             {userAvatar ? (
-                                <img
+                                <Image
                                     src={userAvatar}
                                     alt=""
                                     className={styles.userAvatar}

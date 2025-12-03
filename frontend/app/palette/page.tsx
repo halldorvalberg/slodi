@@ -168,24 +168,24 @@ const PatrolBadge: React.FC<{ name: string; token: string; fgToken: string }> = 
 };
 
 /** Dark mode toggle */
-const ToggleDark: React.FC = () => {
-    const [isDark, setIsDark] = useState(false);
+// const ToggleDark: React.FC = () => {
+//     const [isDark, setIsDark] = useState(false);
 
-    useEffect(() => {
-        setIsDark(document.documentElement.classList.contains("dark"));
-    }, []);
+//     useEffect(() => {
+//         setIsDark(document.documentElement.classList.contains("dark"));
+//     }, []);
 
-    const toggle = () => {
-        document.documentElement.classList.toggle("dark");
-        setIsDark((v) => !v);
-    };
+//     const toggle = () => {
+//         document.documentElement.classList.toggle("dark");
+//         setIsDark((v) => !v);
+//     };
 
-    return (
-        <button onClick={toggle} className={cx(styles.btn, styles.btnSecondary)}>
-            {isDark ? "☀️ Ljóst" : "🌙 Dökkt"}
-        </button>
-    );
-};
+//     return (
+//         <button onClick={toggle} className={cx(styles.btn, styles.btnSecondary)}>
+//             {isDark ? "☀️ Ljóst" : "🌙 Dökkt"}
+//         </button>
+//     );
+// };
 
 /** Theme selector */
 const ThemeSelector: React.FC = () => {

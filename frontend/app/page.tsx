@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
-import Footer from "@/components/Footer";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -71,7 +70,7 @@ export default function Home() {
           "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
         );
       }
-    } catch (err) {
+    } catch {
       setStatus("error");
       setMessage(
         "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."

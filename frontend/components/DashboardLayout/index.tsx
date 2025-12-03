@@ -38,7 +38,7 @@ export default function DashboardLayout({
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const { user, error, isLoading } = useUser();
+    const { user } = useUser();
 
     const resolvedUserName = user?.name || userName;
     const resolvedUserAvatar = user?.picture || userAvatar || undefined;

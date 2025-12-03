@@ -11,11 +11,7 @@ export default function Header() {
 
   const openDrawer = () => setIsDrawerOpen(true);
   const closeDrawer = () => setIsDrawerOpen(false);
-  const { user, error, isLoading } = useUser();
-
-  // if (isLoading) console.log("Loading user...");
-  // else if (error) console.log("Error loading user:", error);
-  // else if (user) console.log("User logged in:", user);
+  const { user } = useUser();
 
   return (
     <header className={styles.headerRoot}>

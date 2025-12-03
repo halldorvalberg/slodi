@@ -1,4 +1,4 @@
-import { Target, Sparkles, BookOpen, Hammer, ClipboardList, Users, Search, BarChart3, Calendar } from "lucide-react";
+import { BookOpen, Hammer, ClipboardList, Users, Search, BarChart3, Calendar } from "lucide-react";
 import styles from "./about.module.css";
 
 export default function AboutPage() {
@@ -48,7 +48,7 @@ export default function AboutPage() {
             <Hammer className={styles.featureIcon} />
             <h3 className={styles.featureTitle}>Dagskrárgerð</h3>
             <p className={styles.featureText}>
-              „Drag-and-drop" verkfæri til að setja saman heildardagskrár (fundi, útilegur eða mót) úr viðfangsefnum. Hægt er að skipuleggja dagskrár eftir tíma, þema eða flokkum.
+              &ldquo;Drag-and-drop&rdquo; verkfæri til að setja saman heildardagskrár (fundi, útilegur eða mót) úr viðfangsefnum. Hægt er að skipuleggja dagskrár eftir tíma, þema eða flokkum.
             </p>
             <span className={styles.statusBadge}>Fyrirhugað</span>
           </div>

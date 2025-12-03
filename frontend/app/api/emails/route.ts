@@ -7,7 +7,6 @@ const API_BASE_URL = process.env.API_BASE_URL ?? 'http://127.0.0.1:8000';
 if (!process.env.API_BASE_URL) {
     // Not fatal — warn so developers know they should set it for non-dev envs.
     // Using console.warn avoids failing the build while still surfacing the issue.
-    // eslint-disable-next-line no-console
     console.warn('API_BASE_URL is not set; defaulting to http://127.0.0.1:8000');
 }
 
@@ -30,7 +29,7 @@ export async function POST(request: NextRequest) {
     try {
         // We expect the request body to be JSON with an "email" field
         body = await request.json();
-    } catch (_err) {
+    } catch {
         return json({ error: 'Invalid JSON body' }, 400);
     }
 
@@ -50,7 +49,7 @@ export async function POST(request: NextRequest) {
         try {
             data = await response.json();
         }
-        catch (_err) {
+        catch {
         // Ignore JSON parsing errors
         }
 
@@ -74,7 +73,7 @@ export async function POST(request: NextRequest) {
 }
 
 // the get function returns a list of all emails in the emaillist
-export async function GET(_req: NextRequest) {
+export async function GET() {
     try {
         console.log("API URL: ", `${API_BASE_URL}/emaillist/`);
         const url = new URL("/emaillist", API_BASE_URL);
