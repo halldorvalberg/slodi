@@ -3,13 +3,14 @@
 
 /* ═══════════════════════════════════════════════════════════════
    SIDEBAR NAVIGATION - Using Slóði Design Tokens
+   UPDATED: No header on dashboard routes, sidebar starts at viewport top
    ═══════════════════════════════════════════════════════════════ */
 
 /* ===== SIDEBAR CONTAINER ===== */
 .sidebar {
   position: fixed;
   left: 0;
-  top: var(--sl-navbar-height, 64px);
+  top: 0; /* Changed from var(--sl-navbar-height, 64px) to 0 */
   bottom: 0;
   width: 240px;
   background: hsl(var(--sl-color-surface));
@@ -27,28 +28,38 @@
   width: 64px;
 }
 
-/* ===== COLLAPSE BUTTON ===== */
+/* ===== COLLAPSE BUTTON (INTEGRATED) ===== */
+.collapseButtonWrapper {
+  padding: 0 var(--sl-spacing-inline);
+  margin-top: var(--sl-spacing-element);
+}
+
 .collapseButton {
-  position: absolute;
-  top: var(--sl-spacing-element);
-  right: -12px;
-  width: 24px;
-  height: 24px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: hsl(var(--sl-color-surface));
-  border: 1px solid hsl(var(--sl-color-border));
-  border-radius: 50%;
+  gap: var(--sl-spacing-gap-md);
+  width: 100%;
+  padding: var(--sl-spacing-inset-md);
+  background: transparent;
+  border: none;
+  border-radius: var(--sl-radius-button);
+  color: hsl(var(--sl-color-text-secondary));
+  font-size: var(--sl-text-body);
+  font-weight: var(--sl-font-weight-medium);
   cursor: pointer;
-  z-index: 100; /* FIX: Higher z-index to stay above separators */
   transition: var(--sl-transition-fast);
-  box-shadow: var(--sl-shadow-card);
+  white-space: nowrap;
+}
+
+/* Compact variant for collapse button */
+.collapseButtonCompact {
+  padding: var(--sl-spacing-inset-sm);
+  font-size: var(--sl-text-body-sm);
 }
 
 .collapseButton:hover {
   background: hsl(var(--sl-color-surface-hover));
-  box-shadow: var(--sl-shadow-card-hover);
+  color: hsl(var(--sl-color-text-primary));
 }
 
 .collapseButton:focus-visible {
@@ -56,10 +67,42 @@
   box-shadow: var(--sl-shadow-focus);
 }
 
+.collapseButton:active {
+  transform: scale(0.98);
+}
+
 .collapseIcon {
-  width: 16px;
-  height: 16px;
-  color: hsl(var(--sl-color-text-secondary));
+  width: var(--sl-size-icon-md);
+  height: var(--sl-size-icon-md);
+  flex-shrink: 0;
+  transition: transform var(--sl-transition-fast);
+}
+
+.collapseButton:hover .collapseIcon {
+  transform: scale(1.1);
+}
+
+.collapseLabel {
+  flex: 1;
+  text-align: left;
+}
+
+/* Collapsed state - center icon only */
+.sidebarCollapsed .collapseButtonWrapper {
+  padding: 0 var(--sl-spacing-compact);
+  margin-top: var(--sl-spacing-element);
+}
+
+.sidebarCollapsed .collapseButton {
+  justify-content: center;
+}
+
+.sidebarCollapsed .collapseButtonCompact {
+  padding: var(--sl-spacing-inset-sm);
+}
+
+.sidebarCollapsed .collapseLabel {
+  display: none;
 }
 
 /* ===== NAVIGATION ===== */
@@ -69,7 +112,7 @@
   padding: var(--sl-spacing-component) 0;
   flex: 1;
   overflow-y: auto;
-  position: relative; /* FIX: Create stacking context for proper z-index */
+  position: relative;
 }
 
 .navList {
@@ -79,8 +122,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--sl-spacing-gap-xs);
-  position: relative; /* FIX: Ensure proper stacking */
-  z-index: 1; /* FIX: Lower than collapse button */
+  position: relative;
+  z-index: 1;
 }
 
 /* Personal section pinned to bottom */
@@ -165,8 +208,8 @@
   height: 1px;
   background: hsl(var(--sl-color-border-subtle));
   margin: var(--sl-spacing-element) var(--sl-spacing-component);
-  position: relative; /* FIX: Create stacking context */
-  z-index: 1; /* FIX: Lower than collapse button */
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== USER SECTION ===== */
@@ -284,7 +327,8 @@
 
   .navLabel,
   .userName,
-  .navBadge {
+  .navBadge,
+  .collapseLabel {
     display: none;
   }
 
@@ -305,8 +349,17 @@
     margin: var(--sl-spacing-element) var(--sl-spacing-compact);
   }
 
+  .collapseButtonWrapper {
+    padding: 0 var(--sl-spacing-compact);
+    margin-top: var(--sl-spacing-element);
+  }
+
   .collapseButton {
-    display: none;
+    justify-content: center;
+  }
+
+  .collapseButtonCompact {
+    padding: var(--sl-spacing-inset-sm);
   }
 }
 
@@ -326,23 +379,15 @@
   .sidebar[data-open="true"] {
     width: 280px;
   }
-
-  .collapseButton {
-    display: none;
-  }
 }
 
 /* ===== DARK MODE ADJUSTMENTS ===== */
-/* Tokens handle most of dark mode, but can add specific overrides here */
-
 :global(.dark) .sidebar {
-  /* Optional: add subtle inner shadow in dark mode */
   box-shadow: inset -1px 0 0 0 hsl(var(--sl-color-border-subtle));
 }
 
 :global(.dark) .collapseButton {
-  /* Ensure button is visible in dark mode */
-  background: hsl(var(--sl-color-surface-secondary));
+  background: hsl(var(--sl-color-surface));
 }
 
 /* ===== SCROLLBAR STYLING ===== */
@@ -375,7 +420,8 @@
   .sidebar,
   .navItem,
   .userLink,
-  .collapseButton {
+  .collapseButton,
+  .collapseIcon {
     transition: none;
   }
 }
@@ -387,7 +433,12 @@
   }
 
   .navItem:focus-visible,
-  .userLink:focus-visible {
+  .userLink:focus-visible,
+  .collapseButton:focus-visible {
     outline: 3px solid currentColor;
+  }
+
+  .collapseButton {
+    border-width: 2px;
   }
 }

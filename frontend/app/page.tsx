@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
+import Footer from "@/components/Footer";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -15,6 +16,7 @@ function isValidEmail(value: string): boolean {
 export default function Home() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   useEffect(() => {
     async function checkApiConnection() {
@@ -46,8 +48,12 @@ export default function Home() {
     e.preventDefault();
 
     if (!isValidEmail(email)) {
+      setStatus("error");
       return setMessage("Vinsamlegast sláðu inn gilt netfang.");
     }
+
+    setStatus("idle");
+
     try {
       const response = await fetch("/api/emails", {
         method: "POST",
@@ -56,14 +62,17 @@ export default function Home() {
       });
 
       if (response.ok) {
+        setStatus("success");
         setMessage("Takk fyrir að skrá þig á póstlistann!");
         setEmail("");
       } else {
+        setStatus("error");
         setMessage(
           "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
         );
       }
     } catch (err) {
+      setStatus("error");
       setMessage(
         "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
       );
@@ -120,12 +129,17 @@ export default function Home() {
           </div>
 
           {message && (
-            <p className={styles.message} aria-live="assertive">
+            <div
+              className={`${styles.message} ${status === "success" ? styles.messageSuccess : ""} ${status === "error" ? styles.messageError : ""}`}
+              aria-live="assertive"
+            >
               {message}
-            </p>
+            </div>
           )}
         </form>
       </div>
+
+
     </div>
   );
 }

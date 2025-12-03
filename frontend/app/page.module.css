@@ -1,151 +1,276 @@
-/* Page shell */
+@import './slodi-tokens.css';
+@import './slodi-utilities.css';
+
+/* ═══════════════════════════════════════════════════════════════
+   SLÓÐI HOMEPAGE - Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ===== PAGE SHELL ===== */
 .page {
-    font-family: var(--font-sans);
-    position: relative;
-    min-height: 85dvh;
-    max-height: 85dvh;
-    /* matches your original Tailwind min-h-[85dvh] / max-h-[85dvh] */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    /* reserve space for the sticky header so content isn't hidden underneath it */
-    padding-top: 4rem;
+  font-family: var(--sl-font-family-body);
+  position: relative;
+  min-height: 85dvh;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: hsl(var(--sl-color-background));
+  color: hsl(var(--sl-color-text-primary));
+  /* Reserve space for sticky header */
+  padding-top: var(--sl-primitive-space-16); /* 64px / 4rem */
 }
 
-/* Hero */
+/* ===== HERO SECTION ===== */
 .hero {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 30dvh;
-    max-height: 35dvh;
-    margin-top: 2rem;
-    z-index: 10;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30dvh;
+  max-height: 35dvh;
+  margin-top: var(--sl-spacing-section);
+  z-index: var(--sl-primitive-z-10);
 }
 
 .heroInner {
-    text-align: center;
-    width: 80%;
-    height: 100%;
-    display: grid;
-    place-items: center;
+  text-align: center;
+  width: 80%;
+  height: 100%;
+  display: grid;
+  place-items: center;
 }
 
 @media (min-width: 640px) {
-    .heroInner {
-        width: 60%;
-    }
+  .heroInner {
+    width: 60%;
+  }
 }
 
+/* ===== TYPOGRAPHY ===== */
 .title {
-    /* Tailwind: text-6xl font-bold uppercase */
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 3.75rem; /* text-6xl */
-    letter-spacing: 0.02em;
-    margin: 0;
-    color: hsl(var(--text-strong));
-    z-index: -1 ;
+  font-weight: var(--sl-font-weight-bold);
+  text-transform: uppercase;
+  font-size: var(--sl-text-heading-1); /* 48px / 3rem */
+  letter-spacing: var(--sl-primitive-letter-spacing-wide);
+  line-height: var(--sl-line-height-heading);
+  margin: 0;
+  color: hsl(var(--sl-color-text-primary));
+  position: relative;
+  z-index: 1;
+}
+
+/* Even bigger on larger screens */
+@media (min-width: 768px) {
+  .title {
+    font-size: var(--sl-primitive-font-size-6xl); /* 60px */
+  }
 }
 
 .subtitle {
-    margin-top: 1rem;
-    font-size: 0.875rem; /* text-sm */
-    text-align: justify;
-    color: hsl(var(--foreground));
-    z-index: -1;
-}
-
-
-/* Signup section */
-.signup {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    max-height: 30dvh;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-}
-
-.form {
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  margin-top: var(--sl-spacing-element);
+  font-size: var(--sl-text-body-sm);
+  line-height: var(--sl-line-height-relaxed);
+  text-align: justify;
+  color: hsl(var(--sl-color-text-secondary));
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 640px) {
-    .form {
-        width: 50%;
-    }
+  .subtitle {
+    font-size: var(--sl-text-body);
+  }
+}
+
+/* ===== SIGNUP SECTION ===== */
+.signup {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 30dvh;
+  background: hsl(var(--sl-color-background));
+  padding: var(--sl-spacing-component) var(--sl-spacing-element);
+}
+
+.form {
+  width: 100%;
+  max-width: var(--sl-primitive-width-xl); /* 576px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-element);
+}
+
+@media (min-width: 640px) {
+  .form {
+    max-width: var(--sl-primitive-width-md); /* 448px */
+  }
 }
 
 .formLead {
-    font-size: 1.125rem; /* text-lg */
-    margin: 0 0 1rem 0;
-    text-align: center;
+  font-size: var(--sl-text-body-lg);
+  font-weight: var(--sl-font-weight-medium);
+  line-height: var(--sl-line-height-normal);
+  margin: 0;
+  text-align: center;
+  color: hsl(var(--sl-color-text-primary));
 }
 
-/* Input + button combo */
+/* ===== INPUT GROUP ===== */
 .inputWrap {
-    position: relative;
-    width: 100%;
+  position: relative;
+  width: 100%;
 }
 
 .input {
-    width: 100%;
-    padding: 0.5rem 3rem 0.5rem 0.75rem; /* py-2 equivalent */
-    /* space for the button on the right */
-    border: 1px solid hsl(var(--border) / 0.35);
-    border-radius: 0.5rem;
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font: inherit;
+  width: 100%;
+  height: var(--sl-input-height);
+  padding: var(--sl-input-padding-y) var(--sl-input-padding-x);
+  padding-right: 7rem; /* Space for button */
+  font-family: var(--sl-input-font-family, var(--sl-font-family-body));
+  font-size: var(--sl-input-font-size);
+  line-height: 1;
+  background: hsl(var(--sl-input-background));
+  border: 1px solid hsl(var(--sl-input-border));
+  border-radius: var(--sl-input-radius);
+  color: hsl(var(--sl-input-text));
+  transition: var(--sl-input-transition);
 }
 
 .input::placeholder {
-    color: hsl(var(--text-muted));
+  color: hsl(var(--sl-input-placeholder));
+}
+
+.input:hover {
+  border-color: hsl(var(--sl-input-border-hover));
+}
+
+.input:focus {
+  outline: none;
+  border-color: hsl(var(--sl-input-border-focus));
+  box-shadow: var(--sl-input-shadow-focus);
 }
 
 .input:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.25);
+  outline: none;
+  border-color: hsl(var(--sl-input-border-focus));
+  box-shadow: var(--sl-input-shadow-focus);
 }
 
-/* Submit button sits inside the input wrap */
+/* ===== SUBMIT BUTTON ===== */
 .submit {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    padding: 0 1rem; /* px-4 */
-    border: 1px solid hsl(var(--primary));
-    border-left: none;
-    border-radius: 0 0.5rem 0.5rem 0;
-    background: transparent;
-    color: hsl(var(--primary));
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  padding: 0 var(--sl-button-padding-x-md);
+  font-family: var(--sl-font-family-body);
+  font-size: var(--sl-button-font-size-md);
+  font-weight: var(--sl-button-font-weight);
+  line-height: 1;
+  border: 1px solid hsl(var(--sl-button-border-secondary));
+  border-left: none;
+  border-radius: 0 var(--sl-button-radius) var(--sl-button-radius) 0;
+  background: hsl(var(--sl-button-background-secondary));
+  color: hsl(var(--sl-button-text-secondary));
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--sl-button-transition);
 }
 
 .submit:hover {
-    background: hsl(var(--primary) / 0.08);
+  background: hsl(var(--sl-button-background-secondary-hover));
+  transform: translateX(-1px);
+}
+
+.submit:active {
+  background: hsl(var(--sl-button-background-secondary-active));
 }
 
 .submit:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px hsl(var(--primary));
+  outline: none;
+  box-shadow: var(--sl-shadow-focus);
+  z-index: var(--sl-primitive-z-10);
 }
 
+/* ===== MESSAGE FEEDBACK ===== */
 .message {
-    margin-top: 1rem;
-    font-size: 0.875rem; /* text-sm */
-    color: hsl(var(--secondary));
+  width: 100%;
+  padding: var(--sl-spacing-inset-md);
+  margin-top: var(--sl-spacing-element);
+  font-size: var(--sl-text-body-sm);
+  line-height: var(--sl-line-height-normal);
+  text-align: center;
+  border-radius: var(--sl-radius-card);
+  background: hsl(var(--sl-color-surface-secondary));
+  color: hsl(var(--sl-color-text-secondary));
+  border: 1px solid hsl(var(--sl-color-border-subtle));
+}
+
+.messageSuccess {
+  background: hsl(var(--sl-alert-background-success));
+  color: hsl(var(--sl-alert-text-success));
+  border-color: hsl(var(--sl-alert-border-success));
+}
+
+.messageError {
+  background: hsl(var(--sl-alert-background-error));
+  color: hsl(var(--sl-alert-text-error));
+  border-color: hsl(var(--sl-alert-border-error));
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .page {
+    padding-top: var(--sl-primitive-space-20); /* 80px / 5rem */
+  }
+  
+  .hero {
+    margin-top: var(--sl-spacing-container);
+  }
+  
+  .formLead {
+    font-size: var(--sl-primitive-font-size-xl);
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .heroInner {
+    width: 50%;
+  }
+  
+  .form {
+    max-width: var(--sl-primitive-width-lg); /* 512px */
+  }
+}
+
+/* ===== UTILITY OVERRIDES ===== */
+
+/* If you want to use a different primary color for this page */
+/* Uncomment and adjust as needed */
+
+/*
+.page {
+  --sl-color-primary: var(--sl-color-patrol-drekar);
+  --sl-color-primary-hover: var(--sl-color-patrol-drekar-hover);
+}
+*/
+
+/* ===== DARK MODE ADJUSTMENTS ===== */
+/* These will automatically apply when .dark class is on <html> */
+/* The tokens handle most of it, but you can add page-specific overrides here if needed */
+
+:global(.dark) .hero {
+  /* Optional: add extra contrast or effects in dark mode */
+}
+
+:global(.dark) .title {
+  /* Optional: adjust title in dark mode */
 }

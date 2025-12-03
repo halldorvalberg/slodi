@@ -1,24 +1,25 @@
 /* Root container for the footer */
 .footerRoot {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  padding: 1rem;
+  background: hsl(var(--sl-color-surface-secondary));
+  color: hsl(var(--sl-color-text-primary));
+  padding: var(--sl-primitive-space-4);
   margin-top: auto;
-  font-family: var(--font-sans);
+  font-family: var(--sl-font-family-body);
+  border-top: 1px solid hsl(var(--sl-color-border));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Content wrapper for layout consistency (centered, limited width) */
 .footerContent {
-  max-width: 72rem;
+  max-width: var(--sl-primitive-width-6xl);
   margin: 0 auto;
   text-align: center;
 }
 
 /* Paragraph text styling */
 .footerText {
-  font-size: 0.875rem; /* 14px */
-  line-height: 1.5;
-  opacity: 0.9;
+  font-size: var(--sl-primitive-font-size-sm);
+  line-height: var(--sl-primitive-line-height-normal);
+  color: hsl(var(--sl-color-text-secondary));
 }

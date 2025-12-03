@@ -2,43 +2,52 @@
 .headerRoot {
   position: sticky;
   top: 0;
-  z-index: 1000; /* header sits above page content */
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  border-bottom: 1px solid hsl(var(--border) / 0.3);
+  z-index: var(--sl-primitive-z-sticky);
+  background: hsl(var(--sl-color-background));
+  color: hsl(var(--sl-color-text-primary));
+  border-bottom: 1px solid hsl(var(--sl-color-border) / 0.3);
+  transition: background-color var(--sl-transition-base), color var(--sl-transition-base), border-color var(--sl-transition-base);
 }
 
 /* Inner layout */
 .headerContent {
-  max-width: 72rem;
+  max-width: var(--sl-primitive-width-6xl);
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: var(--sl-primitive-space-4) var(--sl-primitive-space-8);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--sl-primitive-space-6);
 }
 
 /* Brand / logo */
 .brandLink {
-  font-weight: 700;
+  font-weight: var(--sl-primitive-font-weight-bold);
   text-decoration: none;
-  color: hsl(var(--text-strong));
+  color: hsl(var(--sl-color-text-primary));
+  font-size: var(--sl-primitive-font-size-lg);
+  letter-spacing: var(--sl-primitive-letter-spacing-tight);
 }
 
 /* Primary navigation (desktop) */
 .primaryNav {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--sl-primitive-space-6);
+  align-items: center;
 }
 
 .primaryNavLink {
   text-decoration: none;
-  color: hsl(var(--foreground));
-  font-weight: 500;
+  color: hsl(var(--sl-color-text-primary));
+  font-weight: var(--sl-primitive-font-weight-medium);
+  font-size: var(--sl-primitive-font-size-sm);
+  padding: var(--sl-primitive-space-1) var(--sl-primitive-space-2);
+  border-radius: var(--sl-primitive-radius-sm);
+  transition: background-color var(--sl-transition-fast), color var(--sl-transition-fast);
 }
 
 .primaryNavLink:hover {
-  text-decoration: underline;
+  background: hsl(var(--sl-color-primary) / 0.10);
 }
 
 /* Mobile menu toggle button */
@@ -46,12 +55,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: var(--sl-primitive-space-10);
+  height: var(--sl-primitive-space-10);
   background: none;
-  border: none;
-  font-size: 1.5rem;
+  border: 1px solid hsl(var(--sl-color-border) / 0.4);
+  font-size: var(--sl-primitive-font-size-2xl);
   cursor: pointer;
+  border-radius: var(--sl-primitive-radius-md);
+  color: hsl(var(--sl-color-text-primary));
+  transition: background-color var(--sl-transition-fast), border-color var(--sl-transition-fast);
+}
+.menuToggleButton:hover {
+  background: hsl(var(--sl-color-surface-secondary) / 0.6);
+  border-color: hsl(var(--sl-color-border));
 }
 
 /* Drawer overlay (covers full viewport) */
@@ -61,7 +77,7 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1001;
+  z-index: var(--sl-primitive-z-modal-backdrop);
 }
 
 /* Drawer panel (slides in from the right on mobile) */
@@ -72,14 +88,15 @@
   width: 80%;
   max-width: 20rem;
   height: 100%;
-  background: hsl(var(--background));
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  background: hsl(var(--sl-color-background));
+  box-shadow: var(--sl-primitive-shadow-lg);
   transform: translateX(100%);
-  transition: transform 0.3s ease;
-  z-index: 1002;
+  transition: transform var(--sl-transition-base) var(--sl-primitive-ease-out);
+  z-index: var(--sl-primitive-z-modal);
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: var(--sl-primitive-space-4);
+  gap: var(--sl-primitive-space-4);
 }
 
 /* Active state for the drawer */
@@ -97,14 +114,16 @@
 /* Drawer links */
 .drawerNavLink {
   text-decoration: none;
-  color: hsl(var(--foreground));
-  font-size: 1.25rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid hsl(var(--border) / 0.2);
+  color: hsl(var(--sl-color-text-primary));
+  font-size: var(--sl-primitive-font-size-xl);
+  padding: var(--sl-primitive-space-2) 0;
+  border-bottom: 1px solid hsl(var(--sl-color-border) / 0.2);
+  transition: background-color var(--sl-transition-fast), color var(--sl-transition-fast);
+  border-radius: var(--sl-primitive-radius-sm);
 }
 
 .drawerNavLink:hover {
-  background: hsl(var(--muted) / 0.2);
+  background: hsl(var(--sl-color-surface-secondary) / 0.4);
 }
 
 /* Responsive behavior */

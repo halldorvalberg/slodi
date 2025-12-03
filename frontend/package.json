@@ -19,12 +19,13 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "lucide-react": "^0.555.0",
+    "typescript": "^5",
     "zod": "^4.1.12"
   }
 }

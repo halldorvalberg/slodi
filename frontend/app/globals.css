@@ -194,12 +194,21 @@ body {
   color: hsl(var(--foreground));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Utility classes replaced with standard CSS */
 .antialiased {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Layout helper: main area grows to push footer down */
+.sl-main {
+  flex: 1 0 auto;
+  display: block;
 }
 
 .border {

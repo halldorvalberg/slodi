@@ -1,0 +1,221 @@
+@import './../../app/slodi-tokens.css';
+@import './../../app/slodi-utilities.css';
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD LAYOUT - Using Slóði Design Tokens
+   Updated: Full-page layout (no header/footer on dashboard routes)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ===== LAYOUT CONTAINER ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: hsl(var(--sl-color-background));
+  /* NO padding-top since there's no header on dashboard routes */
+  position: relative;
+}
+
+/* ===== MOBILE MENU BUTTON ===== */
+.mobileMenuButton {
+  position: fixed;
+  top: var(--sl-spacing-element); /* Top of viewport, not below header */
+  left: var(--sl-spacing-element);
+  width: 40px;
+  height: 40px;
+  display: none; /* Hidden on desktop */
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--sl-color-primary));
+  color: hsl(var(--sl-color-text-inverse));
+  border: none;
+  border-radius: var(--sl-radius-button);
+  cursor: pointer;
+  z-index: calc(var(--sl-z-fixed) + 1);
+  box-shadow: var(--sl-shadow-card);
+  transition: var(--sl-transition-fast);
+}
+
+.mobileMenuButton:hover {
+  background: hsl(var(--sl-color-primary-hover));
+  box-shadow: var(--sl-shadow-card-hover);
+}
+
+.mobileMenuButton:focus-visible {
+  outline: none;
+  box-shadow: var(--sl-shadow-focus);
+}
+
+.mobileMenuButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ===== SIDEBAR WRAPPER ===== */
+.sidebarWrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ===== OVERLAY (Mobile) ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: hsl(var(--sl-color-overlay-backdrop));
+  z-index: calc(var(--sl-z-fixed) - 1);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== MAIN CONTENT AREA ===== */
+.main {
+  flex: 1;
+  margin-left: 240px; /* Match full sidebar width */
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  transition: margin-left var(--sl-transition-base);
+  min-width: 0; /* Prevent flex overflow */
+  
+  /* Full height since no header */
+  min-height: 100vh;
+}
+
+/* Main area when sidebar is collapsed */
+.mainCollapsed {
+  margin-left: 64px;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Tablet: Sidebar auto-collapses to icon-only */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .main {
+    margin-left: 64px; /* Match collapsed sidebar width */
+  }
+
+  .mainCollapsed {
+    margin-left: 64px; /* Same as normal, since always collapsed on tablet */
+  }
+}
+
+/* Mobile: Hamburger menu + drawer */
+@media (max-width: 767px) {
+  .mobileMenuButton {
+    display: flex; /* Show mobile menu button */
+  }
+
+  .main {
+    margin-left: 0; /* No margin on mobile */
+    padding: var(--sl-spacing-component) var(--sl-spacing-element);
+    /* Extra top padding for mobile menu button */
+    padding-top: calc(var(--sl-spacing-section) + 40px);
+  }
+
+  .mainCollapsed {
+    margin-left: 0;
+  }
+
+  .sidebarWrapper {
+    position: fixed;
+    z-index: var(--sl-z-fixed);
+  }
+
+  /* Sidebar shown via data attribute */
+  .sidebarWrapper[data-open="true"] {
+    /* Sidebar CSS handles the transform */
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Container for constrained content */
+.container {
+  max-width: var(--sl-primitive-width-6xl);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Section spacing */
+.section {
+  margin-bottom: var(--sl-spacing-section);
+}
+
+/* Grid layouts */
+.grid {
+  display: grid;
+  gap: var(--sl-spacing-component);
+}
+
+.grid2 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Dashboard-specific layouts */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sl-spacing-component);
+}
+
+@media (min-width: 1200px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr 320px;
+    grid-template-rows: auto auto 1fr;
+  }
+
+  /* Calendar in top-right */
+  .calendarWidget {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* Quick actions below calendar */
+  .quickActions {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  /* Feed takes full left column */
+  .feedWidget {
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+}
+
+/* ===== DARK MODE ADJUSTMENTS ===== */
+:global(.dark) .layout {
+  background: hsl(var(--sl-color-background));
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .main,
+  .overlay,
+  .mobileMenuButton {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .mobileMenuButton,
+  .overlay {
+    display: none;
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 0;
+  }
+}
