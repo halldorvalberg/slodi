@@ -163,7 +163,7 @@ export default function AboutPage() {
           <a href="https://github.com/slodi-project" className={styles.ctaButtonPrimary} target="_blank" rel="noopener noreferrer">
             Skoða á GitHub
           </a>
-          <a href="mailto:contact@slodi.is" className={styles.ctaButtonSecondary}>
+          <a href="mailto:slodi@skatarnir.is" className={styles.ctaButtonSecondary}>
             Hafa samband
           </a>
         </div>

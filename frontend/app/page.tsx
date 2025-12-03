@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { BookOpen, Hammer, BarChart3, Tent, Handshake } from "lucide-react";
 import styles from "./page.module.css";
+import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -80,65 +82,186 @@ export default function Home() {
 
   return (
     <div className={styles.page}>
+      {/* Hero Section */}
       <div className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div>
-            <h1 className={styles.title}>Slóði</h1>
+        <div className={styles.heroContent}>
+          <div className={styles.heroText}>
+            <h1 className={styles.title}>
+              <span className={styles.titleMain}>Slóði</span>
+              <span className={styles.titleSub}>Dagskrárgerð fyrir skátaforingja</span>
+            </h1>
 
             <p className={styles.subtitle}>
               Markmið Slóða er að styðja við foringja í skátastarfi með því að gera
-              dagskrárgerð einfaldari, markvissari og skipulagðari. Með því að safna
-              saman dagskrárhugmyndum, bjóða upp á verkfæri til að setja saman
-              skipulagða dagskrá og greina fjölbreytni í dagskránni tryggir Slóði að
-              skátar fái innihaldsríka og fjölbreytta skátadagskrá.
+              dagskrárgerð <strong>einfaldari</strong>, <strong>markvissari</strong> og <strong>skipulagðari</strong>.
+            </p>
+
+            <p className={styles.description}>
+              Safnaðu saman dagskrárhugmyndum, settu saman skipulagða dagskrá og
+              greindu fjölbreytni til að tryggja að skátar fái innihaldsríka og
+              fjölbreytta skátadagskrá.
+            </p>
+
+            {/* Feature Pills */}
+            <div className={styles.features}>
+              <div className={styles.featurePill}>
+                <BookOpen className={styles.featureIcon} />
+                <span>Dagskrárbankinn</span>
+              </div>
+              <div className={styles.featurePill}>
+                <Hammer className={styles.featureIcon} />
+                <span>Vinnubekkurinn</span>
+              </div>
+              <div className={styles.featurePill}>
+                <BarChart3 className={styles.featureIcon} />
+                <span>Greiningartæki</span>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className={styles.ctaButtons}>
+              <Link href="/about" className={styles.ctaButtonPrimary}>
+                Læra meira
+              </Link>
+              <Link href="/dashboard" className={styles.ctaButtonSecondary}>
+                Skoða mælaborð
+              </Link>
+            </div>
+          </div>
+
+          {/* Hero Image/Illustration Placeholder */}
+          <div className={styles.heroIllustration}>
+            <div className={styles.illustrationCard}>
+              <div className={styles.illustrationIcon}>🏕️</div>
+              <p className={styles.illustrationText}>
+                Gert af skátum fyrir skáta
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      {/* <div className={styles.stats}>
+        <div className={styles.statItem}>
+          <div className={styles.statNumber}>500+</div>
+          <div className={styles.statLabel}>Dagskrár</div>
+        </div>
+        <div className={styles.statItem}>
+          <div className={styles.statNumber}>100+</div>
+          <div className={styles.statLabel}>Foringjar</div>
+        </div>
+        <div className={styles.statItem}>
+          <div className={styles.statNumber}>20+</div>
+          <div className={styles.statLabel}>Sveitir</div>
+        </div>
+      </div> */}
+
+      {/* Email Signup Section */}
+      <div className={styles.signup}>
+        <div className={styles.signupCard}>
+          <h2 className={styles.signupTitle}>Fylgstu með framvindu</h2>
+          <p className={styles.signupDescription}>
+            Skráðu þig á póstlista til að fá nýjustu upplýsingar um verkefnið
+          </p>
+
+          <form
+            onSubmit={handleSubmit}
+            className={styles.form}
+            aria-label="Email subscription form"
+          >
+            <div className={styles.inputWrap}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="netfang@example.is"
+                className={styles.input}
+                required
+                aria-label="Email address"
+              />
+
+              <button
+                type="submit"
+                className={styles.submit}
+                title="Submit"
+                aria-label="Submit email"
+              >
+                Skrá mig
+              </button>
+            </div>
+
+            {message && (
+              <div
+                className={`${styles.message} ${status === "success" ? styles.messageSuccess : ""
+                  } ${status === "error" ? styles.messageError : ""}`}
+                aria-live="assertive"
+              >
+                {message}
+              </div>
+            )}
+          </form>
+
+          <p className={styles.signupNote}>
+            Við munum aldrei deila netfanginu þínu með öðrum. Loforð! <Handshake className={styles.inlineIcon} />
+          </p>
+        </div>
+      </div>
+
+      {/* Features Overview */}
+      <div className={styles.featuresSection}>
+        <h2 className={styles.featuresTitle}>Hvað býður Slóði upp á?</h2>
+
+        <div className={styles.featureGrid}>
+          <div className={styles.featureCard}>
+            <BookOpen className={styles.featureCardIcon} />
+            <h3 className={styles.featureCardTitle}>Dagskrárbankinn</h3>
+            <p className={styles.featureCardText}>
+              Miðlægt safn verkefna og leikja með skýrum leiðbeiningum,
+              aldursviðmiðum og ábendingum frá öðrum foringjum.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <Hammer className={styles.featureCardIcon} />
+            <h3 className={styles.featureCardTitle}>Vinnubekkurinn</h3>
+            <p className={styles.featureCardText}>
+              Settu saman heildardagskrár úr viðfangsefnum með drag-and-drop
+              verkfæri. Skipulagðu eftir tíma, þema eða flokkum.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <BarChart3 className={styles.featureCardIcon} />
+            <h3 className={styles.featureCardTitle}>Greiningartæki</h3>
+            <p className={styles.featureCardText}>
+              Greindu fjölbreytni dagskrárinnar og tryggðu að skátar fái
+              jafna blöndu eftir ÆSKA og þroskasviðum.
             </p>
           </div>
         </div>
       </div>
 
-      <div className={styles.signup}>
-        <form
-          onSubmit={handleSubmit}
-          className={styles.form}
-          aria-label="Email subscription form"
-        >
-          <p className={styles.formLead} aria-live="polite">
-            Skráðu þig á póstlista til að fá nýjustu upplýsingar um verkefnið
-          </p>
-
-          <div className={styles.inputWrap}>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Netfang"
-              className={styles.input}
-              required
-              aria-label="Email address"
-            />
-
-            <button
-              type="submit"
-              className={styles.submit}
-              title="Submit"
-              aria-label="Submit email"
-            >
-              Skrá mig
-            </button>
-          </div>
-
-          {message && (
-            <div
-              className={`${styles.message} ${status === "success" ? styles.messageSuccess : ""} ${status === "error" ? styles.messageError : ""}`}
-              aria-live="assertive"
-            >
-              {message}
-            </div>
-          )}
-        </form>
+      {/* Final CTA */}
+      <div className={styles.finalCta}>
+        <h2 className={styles.finalCtaTitle}>Tilbúinn að byrja?</h2>
+        <p className={styles.finalCtaText}>
+          Slóði er opinn hugbúnaður í þróun. Komdu og vertu hluti af verkefninu!
+        </p>
+        <div className={styles.finalCtaButtons}>
+          <Link href="/about" className={styles.ctaButtonPrimary}>
+            Lesa meira um verkefnið
+          </Link>
+          <a
+            href="https://github.com/slodi-project"
+            className={styles.ctaButtonSecondary}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Skoða á GitHub
+          </a>
+        </div>
       </div>
-
-
     </div>
   );
 }
