@@ -1,0 +1,149 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 8px;
+  background: var(--sl-surface, #fff);
+}
+.row {
+  display:flex;
+  gap:0.5rem;
+  align-items: center;
+}
+.input, .textarea, .select {
+  width:100%;
+  padding: 0.45rem 0.6rem;
+  border:1px solid rgba(0,0,0,0.08);
+  border-radius:6px;
+}
+.textarea { min-height: 88px; resize: vertical; }
+.hint { font-size: 0.85rem; color: rgba(0,0,0,0.6); }
+.actions { display:flex; gap:0.5rem; justify-content:flex-end; }
+.btn { padding:0.45rem 0.75rem; border-radius:6px; cursor:pointer; }
+.btnPrimary { background: var(--sl-accent, #0366d6); color: #fff; border: none; }
+.btnNeutral { background: transparent; border: 1px solid rgba(0,0,0,0.08); }
+.error { color: var(--sl-error, #b00020); font-size:0.9rem }
+
+.tagList {
+  display:flex;
+  gap:0.4rem;
+  flex-wrap:wrap;
+  margin-top:0.4rem;
+}
+.tagItem {
+  display:flex;
+  align-items:center;
+  gap:0.4rem;
+  background: rgba(0,0,0,0.04);
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+.tagButton {
+  background: transparent;
+  border: none;
+  padding: 0.15rem;
+  cursor: pointer;
+}
+.tagChip {
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+}
+.tagChip.selected {
+  background: var(--sl-success, #16a34a);
+  color: white;
+}
+
+.ageGrid {
+  display:flex;
+  gap:0.5rem;
+  flex-wrap:wrap;
+  margin-top:0.5rem;
+}
+.ageChip {
+  min-width:92px;
+  padding:0.45rem 0.6rem;
+  border-radius:10px;
+  border:2px solid rgba(0,0,0,0.08);
+  text-align:center;
+  cursor:pointer;
+  font-weight:600;
+}
+.ageChip.selected {
+  color: #fff;
+}
+
+.rowField {
+  display:flex;
+  gap:0.5rem;
+  align-items:center;
+}
+.smallInput { width: 160px; }
+
+.fileInput {
+  margin-top: 0.5rem;
+}
+.imageGrid {
+  display:flex;
+  gap:0.5rem;
+  flex-wrap:wrap;
+  margin-top:0.5rem;
+}
+.dropArea {
+  width:100%;
+  height:160px;
+  border-radius:8px;
+  border:2px dashed rgba(0,0,0,0.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:0.5rem;
+  cursor:pointer;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6));
+}
+.dropArea:hover { border-color: rgba(0,0,0,0.12); }
+.dropIcon {
+  width:48px;
+  height:48px;
+  opacity:0.7;
+}
+.dropHint { font-size:0.95rem; color: rgba(0,0,0,0.6); }
+.dropPreviews { display:flex; gap:0.5rem; align-items:center; justify-content:center; }
+.dropPreviewSingle { width:100%; height:100%; border-radius:6px; overflow:hidden; }
+.dropPreviewSingle img { width:100%; height:100%; object-fit:cover; }
+.imageThumb {
+  position:relative;
+  width:96px;
+  height:72px;
+  border-radius:6px;
+  overflow:hidden;
+  background:#f4f4f4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.imageThumb img { width:100%; height:100%; object-fit:cover; }
+.imageRemove {
+  position:absolute;
+  top:4px;
+  right:4px;
+  background: rgba(0,0,0,0.5);
+  color:white;
+  border:none;
+  border-radius:999px;
+  width:22px;
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+

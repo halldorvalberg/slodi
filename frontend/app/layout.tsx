@@ -31,7 +31,7 @@ const robotoCondensed = Roboto_Condensed({
 
 export const metadata: Metadata = {
   title: {
-    default: "Slóði - Skátaforrit",
+    default: "Slóði - Meira en bara dagskrárvefur",
     template: "%s | Slóði",
   },
   description:
