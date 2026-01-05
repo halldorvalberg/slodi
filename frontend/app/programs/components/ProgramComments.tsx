@@ -15,7 +15,7 @@ interface ProgramCommentsProps {
   comments?: Comment[];
 }
 
-export default function ProgramComments({ programId, comments = [] }: ProgramCommentsProps) {
+export default function ProgramComments({ comments = [] }: ProgramCommentsProps) {
   return (
     <div className="program-comments">
       <h3>Comments ({comments.length})</h3>

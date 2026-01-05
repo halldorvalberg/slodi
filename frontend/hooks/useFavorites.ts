@@ -15,7 +15,11 @@ export function useFavorites() {
     // Optimistic update
     setFavorites(prev => {
       const next = new Set(prev);
-      wasFavorite ? next.delete(programId) : next.add(programId);
+      if (wasFavorite) {
+        next.delete(programId);
+      } else {
+        next.add(programId);
+      }
       return next;
     });
     

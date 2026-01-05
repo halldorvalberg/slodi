@@ -1,16 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import ProgramCard from "@/components/ProgramCard/ProgramCard";
 import styles from "./builder.module.css";
 import usePrograms, { Program as ProgramType } from "@/hooks/usePrograms";
-
-type Program = {
-    id: string;
-    title: string;
-    description?: string;
-    tags?: string[];
-};
 
 export default function BuilderPage() {
     const [query, setQuery] = useState("");
@@ -19,7 +12,7 @@ export default function BuilderPage() {
     // Use the hook that will fetch from the backend. The hook uses
     // `NEXT_PUBLIC_API_BASE` (fallbacks to http://localhost:8000) and expects
     // either an array response or `{ programs: Program[] }`.
-    const { programs, tags, loading, error, refetch } = usePrograms();
+    const { programs, tags, loading, error } = usePrograms();
 
     const filtered = useMemo(() => {
         if (!programs) return [] as ProgramType[];

@@ -39,7 +39,11 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     // Optimistic update
     setFavorites(prev => {
       const next = new Set(prev);
-      wasFavorite ? next.delete(programId) : next.add(programId);
+      if (wasFavorite) {
+        next.delete(programId);
+      } else {
+        next.add(programId);
+      }
       return next;
     });
     
@@ -57,7 +61,11 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       // Revert on error
       setFavorites(prev => {
         const next = new Set(prev);
-        wasFavorite ? next.add(programId) : next.delete(programId);
+        if (wasFavorite) {
+          next.add(programId);
+        } else {
+          next.delete(programId);
+        }
         return next;
       });
       console.error('Failed to update favorite:', error);

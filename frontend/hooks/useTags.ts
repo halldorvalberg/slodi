@@ -7,6 +7,7 @@ export function useTags() {
     tags: [],
     isLoading: false,
     isError: false,
-    createTag: async (name: string) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    createTag: async (_name: string) => {},
   };
 }

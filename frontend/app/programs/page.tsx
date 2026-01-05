@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal/Modal";
 import NewProgramForm from "@/components/NewProgram/NewProgramForm";
 import ProgramCard from "@/components/ProgramCard/ProgramCard";

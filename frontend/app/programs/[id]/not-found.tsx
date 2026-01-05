@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import styles from "./not-found.module.css";
 
 export default function NotFound() {
@@ -11,12 +12,12 @@ export default function NotFound() {
                     Því miður finnst þessi dagskrá ekki. Hún gæti hafa verið fjarlægð eða þú ert með rangan hlekk.
                 </p>
                 <div className={styles.actions}>
-                    <a href="/programs" className={styles.primaryButton}>
+                    <Link href="/programs" className={styles.primaryButton}>
                         Til baka í dagskrárlista
-                    </a>
-                    <a href="/" className={styles.secondaryButton}>
+                    </Link>
+                    <Link href="/" className={styles.secondaryButton}>
                         Fara á forsíðu
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>

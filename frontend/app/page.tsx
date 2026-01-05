@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, Hammer, BarChart3, Tent, Handshake } from "lucide-react";
+import { BookOpen, Hammer, BarChart3, Handshake } from "lucide-react";
 import styles from "./page.module.css";
 import Link from "next/link";
 

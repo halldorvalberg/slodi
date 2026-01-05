@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import SAMPLE_DATA from "../devdata.json";
 import ProgramDetailHero from "../components/ProgramDetailHero";
 import ProgramDetailTabs from "../components/ProgramDetailTabs";
@@ -87,10 +88,10 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
             <nav className={styles.breadcrumb} aria-label="Breadcrumb">
                 <ol>
                     <li>
-                        <a href="/">Heim</a>
+                        <Link href="/">Heim</Link>
                     </li>
                     <li>
-                        <a href="/programs">Dagskrár</a>
+                        <Link href="/programs">Dagskrár</Link>
                     </li>
                     <li>
                         <a href={`/programs?workspace=${program.workspace_id}`}>

@@ -39,7 +39,7 @@ export default function usePrograms(endpoint = "/programs"): UseProgramsResult {
       const list: Program[] = Array.isArray(data) ? data : data.programs || [];
       setPrograms(list);
       setTags(Array.from(new Set(list.flatMap((p) => p.tags || []))));
-    } catch (err: any) {
+    } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
       setPrograms([]);
       setTags([]);
