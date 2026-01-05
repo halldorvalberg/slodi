@@ -219,7 +219,7 @@ export default function NewProgramForm({ onCreated, endpoint = "/programs" }: Pr
       {error ? <div className={styles.error}>{error}</div> : null}
 
       <div className={styles.actions}>
-        <button type="button" className={`${styles.btn} ${styles.btnNeutral}`} onClick={() => { setTitle(""); setDescription(""); setTags(""); }} disabled={loading}>Hreinsa</button>
+        <button type="button" className={`${styles.btn} ${styles.btnNeutral}`} onClick={() => { setTitle(""); setDescription(""); setTags([]); }} disabled={loading}>Hreinsa</button>
         <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading}>{loading ? "Býr til…" : "Búa til"}</button>
       </div>
     </form>

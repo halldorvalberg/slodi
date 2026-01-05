@@ -59,13 +59,19 @@ export default function BuilderPage() {
                 <main className={styles.grid}>
                     {loading ? (
                         Array.from({ length: 6 }).map((_, i) => (
-                            <ProgramCard key={`placeholder-${i}`} id={`ph-${i}`} title={`Hleður…`} description={undefined} tags={[]} />
+                            <ProgramCard key={`placeholder-${i}`} id={`ph-${i}`} name={`Hleður…`} description={undefined} tags={[]} />
                         ))
                     ) : filtered.length === 0 ? (
                         <div>Engar dagskrár fannst fyrir valin skilyrði.</div>
                     ) : (
                         filtered.map((p) => (
-                            <ProgramCard key={p.id} id={p.id} title={p.title} description={p.description} tags={p.tags} />
+                            <ProgramCard 
+                                key={p.id} 
+                                id={p.id} 
+                                name={p.title} 
+                                description={p.description} 
+                                tags={p.tags?.map(tag => ({ id: tag, name: tag }))} 
+                            />
                         ))
                     )}
                 </main>
