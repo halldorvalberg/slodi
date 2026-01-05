@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import styles from "./NewProgramForm.module.css";
 import type { Program as ProgramType } from "@/hooks/usePrograms";
 import usePrograms from "@/hooks/usePrograms";
@@ -24,7 +25,6 @@ export default function NewProgramForm({ onCreated, endpoint = "/programs" }: Pr
   const [equipment, setEquipment] = useState<string>("");
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
   const previewsRef = React.useRef<string[]>([]);
 
   React.useEffect(() => {
@@ -35,7 +35,7 @@ export default function NewProgramForm({ onCreated, endpoint = "/programs" }: Pr
     return () => {
       // revoke any remaining object URLs on unmount
       previewsRef.current.forEach((u) => {
-        try { URL.revokeObjectURL(u); } catch (_) {}
+        try { URL.revokeObjectURL(u); } catch { /* ignore */ }
       });
     };
   }, []);
@@ -98,11 +98,11 @@ export default function NewProgramForm({ onCreated, endpoint = "/programs" }: Pr
       setDuration("");
       setEquipment("");
       // revoke previews before clearing
-      previews.forEach((u) => { try { URL.revokeObjectURL(u); } catch (_) {} });
+      previews.forEach((u) => { try { URL.revokeObjectURL(u); } catch { /* ignore */ } });
       setImages([]);
       setPreviews([]);
-    } catch (err: any) {
-      setError(err?.message || String(err));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -203,12 +203,12 @@ export default function NewProgramForm({ onCreated, endpoint = "/programs" }: Pr
           <div className={styles.imageGrid}>
             {previews.map((src, i) => (
               <div key={src} className={styles.imageThumb}>
-                <img src={src} alt={`Preview ${i + 1}`} />
+                <Image src={src} alt={`Preview ${i + 1}`} width={200} height={200} />
                 <button type="button" className={styles.imageRemove} aria-label="Fjarlægja mynd" onClick={() => {
                   // revoke object URL and remove image/preview
-                  try { URL.revokeObjectURL(src); } catch (_) {}
+                  try { URL.revokeObjectURL(src); } catch { /* ignore */ }
                   setPreviews((p) => p.filter((x, idx) => idx !== i));
-                  setImages((arr) => arr.filter((_, idx) => idx !== i));
+                  setImages((arr) => arr.filter((__, idx) => idx !== i));
                 }}>✕</button>
               </div>
             ))}

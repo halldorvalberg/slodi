@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import styles from "./ProgramCard.module.css";
 
 export interface ProgramCardProps {
@@ -32,7 +33,6 @@ export default function ProgramCard({
   description,
   image,
   author,
-  workspace,
   tags = [],
   like_count = 0,
   onLike,
@@ -77,7 +77,7 @@ export default function ProgramCard({
       {/* Thumbnail/Hero Image */}
       <div className={styles.media}>
         {image ? (
-          <img src={image} alt={name} className={styles.image} />
+          <Image src={image} alt={name} className={styles.image} width={400} height={250} />
         ) : (
           <div className={styles.placeholder}>
             <svg

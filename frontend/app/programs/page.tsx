@@ -45,7 +45,6 @@ export default function ProgramBuilderPage() {
     const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [currentPage, setCurrentPage] = useState(1);
     const [isSearching, setIsSearching] = useState(false);
-    const router = useRouter();
     const [showNewProgram, setShowNewProgram] = useState(false);
 
     const ITEMS_PER_PAGE = 12; // Show 6 programs per page for demo
@@ -55,7 +54,7 @@ export default function ProgramBuilderPage() {
     // Filter and sort items
     const filteredAndSortedItems = useMemo(() => {
         // Filter programs
-        let filtered = SAMPLE.filter((p) => {
+        const filtered = SAMPLE.filter((p) => {
             // Tag filter: OR logic (show if ANY selected tag matches)
             if (selectedTags.length > 0) {
                 const programTags = p.tags || [];
@@ -103,7 +102,7 @@ export default function ProgramBuilderPage() {
         setCurrentPage(1);
     }, [query, selectedTags, sortBy]);
 
-    const handleSearch = (searchQuery: string) => {
+    const handleSearch = () => {
         // Could trigger API call here when backend is ready
         setIsSearching(false);
     };

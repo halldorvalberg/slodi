@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from 'react';
-
 export type TabId = 'overview' | 'instructions' | 'materials' | 'comments' | 'related';
 
 interface ProgramTabsProps {

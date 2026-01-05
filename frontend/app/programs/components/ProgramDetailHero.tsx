@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import styles from "./ProgramDetailHero.module.css";
 
 type Program = {
@@ -35,10 +36,13 @@ export default function ProgramDetailHero({
             {/* Hero Image */}
             {program.image ? (
                 <div className={styles.imageContainer}>
-                    <img
+                    <Image
                         src={program.image}
                         alt={program.name}
                         className={styles.heroImage}
+                        width={1200}
+                        height={500}
+                        priority
                     />
                 </div>
             ) : (

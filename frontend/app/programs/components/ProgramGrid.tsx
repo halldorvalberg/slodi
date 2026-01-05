@@ -69,7 +69,7 @@ export default function ProgramGrid({
         </div>
         <h3 className={styles.emptyTitle}>{emptyMessage}</h3>
         <p className={styles.emptyDescription}>
-          Try adjusting your search or filters to find what you're looking for.
+          Try adjusting your search or filters to find what you&apos;re looking for.
         </p>
       </div>
     );

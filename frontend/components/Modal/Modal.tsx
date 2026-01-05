@@ -35,7 +35,7 @@ export default function Modal({ open, onClose, title, children }: Props) {
             try {
               const ok = window.confirm("Ertu viss um að þú viljir hætta? Öll óvista gögn munu tapast.");
               if (ok) onClose();
-            } catch (e) {
+            } catch {
               // Fallback: if confirm is unavailable, close
               onClose();
             }
