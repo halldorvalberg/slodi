@@ -1,0 +1,120 @@
+/* ═══════════════════════════════════════════════════════════
+   PROGRAM SORT COMPONENT
+   Dropdown for sorting programs
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.sortContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-inline-sm);
+}
+
+.sortLabel {
+  font-size: var(--sl-font-size-sm);
+  font-weight: var(--sl-font-weight-medium);
+  color: hsl(var(--sl-color-text-secondary));
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SELECT WRAPPER
+   ═══════════════════════════════════════════════════════════ */
+
+.sortWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sortSelect {
+  appearance: none;
+  min-width: 160px;
+  padding: var(--sl-spacing-inset-sm);
+  padding-right: calc(var(--sl-spacing-inline-md) + 20px);
+  font-size: var(--sl-font-size-sm);
+  font-weight: var(--sl-font-weight-medium);
+  font-family: inherit;
+  color: hsl(var(--sl-color-text-primary));
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border) / var(--sl-primitive-opacity-30));
+  border-radius: var(--sl-radius-input);
+  cursor: pointer;
+  outline: none;
+  transition: 
+    border-color var(--sl-transition-base),
+    box-shadow var(--sl-transition-base),
+    background-color var(--sl-transition-base);
+}
+
+.sortSelect:hover {
+  border-color: hsl(var(--sl-color-border));
+  background: hsl(var(--sl-color-background-secondary));
+}
+
+.sortSelect:focus {
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: 0 0 0 3px hsl(var(--sl-color-primary) / var(--sl-primitive-opacity-10));
+  background: hsl(var(--sl-color-surface));
+}
+
+/* Dropdown Icon */
+.sortIcon {
+  position: absolute;
+  right: var(--sl-spacing-inline-sm);
+  width: 16px;
+  height: 16px;
+  color: hsl(var(--sl-color-text-tertiary));
+  pointer-events: none;
+  transition: color var(--sl-transition-base);
+}
+
+.sortSelect:hover ~ .sortIcon,
+.sortSelect:focus ~ .sortIcon {
+  color: hsl(var(--sl-color-text-secondary));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .sortContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sl-spacing-stack-xs);
+    width: 100%;
+  }
+
+  .sortWrapper {
+    width: 100%;
+  }
+
+  .sortSelect {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════ */
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .sortSelect {
+    border-width: 2px;
+  }
+
+  .sortSelect:focus {
+    box-shadow: 0 0 0 4px hsl(var(--sl-color-primary) / var(--sl-primitive-opacity-20));
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sortSelect,
+  .sortIcon {
+    transition: none;
+  }
+}

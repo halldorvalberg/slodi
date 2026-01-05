@@ -1,0 +1,303 @@
+/* ═══════════════════════════════════════════════════════════
+   PROGRAM GRID COMPONENT
+   Responsive grid layout for program cards
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.grid {
+  display: grid;
+  gap: var(--sl-spacing-stack-lg);
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GRID VIEW (Default)
+   Responsive column layout
+   ═══════════════════════════════════════════════════════════ */
+
+.grid.grid {
+  /* Mobile: 1 column (< 640px) */
+  grid-template-columns: 1fr;
+  
+  /* Small: Still 1 column (≥ 640px) */
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Medium: 2 columns (≥ 768px) */
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Large: 3 columns (≥ 1024px) */
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Extra Large: 4 columns (≥ 1280px) */
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIST VIEW
+   Horizontal card layout
+   ═══════════════════════════════════════════════════════════ */
+
+.grid.list {
+  grid-template-columns: 1fr;
+  gap: var(--sl-spacing-stack-md);
+}
+
+/* List view cards should have horizontal layout */
+.grid.list > * {
+  /* This would be applied to child cards in list view */
+  /* Cards need to handle their own list view styling */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════════════════════ */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sl-spacing-section);
+  text-align: center;
+  min-height: 400px;
+}
+
+.emptyIcon {
+  width: var(--sl-icon-xl);
+  height: var(--sl-icon-xl);
+  margin-bottom: var(--sl-spacing-stack-lg);
+  color: hsl(var(--sl-color-text-tertiary));
+  opacity: var(--sl-primitive-opacity-40);
+}
+
+.emptyIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.emptyTitle {
+  font-size: var(--sl-font-size-2xl);
+  font-weight: var(--sl-font-weight-semibold);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-stack-sm) 0;
+}
+
+.emptyDescription {
+  font-size: var(--sl-font-size-base);
+  color: hsl(var(--sl-color-text-secondary));
+  max-width: 400px;
+  margin: 0;
+  line-height: var(--sl-line-height-relaxed);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LOADING SKELETON
+   Animated placeholder for loading state
+   ═══════════════════════════════════════════════════════════ */
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-md);
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border) / var(--sl-primitive-opacity-30));
+  border-radius: var(--sl-radius-card);
+  padding: var(--sl-spacing-inset-md);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.skeletonMedia {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--sl-color-background-secondary)),
+    hsl(var(--sl-color-background-tertiary)),
+    hsl(var(--sl-color-background-secondary))
+  );
+  background-size: 200% 100%;
+  border-radius: var(--sl-radius-base);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-sm);
+  flex: 1;
+}
+
+.skeletonTitle {
+  width: 80%;
+  height: 24px;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--sl-color-background-secondary)),
+    hsl(var(--sl-color-background-tertiary)),
+    hsl(var(--sl-color-background-secondary))
+  );
+  background-size: 200% 100%;
+  border-radius: var(--sl-radius-sm);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonByline {
+  width: 40%;
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--sl-color-background-secondary)),
+    hsl(var(--sl-color-background-tertiary)),
+    hsl(var(--sl-color-background-secondary))
+  );
+  background-size: 200% 100%;
+  border-radius: var(--sl-radius-sm);
+  animation: shimmer 1.5s ease-in-out infinite;
+  animation-delay: 0.1s;
+}
+
+.skeletonDescription {
+  width: 100%;
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--sl-color-background-secondary)),
+    hsl(var(--sl-color-background-tertiary)),
+    hsl(var(--sl-color-background-secondary))
+  );
+  background-size: 200% 100%;
+  border-radius: var(--sl-radius-sm);
+  animation: shimmer 1.5s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.skeletonDescription:last-child {
+  width: 70%;
+}
+
+.skeletonTags {
+  display: flex;
+  gap: var(--sl-spacing-inline-xs);
+  margin-top: var(--sl-spacing-stack-sm);
+}
+
+.skeletonTag {
+  width: 60px;
+  height: 24px;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--sl-color-background-secondary)),
+    hsl(var(--sl-color-background-tertiary)),
+    hsl(var(--sl-color-background-secondary))
+  );
+  background-size: 200% 100%;
+  border-radius: var(--sl-radius-badge);
+  animation: shimmer 1.5s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.skeletonFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sl-spacing-inline-md);
+  padding-top: var(--sl-spacing-stack-sm);
+  border-top: 1px solid hsl(var(--sl-color-border) / var(--sl-primitive-opacity-30));
+}
+
+.skeletonButton {
+  width: 80px;
+  height: 32px;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--sl-color-background-secondary)),
+    hsl(var(--sl-color-background-tertiary)),
+    hsl(var(--sl-color-background-secondary))
+  );
+  background-size: 200% 100%;
+  border-radius: var(--sl-radius-button);
+  animation: shimmer 1.5s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .emptyState {
+    padding: var(--sl-spacing-stack-xl);
+    min-height: 300px;
+  }
+  
+  .emptyIcon {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .emptyTitle {
+    font-size: var(--sl-font-size-xl);
+  }
+  
+  .emptyDescription {
+    font-size: var(--sl-font-size-sm);
+  }
+  
+  .skeletonMedia {
+    height: 140px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .skeletonMedia,
+  .skeletonTitle,
+  .skeletonByline,
+  .skeletonDescription,
+  .skeletonTag,
+  .skeletonButton {
+    animation: none;
+  }
+}
+
+/* Screen reader only text */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

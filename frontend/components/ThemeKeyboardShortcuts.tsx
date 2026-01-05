@@ -68,7 +68,7 @@ export default function ThemeKeyboardShortcuts() {
                     setTheme('reduced-motion');
                     handled = true;
                     break;
-                case 't':
+                case 'h':
                     cycleTheme();
                     handled = true;
                     break;
