@@ -3,6 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useLikes } from "@/contexts/LikesContext";
 import styles from "./ProgramCard.module.css";
 
 export interface ProgramCardProps {
@@ -35,11 +36,15 @@ export default function ProgramCard({
   author,
   tags = [],
   like_count = 0,
-  onLike,
-  isLiked = false,
   className,
 }: ProgramCardProps) {
   const router = useRouter();
+  const { likeCount, isLiked, toggleLike } = useLikes(id, like_count || 0);
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleLike();
+  };
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on interactive elements
@@ -48,13 +53,6 @@ export default function ProgramCard({
       return;
     }
     router.push(`/programs/${id}`);
-  };
-
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onLike) {
-      onLike(id);
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -140,7 +138,7 @@ export default function ProgramCard({
           <span className={styles.heartIcon} aria-hidden="true">
             {isLiked ? '❤️' : '🤍'}
           </span>
-          <span className={styles.likeCount}>{like_count}</span>
+          <span className={styles.likeCount}>{likeCount}</span>
         </button>
 
         {/* Read more button */}
