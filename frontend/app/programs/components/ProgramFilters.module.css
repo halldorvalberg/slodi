@@ -188,7 +188,66 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   CHECKBOX LIST
+   TAG LIST (Interactive Buttons)
+   ═══════════════════════════════════════════════════════════ */
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-spacing-inline-xs);
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: var(--sl-spacing-inline-xs);
+}
+
+.tagButton {
+  padding: var(--sl-spacing-inset-xs) var(--sl-spacing-inset-sm);
+  font-size: var(--sl-font-size-sm);
+  font-weight: var(--sl-font-weight-medium);
+  color: hsl(var(--sl-color-text-secondary));
+  background: hsl(var(--sl-color-background-secondary));
+  border: 1px solid hsl(var(--sl-color-border) / var(--sl-primitive-opacity-30));
+  border-radius: var(--sl-radius-badge);
+  cursor: pointer;
+  transition: 
+    background-color var(--sl-transition-base),
+    color var(--sl-transition-base),
+    border-color var(--sl-transition-base),
+    transform var(--sl-transition-base);
+  white-space: nowrap;
+}
+
+.tagButton:hover {
+  color: hsl(var(--sl-color-text-primary));
+  background: hsl(var(--sl-color-background-tertiary));
+  border-color: hsl(var(--sl-color-border));
+  transform: translateY(-1px);
+}
+
+.tagButton:active {
+  transform: translateY(0);
+}
+
+.tagButton:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-primary));
+  outline-offset: 2px;
+}
+
+.tagButtonActive {
+  color: hsl(var(--sl-color-text-on-primary));
+  background: hsl(var(--sl-color-primary));
+  border-color: hsl(var(--sl-color-primary));
+  font-weight: var(--sl-font-weight-semibold);
+}
+
+.tagButtonActive:hover {
+  background: hsl(var(--sl-color-primary-hover));
+  border-color: hsl(var(--sl-color-primary-hover));
+  color: hsl(var(--sl-color-text-on-primary));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHECKBOX LIST (Legacy - can be removed if not used elsewhere)
    ═══════════════════════════════════════════════════════════ */
 
 .checkboxList {
@@ -323,20 +382,24 @@
    SCROLLBAR STYLING
    ═══════════════════════════════════════════════════════════ */
 
+.tagList::-webkit-scrollbar,
 .checkboxList::-webkit-scrollbar {
   width: 8px;
 }
 
+.tagList::-webkit-scrollbar-track,
 .checkboxList::-webkit-scrollbar-track {
   background: hsl(var(--sl-color-background-secondary));
   border-radius: var(--sl-radius-base);
 }
 
+.tagList::-webkit-scrollbar-thumb,
 .checkboxList::-webkit-scrollbar-thumb {
   background: hsl(var(--sl-color-border));
   border-radius: var(--sl-radius-base);
 }
 
+.tagList::-webkit-scrollbar-thumb:hover,
 .checkboxList::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--sl-color-text-tertiary));
 }
@@ -355,6 +418,7 @@
     flex: 1 1 250px;
   }
 
+  .tagList,
   .checkboxList {
     max-height: 200px;
   }
@@ -376,6 +440,7 @@
     justify-content: center;
   }
 
+  .tagList,
   .checkboxList {
     max-height: 150px;
   }
@@ -389,6 +454,7 @@
   .expandIcon,
   .filterSectionHeader,
   .filterActionButton,
+  .tagButton,
   .checkboxLabel,
   .radioLabel,
   .filterSelect {

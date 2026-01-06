@@ -4,223 +4,312 @@ import React, { useState } from "react";
 import Image from "next/image";
 import styles from "./NewProgramForm.module.css";
 import type { Program as ProgramType } from "@/hooks/usePrograms";
-import usePrograms from "@/hooks/usePrograms";
+import { useTags } from "@/hooks/useTags";
 
 type Props = {
   onCreated?: (program: ProgramType) => void;
-  endpoint?: string; // relative endpoint, defaults to '/programs'
+  onCancel?: () => void;
+  endpoint?: string;
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
 
-export default function NewProgramForm({ onCreated, endpoint = "/programs" }: Props) {
-  const [title, setTitle] = useState("");
+export default function NewProgramForm({ onCreated, onCancel, endpoint = "/programs" }: Props) {
+  const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  // selected tags for this new program
-  const [tags, setTags] = useState<string[]>([]);
-  // selected age groups
-  const [ages, setAges] = useState<string[]>([]);
-  // duration (e.g., "30 mínútur"), equipment and images
-  const [duration, setDuration] = useState<string>("");
-  const [equipment, setEquipment] = useState<string>("");
-  const [images, setImages] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
-  const previewsRef = React.useRef<string[]>([]);
+  const [isPublic, setIsPublic] = useState(false);
+  const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const imagePreviewRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    previewsRef.current = previews;
-  }, [previews]);
+    imagePreviewRef.current = imagePreview;
+  }, [imagePreview]);
 
   React.useEffect(() => {
     return () => {
-      // revoke any remaining object URLs on unmount
-      previewsRef.current.forEach((u) => {
-        try { URL.revokeObjectURL(u); } catch { /* ignore */ }
-      });
+      // Revoke object URL on unmount
+      if (imagePreviewRef.current) {
+        try { URL.revokeObjectURL(imagePreviewRef.current); } catch { /* ignore */ }
+      }
     };
   }, []);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // get available tags from the same source used in the search/listing
-  const { tags: availableTags, loading: tagsLoading } = usePrograms();
-  // Placeholder tags for testing when backend provides none
-  const PLACEHOLDER_TAGS = ["barn", "leikur", "útilegur", "kennslu", "fjölskyldu"];
+  // Get available tags
+  const { tags: availableTags } = useTags();
+  
+  // Placeholder tags for development
+  const PLACEHOLDER_TAGS = ["útivist", "innileikur", "list", "sköpun", "matreiðsla", "leikur", "fræðsla", "náttúrufræði"];
 
-  // fixed age groups (labels in Icelandic). Each has a color for stroke/fill.
-  const AGE_GROUPS: { id: string; label: string; color: string }[] = [
-    { id: "drekaskatar", label: "Drekaskátar", color: "#f97316" },
-    { id: "falkaskatar", label: "Fálkaskátar", color: "#fb7185" },
-    { id: "drottskatar", label: "Dróttskátar", color: "#60a5fa" },
-    { id: "rekkaskatar", label: "Rekkaskátar", color: "#a78bfa" },
-    { id: "roverskatar", label: "Róverskátar", color: "#34d399" },
-  ];
-
-  const create = async (e?: React.FormEvent) => {
-    e?.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
-    if (!title.trim()) {
-      setError("Titill má ekki vera auður");
+    
+    if (!name.trim()) {
+      setError("Heiti hugmyndar er nauðsynlegt");
       return;
     }
+
+    setLoading(true);
+    
     try {
-      const form = new FormData();
-      form.append("title", title.trim());
-      if (description.trim()) form.append("description", description.trim());
-      if (duration.trim()) form.append("duration", duration.trim());
-      if (equipment.trim()) form.append("equipment", equipment.trim());
-      // arrays as JSON strings
-      form.append("tags", JSON.stringify(tags));
-      form.append("ages", JSON.stringify(ages));
-      images.forEach((f, i) => form.append("images", f, f.name || `image-${i}`));
+      const formData = new FormData();
+      formData.append("name", name.trim());
+      if (description.trim()) formData.append("description", description.trim());
+      formData.append("public", String(isPublic));
+      if (image.trim()) formData.append("image", image.trim());
+      if (imageFile) formData.append("imageFile", imageFile);
+      
+      // Add tags as JSON array
+      if (selectedTags.length > 0) {
+        formData.append("tags", JSON.stringify(selectedTags));
+      }
 
       const url = new URL(endpoint, API_BASE).toString();
       const res = await fetch(url, {
         method: "POST",
-        body: form,
+        body: formData,
         credentials: "include",
       });
 
       if (!res.ok) {
         const txt = await res.text();
-        throw new Error(`Server error: ${res.status} ${res.statusText} ${txt}`);
+        throw new Error(`Villa kom upp: ${res.status} ${res.statusText}`);
       }
 
       const data = await res.json();
-      const program: ProgramType = Array.isArray(data) ? data[0] : data.program || data;
-      onCreated?.(program as ProgramType);
-
-      // reset form
-      setTitle("");
-      setDescription("");
-      setTags([]);
-      setAges([]);
-      setDuration("");
-      setEquipment("");
-      // revoke previews before clearing
-      previews.forEach((u) => { try { URL.revokeObjectURL(u); } catch { /* ignore */ } });
-      setImages([]);
-      setPreviews([]);
+      const program: ProgramType = Array.isArray(data) ? data[0] : data;
+      
+      // Reset form
+      handleReset();
+      
+      onCreated?.(program);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(err instanceof Error ? err.message : "Óþekkt villa kom upp");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleReset = () => {
+    setName("");
+    setDescription("");
+    setIsPublic(false);
+    setImage("");
+    setSelectedTags([]);
+    if (imagePreview) {
+      try { URL.revokeObjectURL(imagePreview); } catch { /* ignore */ }
+    }
+    setImageFile(null);
+    setImagePreview(null);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Revoke previous preview
+    if (imagePreview) {
+      try { URL.revokeObjectURL(imagePreview); } catch { /* ignore */ }
+    }
+
+    setImageFile(file);
+    const preview = URL.createObjectURL(file);
+    setImagePreview(preview);
+  };
+
+  const handleRemoveImage = () => {
+    if (imagePreview) {
+      try { URL.revokeObjectURL(imagePreview); } catch { /* ignore */ }
+    }
+    setImageFile(null);
+    setImagePreview(null);
+    setImage("");
+  };
+
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const displayTags = availableTags.length > 0 ? availableTags : PLACEHOLDER_TAGS;
+
   return (
-    <form className={styles.form} onSubmit={create} aria-label="Ný dagskrá">
-      <label>
-        Heiti Hugmyndar
-        <input className={styles.input} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Heiti hugmyndar" />
-      </label>
-
-      <label>
-        Lýsing verkefnis
-        <textarea className={styles.textarea} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Stutt lýsing á verkefninu" />
-      </label>
-
-      <div className={styles.rowField}>
-        <label style={{ flex: 1 }}>
-          Tímalengd
-          <input className={`${styles.input} ${styles.smallInput}`} value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="t.d. 30 mín" />
+    <form className={styles.form} onSubmit={handleSubmit} aria-label="Ný dagskrá">
+      {/* Program Name */}
+      <div className={styles.field}>
+        <label htmlFor="program-name" className={styles.label}>
+          Heiti hugmyndar <span className={styles.required}>*</span>
         </label>
-
-        <label style={{ flex: 2 }}>
-          Búnaður
-          <input className={styles.input} value={equipment} onChange={(e) => setEquipment(e.target.value)} placeholder="T.d. bolt, kaffi" />
-        </label>
+        <input
+          id="program-name"
+          type="text"
+          className={styles.input}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="t.d. Náttúruganga í skóginum"
+          required
+          maxLength={255}
+        />
+        <p className={styles.hint}>Stuttur og lýsandi titill á dagskrárhugmyndinni</p>
       </div>
 
-      <label>
-        Aldursbil
-        <div className={styles.ageGrid}>
-          {AGE_GROUPS.map((g) => {
-            const selected = ages.includes(g.id);
-            const style: React.CSSProperties = selected
-              ? { background: g.color, borderColor: g.color }
-              : { background: "transparent", borderColor: g.color, color: undefined };
+      {/* Description */}
+      <div className={styles.field}>
+        <label htmlFor="program-description" className={styles.label}>
+          Lýsing
+        </label>
+        <textarea
+          id="program-description"
+          className={styles.textarea}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Lýstu hugmyndinni stuttlega..."
+          rows={4}
+          maxLength={1000}
+        />
+        <p className={styles.hint}>Stutt lýsing sem hjálpar öðrum að skilja verkefnið</p>
+      </div>
+
+      {/* Tags */}
+      <div className={styles.field}>
+        <label className={styles.label}>
+          Merkimiðar
+        </label>
+        <div className={styles.tagGrid}>
+          {displayTags.map((tag) => {
+            const isSelected = selectedTags.includes(tag);
             return (
               <button
-                key={g.id}
+                key={tag}
                 type="button"
-                className={`${styles.ageChip} ${selected ? styles.selected : ""}`}
-                style={style}
-                aria-pressed={selected}
-                onClick={() => setAges((s) => (s.includes(g.id) ? s.filter((x) => x !== g.id) : [...s, g.id]))}
+                className={`${styles.tagButton} ${isSelected ? styles.tagButtonActive : ''}`}
+                onClick={() => handleTagToggle(tag)}
+                aria-pressed={isSelected}
               >
-                {g.label}
+                {tag}
               </button>
             );
           })}
         </div>
-        <div className={styles.hint}>Veldu eitt eða fleiri aldursbil sem verkefnið hentar fyrir.</div>
-      </label>
+        {selectedTags.length > 0 && (
+          <p className={styles.hint}>{selectedTags.length} merkimiði valinn</p>
+        )}
+      </div>
 
-      <label>
-        Merkimiðar
-        <div className={styles.tagList} aria-live="polite">
-          {tags.length === 0 ? <div className={styles.hint}>Engir merkimiðar valdir enn</div> : null}
-          {((availableTags && availableTags.length > 0) ? availableTags : (!tagsLoading ? PLACEHOLDER_TAGS : [])).map((t) => {
-            const selected = tags.includes(t);
-            return selected ? (
-              <span key={t} className={`${styles.tagChip} selected`}>
-                {t}
-                <button type="button" className={styles.tagButton} aria-label={`Fjarlægja merkimiða ${t}`} onClick={() => setTags((s) => s.filter((x) => x !== t))}>✕</button>
-              </span>
-            ) : (
-              <span key={t} className={styles.tagItem}>
-                {t}
-                <button type="button" className={styles.tagButton} aria-label={`Bæta merkimiða ${t}`} onClick={() => setTags((s) => Array.from(new Set([...s, t])))}>+</button>
-              </span>
-            );
-          })}
-          {tagsLoading ? <div className={styles.hint}>Hleður merkimiða…</div> : null}
-          {!tagsLoading && (!availableTags || availableTags.length === 0) ? (
-            <div className={styles.hint}>Engir merkimiðar frá bakenda — sýni staðgengla til prófunar.</div>
-          ) : null}
-        </div>
-      </label>
-
-      <label>
-        Myndir
-        <div className={styles.fileInput}>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              const files = Array.from(e.target.files || []);
-              if (files.length === 0) return;
-              setImages((s) => [...s, ...files]);
-              // create previews
-              const urls = files.map((f) => URL.createObjectURL(f));
-              setPreviews((p) => [...p, ...urls]);
-              // note: should revokeObjectURL on cleanup/remove
-            }}
-          />
-
-          <div className={styles.imageGrid}>
-            {previews.map((src, i) => (
-              <div key={src} className={styles.imageThumb}>
-                <Image src={src} alt={`Preview ${i + 1}`} width={200} height={200} />
-                <button type="button" className={styles.imageRemove} aria-label="Fjarlægja mynd" onClick={() => {
-                  // revoke object URL and remove image/preview
-                  try { URL.revokeObjectURL(src); } catch { /* ignore */ }
-                  setPreviews((p) => p.filter((x, idx) => idx !== i));
-                  setImages((arr) => arr.filter((__, idx) => idx !== i));
-                }}>✕</button>
-              </div>
-            ))}
+      {/* Image */}
+      <div className={styles.field}>
+        <label className={styles.label}>
+          Mynd
+        </label>
+        
+        {imagePreview ? (
+          <div className={styles.imagePreview}>
+            <Image 
+              src={imagePreview} 
+              alt="Preview" 
+              width={400} 
+              height={250}
+              className={styles.previewImage}
+            />
+            <button
+              type="button"
+              className={styles.removeImage}
+              onClick={handleRemoveImage}
+              aria-label="Fjarlægja mynd"
+            >
+              ✕
+            </button>
           </div>
+        ) : (
+          <div className={styles.imageUpload}>
+            <input
+              type="file"
+              id="image-upload"
+              accept="image/*"
+              onChange={handleImageChange}
+              className={styles.fileInput}
+            />
+            <label htmlFor="image-upload" className={styles.uploadLabel}>
+              <svg className={styles.uploadIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span className={styles.uploadText}>Smelltu til að velja mynd</span>
+              <span className={styles.uploadHint}>eða dragðu mynd hingað</span>
+            </label>
+          </div>
+        )}
+        
+        {/* Image URL fallback */}
+        <div className={styles.orDivider}>
+          <span>eða</span>
         </div>
-      </label>
+        <input
+          type="url"
+          className={styles.input}
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+          placeholder="https://example.com/mynd.jpg"
+        />
+        <p className={styles.hint}>Settu inn vefslóð á mynd</p>
+      </div>
 
-      {error ? <div className={styles.error}>{error}</div> : null}
+      {/* Public Toggle */}
+      <div className={styles.field}>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            className={styles.checkbox}
+            checked={isPublic}
+            onChange={(e) => setIsPublic(e.target.checked)}
+          />
+          <span>Gera þessa hugmynd opinbera</span>
+        </label>
+        <p className={styles.hint}>Opinberar hugmyndir eru sýnilegar öllum í dagskrábankanum</p>
+      </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className={styles.error} role="alert">
+          {error}
+        </div>
+      )}
+
+      {/* Form Actions */}
       <div className={styles.actions}>
-        <button type="button" className={`${styles.btn} ${styles.btnNeutral}`} onClick={() => { setTitle(""); setDescription(""); setTags([]); }} disabled={loading}>Hreinsa</button>
-        <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading}>{loading ? "Býr til…" : "Búa til"}</button>
+        {onCancel && (
+          <button
+            type="button"
+            className={styles.buttonSecondary}
+            onClick={onCancel}
+            disabled={loading}
+          >
+            Hætta við
+          </button>
+        )}
+        <button
+          type="button"
+          className={styles.buttonSecondary}
+          onClick={handleReset}
+          disabled={loading}
+        >
+          Hreinsa
+        </button>
+        <button
+          type="submit"
+          className={styles.buttonPrimary}
+          disabled={loading || !name.trim()}
+        >
+          {loading ? "Býr til..." : "Búa til hugmynd"}
+        </button>
       </div>
     </form>
   );

@@ -252,6 +252,61 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
+   FAVORITE BUTTON
+   ═══════════════════════════════════════════════════════════ */
+
+.favoriteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sl-spacing-inset-xs) var(--sl-spacing-inset-sm);
+  background: transparent;
+  border: 1px solid hsl(var(--sl-color-border) / var(--sl-primitive-opacity-40));
+  border-radius: var(--sl-radius-button);
+  color: hsl(var(--sl-color-text-secondary));
+  font-size: var(--sl-font-size-base);
+  cursor: pointer;
+  transition: 
+    background-color var(--sl-transition-fast),
+    border-color var(--sl-transition-fast),
+    transform var(--sl-transition-fast);
+  
+  /* Ensure proper hit target size */
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.favoriteButton:hover {
+  background: hsl(var(--sl-color-surface-hover));
+  border-color: hsl(var(--sl-color-border-hover));
+}
+
+.favoriteButton:active {
+  transform: scale(0.95);
+}
+
+.favoriteButton.favorited {
+  background: hsl(var(--sl-color-warning-subtle));
+  border-color: hsl(var(--sl-color-warning) / var(--sl-primitive-opacity-40));
+  color: hsl(var(--sl-color-warning));
+}
+
+.favoriteButton.favorited:hover {
+  background: hsl(var(--sl-color-warning-muted));
+  border-color: hsl(var(--sl-color-warning) / var(--sl-primitive-opacity-60));
+}
+
+.starIcon {
+  font-size: var(--sl-font-size-base);
+  line-height: 1;
+  transition: transform var(--sl-transition-fast);
+}
+
+.favoriteButton:active .starIcon {
+  transform: scale(1.2);
+}
+
+/* ═══════════════════════════════════════════════════════════
    READ MORE BUTTON
    ═══════════════════════════════════════════════════════════ */
 
@@ -319,6 +374,7 @@
   }
   
   .likeButton,
+  .favoriteButton,
   .readMore {
     width: 100%;
     justify-content: center;
@@ -331,8 +387,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card,
-  .likeButton,
+  .favoriteButton,
   .readMore,
+  .heartIcon,
+  .starore,
   .heartIcon,
   .arrow,
   .tag {
@@ -345,7 +403,7 @@
   .card {
     border-width: 2px;
   }
-  
+  .favoriteButton,
   .likeButton,
   .readMore {
     border-width: 2px;

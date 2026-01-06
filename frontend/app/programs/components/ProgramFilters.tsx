@@ -36,6 +36,15 @@ export default function ProgramFilters({
   const [isWorkspaceExpanded, setIsWorkspaceExpanded] = useState(false);
   const [isVisibilityExpanded, setIsVisibilityExpanded] = useState(false);
 
+  // Sort tags: active tags first (in selection order), then inactive alphabetically
+  const sortedTags = useMemo(() => {
+    const activeTags = selectedTags.filter(tag => availableTags.includes(tag));
+    const inactiveTags = availableTags
+      .filter(tag => !selectedTags.includes(tag))
+      .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+    return [...activeTags, ...inactiveTags];
+  }, [availableTags, selectedTags]);
+
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (selectedTags.length > 0) count += selectedTags.length;
@@ -131,23 +140,25 @@ export default function ProgramFilters({
               </div>
             )}
 
-            {/* Tag checkboxes */}
-            <div className={styles.checkboxList} role="group" aria-label="Tag síur">
+            {/* Interactive tag buttons */}
+            <div className={styles.tagList} role="group" aria-label="Tag síur">
               {availableTags.length === 0 ? (
                 <p className={styles.emptyMessage}>Engin merki í boði</p>
               ) : (
-                availableTags.map((tag) => (
-                  <label key={tag} className={styles.checkboxLabel}>
-                    <input
-                      type="checkbox"
-                      className={styles.checkbox}
-                      checked={selectedTags.includes(tag)}
-                      onChange={() => handleTagToggle(tag)}
-                      aria-label={`Sía eftir merki: ${tag}`}
-                    />
-                    <span className={styles.checkboxText}>{tag}</span>
-                  </label>
-                ))
+                  sortedTags.map((tag) => {
+                    const isSelected = selectedTags.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        className={`${styles.tagButton} ${isSelected ? styles.tagButtonActive : ''}`}
+                        onClick={() => handleTagToggle(tag)}
+                        aria-label={`${isSelected ? 'Afvirkja' : 'Virkja'} síu: ${tag}`}
+                        aria-pressed={isSelected}
+                      >
+                        {tag}
+                      </button>
+                    );
+                  })
               )}
             </div>
           </div>

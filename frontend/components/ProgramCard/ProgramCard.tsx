@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useLikes } from "@/contexts/LikesContext";
+import { useFavorite } from "@/contexts/FavoritesContext";
 import styles from "./ProgramCard.module.css";
 
 export interface ProgramCardProps {
@@ -40,10 +41,16 @@ export default function ProgramCard({
 }: ProgramCardProps) {
   const router = useRouter();
   const { likeCount, isLiked, toggleLike } = useLikes(id, like_count || 0);
+  const { isFavorite, toggleFavorite } = useFavorite(id);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleLike();
+  };
+
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite();
   };
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -139,6 +146,18 @@ export default function ProgramCard({
             {isLiked ? '❤️' : '🤍'}
           </span>
           <span className={styles.likeCount}>{likeCount}</span>
+        </button>
+
+        {/* Favorite button */}
+        <button
+          className={`${styles.favoriteButton} ${isFavorite ? styles.favorited : ''}`}
+          onClick={handleFavorite}
+          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <span className={styles.starIcon} aria-hidden="true">
+            {isFavorite ? '⭐' : '☆'}
+          </span>
         </button>
 
         {/* Read more button */}
