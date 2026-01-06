@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { BookOpen, Hammer, BarChart3, Handshake } from "lucide-react";
 import styles from "./page.module.css";
 import Link from "next/link";
+import HeroSection from "./(landing)/components/HeroSection";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -80,10 +81,20 @@ export default function Home() {
     }
   };
 
+  const scrollToEmailSignup = () => {
+    const emailSection = document.querySelector('#email-signup');
+    if (emailSection) {
+      emailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className={styles.page}>
       {/* Hero Section */}
-      <div className={styles.hero}>
+      <HeroSection onEmailSignupClick={scrollToEmailSignup} />
+
+      {/* Old Hero Section - keeping for now */}
+      <div className={styles.hero} style={{ display: 'none' }}>
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
             <h1 className={styles.title}>
@@ -141,24 +152,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Stats Section */}
-      {/* <div className={styles.stats}>
-        <div className={styles.statItem}>
-          <div className={styles.statNumber}>500+</div>
-          <div className={styles.statLabel}>Dagskrár</div>
-        </div>
-        <div className={styles.statItem}>
-          <div className={styles.statNumber}>100+</div>
-          <div className={styles.statLabel}>Foringjar</div>
-        </div>
-        <div className={styles.statItem}>
-          <div className={styles.statNumber}>20+</div>
-          <div className={styles.statLabel}>Sveitir</div>
-        </div>
-      </div> */}
-
       {/* Email Signup Section */}
-      <div className={styles.signup}>
+      <div id="email-signup" className={styles.signup}>
         <div className={styles.signupCard}>
           <h2 className={styles.signupTitle}>Fylgstu með framvindu</h2>
           <p className={styles.signupDescription}>
