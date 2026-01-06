@@ -12,32 +12,13 @@
 
 /* ═══════════════════════════════════════════════════════════
    GRID VIEW (Default)
-   Responsive column layout
+   Responsive column layout - uses auto-fill for fluid responsiveness
    ═══════════════════════════════════════════════════════════ */
 
 .grid.grid {
-  /* Mobile: 1 column (< 640px) */
-  grid-template-columns: 1fr;
-  
-  /* Small: Still 1 column (≥ 640px) */
-  @media (min-width: 640px) {
-    grid-template-columns: 1fr;
-  }
-  
-  /* Medium: 2 columns (≥ 768px) */
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  /* Large: 3 columns (≥ 1024px) */
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  /* Extra Large: 4 columns (≥ 1280px) */
-  @media (min-width: 1280px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  /* Fluid grid: automatically adjusts columns based on available space */
+  /* Minimum card width: 280px, cards grow equally to fill space */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -10,7 +10,7 @@ import ProgramFilters from "./components/ProgramFilters";
 import ProgramSort, { type SortOption } from "./components/ProgramSort";
 import Pagination from "./components/Pagination";
 import styles from "./program.module.css";
-import SAMPLE_DATA from "./devdata.json";
+import SAMPLE_DATA from "./devdata.json"; // Sample data for development when backend is not running
 
 type Program = {
     id: string;
@@ -101,6 +101,14 @@ export default function ProgramBuilderPage() {
         setCurrentPage(1);
     }, [query, selectedTags, sortBy]);
 
+    // Scroll to top of page when page changes
+    useEffect(() => {
+        const headerElement = document.querySelector('header');
+        if (headerElement) {
+            headerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, [currentPage]);
+
     const handleSearch = () => {
         // Could trigger API call here when backend is ready
         setIsSearching(false);
@@ -119,16 +127,24 @@ export default function ProgramBuilderPage() {
                         <h1>Dagskrárbankinn</h1>
                         <p>Leitaðu að og skoðaðu dagskrár hugmyndir.</p>
                     </div>
-                    <div>
-                        <button className={styles.addButton} onClick={() => setShowNewProgram(true)}>
-                            Bæta hugmynd í bankann
-                        </button>
-                        <Modal open={showNewProgram} onClose={() => setShowNewProgram(false)} title="Bæta hugmynd í bankann">
-                            <NewProgramForm onCreated={() => setShowNewProgram(false)} />
-                        </Modal>
-                    </div>
                 </div>
             </header>
+
+            {/* Floating Action Button */}
+            <button
+                className={styles.fab}
+                onClick={() => setShowNewProgram(true)}
+                aria-label="Bæta við dagskrá"
+            >
+                <svg className={styles.fabIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className={styles.fabLabel}>Bæta við dagskrá</span>
+            </button>
+
+            <Modal open={showNewProgram} onClose={() => setShowNewProgram(false)} title="Bæta hugmynd í bankann">
+                <NewProgramForm onCreated={() => setShowNewProgram(false)} />
+            </Modal>
 
             <div className={styles.mainHeader}>
                 <div className={styles.resultInfo}>
@@ -144,7 +160,7 @@ export default function ProgramBuilderPage() {
             <div className={styles.container}>
                 <div className={styles.filtersWrapper}>
                     <div className={styles.filterSection}>
-                        <label className={styles.filterLabel}>Leit</label>
+                        {/* <label className={styles.filterLabel}>Leit</label> */}
                         <ProgramSearch
                             value={query}
                             onChange={setQuery}

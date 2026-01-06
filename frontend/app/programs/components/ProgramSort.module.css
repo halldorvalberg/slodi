@@ -7,7 +7,7 @@
 .sortContainer {
   display: flex;
   align-items: center;
-  gap: var(--sl-spacing-inline-sm);
+  gap: 12px;
 }
 
 .sortLabel {
@@ -29,9 +29,8 @@
 
 .sortSelect {
   appearance: none;
-  min-width: 160px;
-  padding: var(--sl-spacing-inset-sm);
-  padding-right: calc(var(--sl-spacing-inline-md) + 20px);
+  min-width: 180px;
+  padding: 10px 40px 10px 16px;
   font-size: var(--sl-font-size-sm);
   font-weight: var(--sl-font-weight-medium);
   font-family: inherit;
@@ -61,16 +60,19 @@
 /* Dropdown Icon */
 .sortIcon {
   position: absolute;
-  right: var(--sl-spacing-inline-sm);
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 16px;
   height: 16px;
   color: hsl(var(--sl-color-text-tertiary));
   pointer-events: none;
   transition: color var(--sl-transition-base);
+  flex-shrink: 0;
 }
 
-.sortSelect:hover ~ .sortIcon,
-.sortSelect:focus ~ .sortIcon {
+.sortWrapper:hover .sortIcon,
+.sortWrapper:focus-within .sortIcon {
   color: hsl(var(--sl-color-text-secondary));
 }
 

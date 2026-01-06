@@ -25,20 +25,22 @@
 /* Search Icon */
 .searchIcon {
   position: absolute;
-  left: var(--sl-spacing-inline-sm);
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 20px;
   height: 20px;
   color: hsl(var(--sl-color-text-tertiary));
   pointer-events: none;
   transition: color var(--sl-transition-base);
+  z-index: 1;
+  flex-shrink: 0;
 }
 
 /* Input Field */
 .searchInput {
   width: 100%;
-  padding: var(--sl-spacing-inset-sm);
-  padding-left: calc(var(--sl-spacing-inline-sm) + 20px + var(--sl-spacing-inline-xs));
-  padding-right: calc(var(--sl-spacing-inline-sm) + 32px);
+  padding: 10px 48px 10px 44px;
   font-size: var(--sl-font-size-base);
   font-family: inherit;
   line-height: var(--sl-line-height-normal);
@@ -65,7 +67,7 @@
   background: hsl(var(--sl-color-surface));
 }
 
-.searchInput:focus + .searchIcon {
+.searchWrapper:focus-within .searchIcon {
   color: hsl(var(--sl-color-primary));
 }
 
@@ -74,7 +76,7 @@
   border-color: hsl(var(--sl-color-border));
 }
 
-.searchInput.active ~ .searchIcon {
+.searchWrapper:has(.searchInput.active) .searchIcon {
   color: hsl(var(--sl-color-text-secondary));
 }
 

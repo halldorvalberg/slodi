@@ -139,12 +139,20 @@ export default function ProgramCard({
         <button
           className={`${styles.likeButton} ${isLiked ? styles.liked : ''}`}
           onClick={handleLike}
-          aria-label={isLiked ? 'Unlike this program' : 'Like this program'}
-          title={isLiked ? 'Unlike' : 'Like'}
+          aria-label={isLiked ? 'Afþakka dagskrá' : 'Þakka fyrir dagskrá'}
+          title={isLiked ? 'Afþakka' : 'Þakka fyrir'}
         >
-          <span className={styles.heartIcon} aria-hidden="true">
-            {isLiked ? '❤️' : '🤍'}
-          </span>
+          <svg
+            className={styles.heartIcon}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill={isLiked ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
           <span className={styles.likeCount}>{likeCount}</span>
         </button>
 
@@ -152,12 +160,20 @@ export default function ProgramCard({
         <button
           className={`${styles.favoriteButton} ${isFavorite ? styles.favorited : ''}`}
           onClick={handleFavorite}
-          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          aria-label={isFavorite ? 'Fjarlægja úr möppu' : 'Vista í möppu'}
+          title={isFavorite ? 'Fjarlægja úr möppu' : 'Vista í möppu'}
         >
-          <span className={styles.starIcon} aria-hidden="true">
-            {isFavorite ? '⭐' : '☆'}
-          </span>
+          <svg
+            className={styles.bookmarkIcon}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill={isFavorite ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+          </svg>
         </button>
 
         {/* Read more button */}
@@ -167,9 +183,9 @@ export default function ProgramCard({
             e.stopPropagation();
             router.push(`/programs/${id}`);
           }}
-          aria-label={`Read more about ${name}`}
+          aria-label={`Lesa meira um ${name}`}
         >
-          Read More
+          Lesa meira
           <svg
             className={styles.arrow}
             xmlns="http://www.w3.org/2000/svg"

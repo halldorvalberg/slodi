@@ -2,7 +2,7 @@
     { 
         "id": "a3e7b8c9-1234-5678-90ab-cdef12345678",
         "content_type": "program",
-        "name": "Búsáhaldaskrá fyrir Útileguna",
+        "name": "Búsáhaldaskrá fyrir útileguna",
         "description": "Nákvæm listi yfir allt búsáhald sem þarf fyrir árangursríka útilegu. Inniheldur grunnbúnað, öryggisgalla, eldavél og fleira. Hentar fyrir 5-10 manna hópa í 2-3 daga ferð.",
         "public": true,
         "like_count": 42,
@@ -25,7 +25,7 @@
     { 
         "id": "b4f8c9d0-2345-6789-01bc-def234567890",
         "content_type": "program",
-        "name": "Náttúrufræðiganga í Skóginum",
+        "name": "Náttúrufræðiganga í skóginum",
         "description": "Skemmtileg og fræðandi ganga þar sem börn læra um íslenska trjátegunda, fugla og smádýr. Inniheldur leikrænar æfingar og hagnýtar athugasemdir fyrir leiðsögumenn. Tekur um 90 mínútur með 15-20 þátttakendum.",
         "public": true,
         "like_count": 67,
@@ -48,7 +48,7 @@
     { 
         "id": "c5g9d0e1-3456-7890-12cd-ef3456789012",
         "content_type": "program",
-        "name": "Húðflúr og Listaverkefni",
+        "name": "Húðflúr og listaverkefni",
         "description": "Skapandi listaverkefni þar sem börn mála andlit hvers annars og búa til litríkar myndir. Örugg málning, auðveld fyrirmæli, og skemmtilegir sniðmátar fylgja með. Hentar fyrir 8-14 ára aldur.",
         "public": true,
         "like_count": 89,
@@ -71,7 +71,7 @@
     { 
         "id": "d6h0e1f2-4567-8901-23de-f45678901234",
         "content_type": "program",
-        "name": "Eldavél og Matreiðsla Utandyra",
+        "name": "Eldavél og matreiðsla utandyra",
         "description": "Kennum ungmennum að nota eldavél á öruggan hátt og elda einfaldan mat úti í náttúrunni. Inniheldur uppskriftir að súpu, samlokum og eftirrétti. Áhersla á eldvarnaröryggi og umhverfisvernd.",
         "public": true,
         "like_count": 34,
@@ -94,7 +94,7 @@
     { 
         "id": "e7i1f2g3-5678-9012-34ef-56789012345",
         "content_type": "program",
-        "name": "Hnútalærdómur - Grunnhnútar",
+        "name": "Hnútalærdómur - grunnhnútar",
         "description": "Kynnum 10 grunnhnúta sem allir skátar ættu að kunna: slaufuhnút, páls-steik, kólfsteik og fleiri. Með skýrum myndum og skref-fyrir-skref leiðbeiningum. Praktísk æfing með tau og tóg.",
         "public": true,
         "like_count": 56,
@@ -117,7 +117,7 @@
     { 
         "id": "f8j2g3h4-6789-0123-45fg-678901234567",
         "content_type": "program",
-        "name": "Stjörnufræði undir Berum Himni",
+        "name": "Stjörnufræði undir berum himni",
         "description": "Náttúruleg nálgun að stjörnufræði þar sem börn læra að þekkja stjörnumerki, finna norðurstjörnuna og skilja mánaðarfasa. Best á skýlausum næturleitum. Krefst ljóslyktna og stjörnukorta.",
         "public": true,
         "like_count": 23,
@@ -140,7 +140,7 @@
     { 
         "id": "g9k3h4i5-7890-1234-56gh-789012345678",
         "content_type": "program",
-        "name": "Leikir fyrir Stóran Hóp",
+        "name": "Leikir fyrir stóran hóp",
         "description": "Safn af 20+ hópaleikjum sem henta fyrir 30-100 manns. Inniheldur íþróttalega leiki, samvinnuleiki og rólegri leiki. Lágmarks búnaður þarf og auðvelt að aðlaga að mismunandi aldurshópum.",
         "public": true,
         "like_count": 104,
@@ -163,7 +163,7 @@
     { 
         "id": "h0l4i5j6-8901-2345-67hi-890123456789",
         "content_type": "program",
-        "name": "Gervihólfagerð fyrir Fugla",
+        "name": "Gervihólfagerð fyrir fugla",
         "description": "Umhverfisvænt verkefni þar sem börn smíða fuglahólf úr endurunnið efni. Lær um íslenska fugla, búsvæði þeirra og mikilvægi verndunar. Verkfræðileg hugsun og náttúruvernd sameinuð.",
         "public": false,
         "like_count": 18,
@@ -186,7 +186,7 @@
     { 
         "id": "i1m5j6k7-9012-3456-78ij-901234567890",
         "content_type": "program",
-        "name": "Tjaldstæðareglur og Góð Hegðun",
+        "name": "Tjaldstæðareglur og góð hegðun",
         "description": "Kennum börnum góða hegðun á tjaldstæðum: hljóðnota, umgengni um aðstöðu, úrgangsflokkun og virðingu fyrir náttúrunni. Æfingaleikir og hópumræður.",
         "public": true,
         "like_count": 45,
@@ -209,7 +209,7 @@
     { 
         "id": "j2n6k7l8-0123-4567-89jk-012345678901",
         "content_type": "program",
-        "name": "Skátamerki og Hefðir",
+        "name": "Skátamerki og hefðir",
         "description": "Kynning á sögu skátahreyfingarinnar á Íslandi, merkjum félaga og mikilvægum hefðum. Þátttakendur læra um skátaheilsun, loforð og lögmál. Hentar fyrir nýja meðlimi.",
         "public": true,
         "like_count": 71,
@@ -232,7 +232,7 @@
     { 
         "id": "k3o7l8m9-1234-5678-90kl-123456789012",
         "content_type": "program",
-        "name": "Vatnaleikir á Ströndinni",
+        "name": "Vatnaleikir á ströndinni",
         "description": "Skemmtilegir vatnaleikir fyrir heita sumardaga við ströndina. Öryggi í fyrsta sæti með björgunarvesti og eftirlit. Inniheldur leiki eins og stafeta, köfun og vatnsbolta.",
         "public": true,
         "like_count": 93,
@@ -301,7 +301,7 @@
     { 
         "id": "n6r0o1p2-4567-8901-23no-456789012345",
         "content_type": "program",
-        "name": "Brauðgerð á Eldavél",
+        "name": "Brauðgerð á eldavél",
         "description": "Lærum að baka einfalt brauð og bollur úti á eldavél. Uppskriftir, tækni og ábendingar. Krakkarnir fá að eta niðurstöðuna!",
         "public": true,
         "like_count": 81,
@@ -324,7 +324,7 @@
     { 
         "id": "o7s1p2q3-5678-9012-34op-567890123456",
         "content_type": "program",
-        "name": "Kvöldvaka við Bálið",
+        "name": "Kvöldvaka við bálið",
         "description": "Hefðbundin kvöldvaka þar sem við söfnumst í kring um bál. Sögusagnir, söngur, marshmallows og samverustund. Rólegt og notalegt.",
         "public": true,
         "like_count": 107,
@@ -347,7 +347,7 @@
     { 
         "id": "p8t2q3r4-6789-0123-45pq-678901234567",
         "content_type": "program",
-        "name": "Tálgunarverkefni fyrir Byrjendur",
+        "name": "Tálgunarverkefni fyrir byrjendur",
         "description": "Örugg inngangur að tálgun með einföldum verkfærum. Börn læra að móta tréspýtur í einfaldar myndir. Öryggisbúnaður og leiðbeiningar fylgja með.",
         "public": true,
         "like_count": 29,
@@ -370,7 +370,7 @@
     { 
         "id": "q9u3r4s5-7890-1234-56qr-789012345678",
         "content_type": "program",
-        "name": "Langlaupaæfing fyrir Byrjendur",
+        "name": "Langlaupaæfing fyrir byrjendur",
         "description": "Hægt upphitunarprógramm fyrir þá sem vilja byrja að hlaupa. Teygjur, tækni og hægt tempo. Hentar öllum aldri og getu.",
         "public": true,
         "like_count": 51,
@@ -393,7 +393,7 @@
     { 
         "id": "r0v4s5t6-8901-2345-67rs-890123456789",
         "content_type": "program",
-        "name": "Ljósmyndun í Náttúrunni",
+        "name": "Ljósmyndun í náttúrunni",
         "description": "Kennum grunnreglur ljósmyndunar og lærum að fanga fallega náttúrumynd. Börn nota sína eigin síma eða fá lánað myndavélar.",
         "public": true,
         "like_count": 66,

@@ -39,7 +39,7 @@ export default function BuilderPage() {
                     </label>
 
                     <label>
-                        Tag
+                        Flokkur
                         <select value={tagFilter} onChange={(e) => setTagFilter(e.target.value)}>
                             <option value="all">Allt</option>
                             {/* Backend-driven tags (placeholder until API exists) */}

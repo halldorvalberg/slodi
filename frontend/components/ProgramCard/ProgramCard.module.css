@@ -8,6 +8,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--sl-spacing-stack-md);
+  width: 100%;
   
   /* Surface */
   background: hsl(var(--sl-color-surface));
@@ -78,11 +79,12 @@
     hsl(var(--sl-color-background-tertiary))
   );
   color: hsl(var(--sl-color-text-tertiary));
+  padding: var(--sl-spacing-element);
 }
 
 .placeholderIcon {
-  width: var(--sl-icon-xl);
-  height: var(--sl-icon-xl);
+  width: 48px;
+  height: 48px;
   opacity: var(--sl-primitive-opacity-40);
 }
 
@@ -236,8 +238,8 @@
 }
 
 .heartIcon {
-  font-size: var(--sl-font-size-base);
-  line-height: 1;
+  width: 18px;
+  height: 18px;
   transition: transform var(--sl-transition-fast);
 }
 
@@ -302,7 +304,14 @@
   transition: transform var(--sl-transition-fast);
 }
 
-.favoriteButton:active .starIcon {
+.bookmarkIcon {
+  width: 20px;
+  height: 20px;
+  transition: transform var(--sl-transition-fast);
+}
+
+.favoriteButton:active .starIcon,
+.favoriteButton:active .bookmarkIcon {
   transform: scale(1.2);
 }
 

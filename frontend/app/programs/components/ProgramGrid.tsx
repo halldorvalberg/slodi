@@ -69,7 +69,7 @@ export default function ProgramGrid({
         </div>
         <h3 className={styles.emptyTitle}>{emptyMessage}</h3>
         <p className={styles.emptyDescription}>
-          Try adjusting your search or filters to find what you&apos;re looking for.
+          Prófaðu að breyta leitar- eða merkjasíunni til að finna það sem þú leitar að.
         </p>
       </div>
     );
@@ -80,7 +80,7 @@ export default function ProgramGrid({
     <div
       className={`${styles.grid} ${styles[view]} ${className}`}
       role="list"
-      aria-label="Programs"
+      aria-label="Dagskrár"
     >
       {children}
     </div>

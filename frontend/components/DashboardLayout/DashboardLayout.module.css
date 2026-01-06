@@ -78,7 +78,7 @@
 .main {
   flex: 1;
   margin-left: 240px; /* Match full sidebar width */
-  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  padding: 0 var(--sl-spacing-element) var(--sl-spacing-section);
   transition: margin-left var(--sl-transition-base);
   min-width: 0; /* Prevent flex overflow */
   
