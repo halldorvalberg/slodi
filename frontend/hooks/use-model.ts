@@ -44,12 +44,12 @@ function useModel<T extends Record<string, unknown>>(
 ): [T, EventProxy<T>] {
   const [state, setState] = useState<T>(initialState);
 
-  const createHandler = <K extends keyof T>(key: K): FieldHandler<T[K]> => ({
-    set: (value: T[K]) => setState((prev) => ({ ...prev, [key]: value })),
-    reset: () => setState((prev) => ({ ...prev, [key]: initialState[key] })),
-  });
-
   const event = useMemo(() => {
+    const createHandler = <K extends keyof T>(key: K): FieldHandler<T[K]> => ({
+      set: (value: T[K]) => setState((prev) => ({ ...prev, [key]: value })),
+      reset: () => setState((prev) => ({ ...prev, [key]: initialState[key] })),
+    });
+
     const handler: BaseHandler<T> = {
       set: <K extends keyof T>(key: K, value: T[K]) =>
         setState((prev) => ({ ...prev, [key]: value })),
@@ -78,7 +78,7 @@ function useModel<T extends Record<string, unknown>>(
         return false;
       },
     }) as EventProxy<T>;
-  }, [createHandler, initialState]);
+  }, [initialState]);
 
   return [state, event];
 }

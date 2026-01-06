@@ -78,7 +78,6 @@ export default function NewProgramForm({ onCreated, onCancel, endpoint = "/progr
       });
 
       if (!res.ok) {
-        const txt = await res.text();
         throw new Error(`Villa kom upp: ${res.status} ${res.statusText}`);
       }
 
@@ -264,16 +263,45 @@ export default function NewProgramForm({ onCreated, onCancel, endpoint = "/progr
 
       {/* Public Toggle */}
       <div className={styles.field}>
-        <label className={styles.checkboxLabel}>
-          <input
-            type="checkbox"
-            className={styles.checkbox}
-            checked={isPublic}
-            onChange={(e) => setIsPublic(e.target.checked)}
-          />
-          <span>Gera þessa hugmynd opinbera</span>
-        </label>
-        <p className={styles.hint}>Opinberar hugmyndir eru sýnilegar öllum í dagskrábankanum</p>
+        <div className={styles.visibilityToggle}>
+          <div className={styles.toggleContent}>
+            <div className={styles.toggleHeader}>
+              <svg className={styles.toggleIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isPublic ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                )}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <div className={styles.toggleLabels}>
+                <span className={styles.toggleTitle}>Sýnileiki hugmyndar</span>
+                <span className={styles.toggleStatus}>
+                  {isPublic ? 'Opinber' : 'Einka'}
+                </span>
+              </div>
+            </div>
+            <label className={styles.switchLabel}>
+              <input
+                type="checkbox"
+                className={styles.switchInput}
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                aria-label="Gera hugmynd opinbera"
+              />
+              <span className={styles.switch}>
+                <span className={styles.switchThumb}></span>
+              </span>
+            </label>
+          </div>
+          <p className={styles.toggleHint}>
+            {isPublic
+              ? 'Þessi hugmynd verður sýnileg öllum í dagskrábankanum'
+              : 'Aðeins þú og meðlimir vinnusvæðisins geta séð þessa hugmynd'
+            }
+          </p>
+        </div>
       </div>
 
       {/* Error Message */}
