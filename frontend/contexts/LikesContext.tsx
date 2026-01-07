@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { toggleProgramLike } from '@/services/programs.service';
 
 interface LikesContextValue {
   likedPrograms: Map<string, number>; // programId -> like_count
@@ -77,21 +78,9 @@ export function LikesProvider({ children }: { children: React.ReactNode }) {
     try {
       // TODO: Replace with actual API call when backend is ready
       // POST /api/programs/:id/like
-      const response = await fetch(`/api/programs/${programId}/like`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: wasLiked ? 'unlike' : 'like' }),
-      });
-
-      if (!response.ok) {
-        // Silently fail for now since backend doesn't exist
-        // In production, you'd want to show an error to the user
-        console.warn('Like API endpoint not available yet');
-        return;
-      }
+      const data = await toggleProgramLike(programId, wasLiked ? 'unlike' : 'like');
 
       // Update with actual count from server
-      const data = await response.json();
       setLikedPrograms(prev => {
         const next = new Map(prev);
         if (data.liked) {

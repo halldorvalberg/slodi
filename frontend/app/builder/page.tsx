@@ -12,7 +12,8 @@ export default function BuilderPage() {
     // Use the hook that will fetch from the backend. The hook uses
     // `NEXT_PUBLIC_API_BASE` (fallbacks to http://localhost:8000) and expects
     // either an array response or `{ programs: Program[] }`.
-    const { programs, tags, loading, error } = usePrograms();
+    const workspaceId = "defaultWorkspace"; // Replace with the actual workspace ID
+    const { programs, tags, loading, error } = usePrograms(workspaceId);
 
     const filtered = useMemo(() => {
         if (!programs) return [] as ProgramType[];
@@ -20,7 +21,7 @@ export default function BuilderPage() {
             if (tagFilter !== "all" && !(p.tags || []).includes(tagFilter)) return false;
             if (!query) return true;
             const q = query.trim().toLowerCase();
-            return p.title.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
+            return p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
         });
     }, [programs, query, tagFilter]);
 
@@ -68,7 +69,7 @@ export default function BuilderPage() {
                             <ProgramCard 
                                 key={p.id} 
                                 id={p.id} 
-                                name={p.title} 
+                                name={p.name} 
                                 description={p.description} 
                                 tags={p.tags?.map(tag => ({ id: tag, name: tag }))} 
                             />

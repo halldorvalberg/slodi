@@ -1,13 +1,62 @@
-// Hook for fetching and managing tags
+"use client";
 
-export function useTags() {
-  // TODO: Implement SWR or TanStack Query
-  
-  return {
-    tags: [],
-    isLoading: false,
-    isError: false,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    createTag: async (_name: string) => {},
+import { useCallback, useEffect, useState } from "react";
+import { fetchTags, createTag as createTagApi, type Tag } from "@/services/tags.service";
+import { handleApiError } from "@/lib/api-utils";
+
+type UseTagsResult = {
+  tags: Tag[] | null;
+  tagNames: string[] | null;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+  createTag: (name: string) => Promise<Tag | null>;
+};
+
+export function useTags(query?: string): UseTagsResult {
+  const [tags, setTags] = useState<Tag[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const loadTags = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchTags(query);
+      setTags(data);
+    } catch (err) {
+      const errorMessage = handleApiError(err, "Failed to fetch tags");
+      setError(new Error(errorMessage));
+      setTags([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [query]);
+
+  useEffect(() => {
+    loadTags();
+  }, [loadTags]);
+
+  const createTag = useCallback(async (name: string): Promise<Tag | null> => {
+    try {
+      const newTag = await createTagApi({ name });
+      await loadTags(); // Refresh the list
+      return newTag;
+    } catch (err) {
+      const errorMessage = handleApiError(err, "Failed to create tag");
+      setError(new Error(errorMessage));
+      return null;
+    }
+  }, [loadTags]);
+
+  const tagNames = tags ? tags.map(tag => tag.name) : null;
+
+  return { 
+    tags,
+    tagNames,
+    loading,
+    error,
+    refetch: loadTags,
+    createTag 
   };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { checkResponse } from '@/lib/api-utils';
 
 interface FavoritesContextValue {
   favorites: Set<string>;
@@ -74,10 +75,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
           method: 'DELETE'
         });
 
-        if (!response.ok) {
-          console.warn('Favorites API endpoint not available yet');
-          return;
-        }
+        checkResponse(response);
       } else {
         const response = await fetch('/api/users/me/favorites', {
           method: 'POST',
@@ -85,10 +83,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({ programId }),
         });
 
-        if (!response.ok) {
-          console.warn('Favorites API endpoint not available yet');
-          return;
-        }
+        checkResponse(response);
       }
     } catch (error) {
       // Revert optimistic update on error

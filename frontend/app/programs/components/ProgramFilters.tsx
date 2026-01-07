@@ -19,6 +19,7 @@ interface ProgramFiltersProps {
   onWorkspaceChange?: (workspaceId: string | null) => void;
   visibility?: 'all' | 'public' | 'private';
   onVisibilityChange?: (visibility: 'all' | 'public' | 'private') => void;
+  isLoadingTags?: boolean;
 }
 
 export default function ProgramFilters({
@@ -31,6 +32,7 @@ export default function ProgramFilters({
   onWorkspaceChange,
   visibility = 'all',
   onVisibilityChange,
+  isLoadingTags = false,
 }: ProgramFiltersProps) {
   const [isTagsExpanded, setIsTagsExpanded] = useState(true);
   const [isWorkspaceExpanded, setIsWorkspaceExpanded] = useState(false);
@@ -102,7 +104,7 @@ export default function ProgramFilters({
           aria-controls="tags-filter-content"
         >
           <span className={styles.filterSectionTitle}>
-            Merki
+            Flokkur
             {selectedTags.length > 0 && (
               <span className={styles.selectedCount}>({selectedTags.length})</span>
             )}
@@ -142,8 +144,10 @@ export default function ProgramFilters({
 
             {/* Interactive tag buttons */}
             <div className={styles.tagList} role="group" aria-label="Tag síur">
-              {availableTags.length === 0 ? (
-                <p className={styles.emptyMessage}>Engin merki í boði</p>
+              {isLoadingTags ? (
+                <p className={styles.loadingMessage}>Hleð flokkum...</p>
+              ) : availableTags.length === 0 ? (
+                <p className={styles.emptyMessage}>Enginn flokkur í boði</p>
               ) : (
                   sortedTags.map((tag) => {
                     const isSelected = selectedTags.includes(tag);

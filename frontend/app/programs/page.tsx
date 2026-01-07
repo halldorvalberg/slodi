@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import Modal from "@/components/Modal/Modal";
-import NewProgramForm from "@/components/NewProgram/NewProgramForm";
+import NewProgramForm from "@/app/programs/components/NewProgramForm";
 import ProgramCard from "@/components/ProgramCard/ProgramCard";
 import ProgramSearch from "./components/ProgramSearch";
 import ProgramGrid from "./components/ProgramGrid";
@@ -11,30 +11,13 @@ import ProgramSort, { type SortOption } from "./components/ProgramSort";
 import Pagination from "./components/Pagination";
 import styles from "./program.module.css";
 import SAMPLE_DATA from "./devdata.json"; // Sample data for development when backend is not running
-
-type Program = {
-    id: string;
-    content_type: "program";
-    name: string;
-    description: string | null;
-    public: boolean;
-    like_count: number;
-    created_at: string;
-    author_id: string;
-    image: string | null;
-    workspace_id: string;
-    author: {
-        id: string;
-        name: string;
-        email: string;
-    };
-    workspace: {
-        id: string;
-        name: string;
-    };
-    tags?: string[];
-    comment_count?: number;
-};
+import {
+    type Program,
+    filterProgramsByQuery,
+    filterProgramsByTags,
+    sortPrograms
+} from "@/services/programs.service";
+import { useTags } from "@/hooks/useTags";
 
 const SAMPLE: Program[] = SAMPLE_DATA as Program[];
 
@@ -46,48 +29,23 @@ export default function ProgramBuilderPage() {
     const [isSearching, setIsSearching] = useState(false);
     const [showNewProgram, setShowNewProgram] = useState(false);
 
-    const ITEMS_PER_PAGE = 12; // Show 6 programs per page for demo
+    const ITEMS_PER_PAGE = 12; // Show 12 programs per page for demo
 
-    const availableTags = useMemo(() => Array.from(new Set(SAMPLE.flatMap((s) => s.tags || []))), []);
+    // Fetch tags from backend using tags.service.ts
+    const { tagNames: backendTags, loading: tagsLoading } = useTags();
+
+    const availableTags = backendTags || [];
 
     // Filter and sort items
     const filteredAndSortedItems = useMemo(() => {
-        // Filter programs
-        const filtered = SAMPLE.filter((p) => {
-            // Tag filter: OR logic (show if ANY selected tag matches)
-            if (selectedTags.length > 0) {
-                const programTags = p.tags || [];
-                const hasMatchingTag = selectedTags.some(selectedTag => programTags.includes(selectedTag));
-                if (!hasMatchingTag) return false;
-            }
+        // Apply tag filter
+        let filtered = filterProgramsByTags(SAMPLE, selectedTags);
 
-            // Search filter
-            if (query) {
-                const q = query.trim().toLowerCase();
-                const matchesSearch = p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
-                if (!matchesSearch) return false;
-            }
+        // Apply search filter
+        filtered = filterProgramsByQuery(filtered, query);
 
-            return true;
-        });
-
-        // Sort programs
-        const sorted = [...filtered].sort((a, b) => {
-            switch (sortBy) {
-                case 'newest':
-                    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-                case 'oldest':
-                    return new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
-                case 'most-liked':
-                    return (b.like_count || 0) - (a.like_count || 0);
-                case 'alphabetical':
-                    return a.name.localeCompare(b.name, 'is');
-                default:
-                    return 0;
-            }
-        });
-
-        return sorted;
+        // Apply sort
+        return sortPrograms(filtered, sortBy);
     }, [query, selectedTags, sortBy]);
 
     // Pagination calculations
@@ -175,6 +133,7 @@ export default function ProgramBuilderPage() {
                         selectedTags={selectedTags}
                         onTagsChange={setSelectedTags}
                         onClearAll={handleClearAllFilters}
+                        isLoadingTags={tagsLoading}
                     />
                 </div>
 

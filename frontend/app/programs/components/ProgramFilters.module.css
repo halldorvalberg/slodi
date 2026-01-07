@@ -378,6 +378,25 @@
   margin: 0;
 }
 
+.loadingMessage {
+  padding: var(--sl-spacing-inset-sm);
+  font-size: var(--sl-font-size-sm);
+  color: hsl(var(--sl-color-text-secondary));
+  text-align: center;
+  margin: 0;
+  font-style: italic;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
    SCROLLBAR STYLING
    ═══════════════════════════════════════════════════════════ */
