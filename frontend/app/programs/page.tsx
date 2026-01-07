@@ -10,7 +10,6 @@ import ProgramFilters from "./components/ProgramFilters";
 import ProgramSort, { type SortOption } from "./components/ProgramSort";
 import Pagination from "./components/Pagination";
 import styles from "./program.module.css";
-import SAMPLE_DATA from "./devdata.json"; // Sample data for development when backend is not running
 import {
     type Program,
     filterProgramsByQuery,
@@ -18,8 +17,7 @@ import {
     sortPrograms
 } from "@/services/programs.service";
 import { useTags } from "@/hooks/useTags";
-
-const SAMPLE: Program[] = SAMPLE_DATA as Program[];
+import usePrograms from "@/hooks/usePrograms";
 
 export default function ProgramBuilderPage() {
     const [query, setQuery] = useState("");
@@ -29,24 +27,31 @@ export default function ProgramBuilderPage() {
     const [isSearching, setIsSearching] = useState(false);
     const [showNewProgram, setShowNewProgram] = useState(false);
 
-    const ITEMS_PER_PAGE = 12; // Show 12 programs per page for demo
+    const ITEMS_PER_PAGE = 12; // Show 12 programs per page
+
+    // Important: Use a fixed workspace ID for fetching programs, this id is the "public" workspace
+    const workspaceId = "36606c77-5e0d-4fc9-891f-4e0126c6e9a6";
 
     // Fetch tags from backend using tags.service.ts
     const { tagNames: backendTags, loading: tagsLoading } = useTags();
 
+    // Fetch programs from backend
+    const { programs: backendPrograms, loading: programsLoading, error: programsError } = usePrograms(workspaceId);
+
     const availableTags = backendTags || [];
+    const programs = backendPrograms || [];
 
     // Filter and sort items
     const filteredAndSortedItems = useMemo(() => {
         // Apply tag filter
-        let filtered = filterProgramsByTags(SAMPLE, selectedTags);
+        let filtered = filterProgramsByTags(programs, selectedTags);
 
         // Apply search filter
         filtered = filterProgramsByQuery(filtered, query);
 
         // Apply sort
         return sortPrograms(filtered, sortBy);
-    }, [query, selectedTags, sortBy]);
+    }, [programs, query, selectedTags, sortBy]);
 
     // Pagination calculations
     const totalPages = Math.ceil(filteredAndSortedItems.length / ITEMS_PER_PAGE);
@@ -68,7 +73,7 @@ export default function ProgramBuilderPage() {
     }, [currentPage]);
 
     const handleSearch = () => {
-        // Could trigger API call here when backend is ready
+        // Search is handled by client-side filtering
         setIsSearching(false);
     };
 
@@ -140,9 +145,11 @@ export default function ProgramBuilderPage() {
                 <main className={styles.main}>
                     <ProgramGrid
                         isEmpty={filteredAndSortedItems.length === 0}
-                        isLoading={isSearching}
+                        isLoading={programsLoading}
                         emptyMessage={
-                            query.trim() || selectedTags.length > 0
+                            programsError
+                                ? "Villa kom upp við að sækja dagskrár"
+                                : query.trim() || selectedTags.length > 0
                                 ? "Engar dagskrár fundust með þessari leit"
                                 : "Engar dagskrár í boði"
                         }
