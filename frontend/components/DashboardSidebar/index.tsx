@@ -46,6 +46,7 @@ interface NavItem {
     badge?: number; // Optional notification count
     roleRequired?: "admin" | "editor"; // Minimum role required (omit for all users)
     group?: "home" | "dashboard" | "primary" | "secondary" | "personal"; // Navigation section
+    disabled?: boolean; // Whether item is disabled (not yet implemented)
 }
 
 /**
@@ -74,6 +75,8 @@ interface DashboardSidebarProps {
  * - Items without roleRequired are visible to all users
  * - roleRequired "editor": visible to editors and admins
  * - roleRequired "admin": visible only to admins
+ * 
+ * Disabled items are shown but not clickable (for features in development)
  */
 const NAV_ITEMS: NavItem[] = [
     // Home navigation
@@ -103,12 +106,14 @@ const NAV_ITEMS: NavItem[] = [
         icon: Hammer,
         group: "primary",
         roleRequired: "editor", // Requires editor or admin role
+        disabled: true, // Not yet implemented
     },
     {
         label: "Veggurinn",
         path: "/social",
         icon: MessageSquare,
         group: "primary",
+        disabled: true, // Not yet implemented
     },
     // Secondary navigation - advanced features
     {
@@ -116,6 +121,7 @@ const NAV_ITEMS: NavItem[] = [
         path: "/analytics",
         icon: BarChart3,
         group: "secondary",
+        disabled: true, // Not yet implemented
     },
     {
         label: "Stjórnun",
@@ -123,6 +129,7 @@ const NAV_ITEMS: NavItem[] = [
         icon: Shield,
         group: "secondary",
         roleRequired: "admin", // Admin-only access
+        disabled: true, // Not yet implemented
     },
     // Personal navigation - user-specific items
     {
@@ -130,6 +137,7 @@ const NAV_ITEMS: NavItem[] = [
         path: "/profile",
         icon: User,
         group: "personal",
+        disabled: true, // Not yet implemented
     },
     {
         label: "Stillingar",
@@ -142,6 +150,7 @@ const NAV_ITEMS: NavItem[] = [
         path: "/badges",
         icon: Award,
         group: "personal",
+        disabled: true, // Not yet implemented
     },
 ];
 
@@ -199,7 +208,7 @@ export default function DashboardSidebar({
 
     /**
      * Render a single navigation item
-     * Handles permission checking, active state, badges, and accessibility
+     * Handles permission checking, active state, badges, disabled state, and accessibility
      */
     const renderNavItem = (item: NavItem) => {
         // Hide items the user doesn't have permission for
@@ -207,28 +216,45 @@ export default function DashboardSidebar({
 
         const Icon = item.icon;
         const active = isActive(item.path);
+        const isDisabled = item.disabled || false;
 
         // Apply badge count to "Merkin mín" item
         const badge = item.path === "/badges" ? badgeCount : item.badge;
         const showBadge = badge && badge > 0;
 
+        const content = (
+            <>
+                <Icon className={styles.navIcon} aria-hidden="true" />
+                {!isCollapsed && <span className={styles.navLabel}>{item.label}</span>}
+                {showBadge && (
+                    <span className={styles.navBadge} aria-label={`${badge} ólesnar`}>
+                        {badge}
+                    </span>
+                )}
+            </>
+        );
+
         return (
             <li key={item.path}>
-                <Link
-                    href={item.path}
-                    className={`${styles.navItem} ${active ? styles.navItemActive : ""}`}
-                    aria-current={active ? "page" : undefined}
-                    aria-label={item.label}
-                    title={isCollapsed ? item.label : undefined} // Tooltip when collapsed
-                >
-                    <Icon className={styles.navIcon} aria-hidden="true" />
-                    {!isCollapsed && <span className={styles.navLabel}>{item.label}</span>}
-                    {showBadge && (
-                        <span className={styles.navBadge} aria-label={`${badge} ólesnar`}>
-                            {badge}
-                        </span>
-                    )}
-                </Link>
+                {isDisabled ? (
+                    <div
+                        className={`${styles.navItem} ${styles.navItemDisabled}`}
+                        aria-disabled="true"
+                        title="Ennþá í vinnslu..."
+                    >
+                        {content}
+                    </div>
+                ) : (
+                    <Link
+                        href={item.path}
+                        className={`${styles.navItem} ${active ? styles.navItemActive : ""}`}
+                        aria-current={active ? "page" : undefined}
+                        aria-label={item.label}
+                        title={isCollapsed ? item.label : undefined} // Tooltip when collapsed
+                    >
+                        {content}
+                    </Link>
+                )}
             </li>
         );
     };
