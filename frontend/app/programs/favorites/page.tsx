@@ -125,7 +125,7 @@ export default function FavoriteProgramsPage() {
                 image={program.image}
                 author={program.author}
                 workspace={program.workspace}
-                tags={program.tags?.map(tag => ({ id: tag, name: tag })) || []}
+                tags={program.tags}
                 like_count={program.like_count}
                 created_at={program.created_at}
                 public={program.public}

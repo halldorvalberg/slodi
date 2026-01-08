@@ -89,3 +89,84 @@ export async function deleteTag(id: string): Promise<void> {
 export function extractTagNames(tags: Tag[]): string[] {
   return tags.map(tag => tag.name);
 }
+
+/**
+ * Get all tags for a specific content item
+ */
+export async function fetchContentTags(contentId: string): Promise<Tag[]> {
+  const url = buildApiUrl(`/content/${contentId}/tags`);
+  return fetchAndCheck<Tag[]>(url, {
+    method: "GET",
+    credentials: "include",
+  });
+}
+
+/**
+ * Add a tag to content (by tag ID)
+ * Returns whether the tag was newly created (true) or already existed (false)
+ */
+export async function addTagToContent(
+  contentId: string,
+  tagId: string,
+  getToken: () => Promise<string | null>
+): Promise<{ created: boolean }> {
+  const url = buildApiUrl(`/content/${contentId}/tags/${tagId}`);
+  
+  const token = await getToken();
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to add tag: ${error}`);
+  }
+
+  // 201 = created, 200 = already existed
+  return { created: response.status === 201 };
+}
+
+/**
+ * Remove a tag from content
+ */
+export async function removeTagFromContent(
+  contentId: string,
+  tagId: string,
+  getToken: () => Promise<string | null>
+): Promise<void> {
+  const url = buildApiUrl(`/content/${contentId}/tags/${tagId}`);
+  
+  const token = await getToken();
+  if (!token) {
+    throw new Error("Authentication required");
+  }
+
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Failed to remove tag: ${error}`);
+  }
+}
+
+/**
+ * Find tag ID by tag name
+ * Returns null if tag doesn't exist
+ */
+export async function findTagIdByName(tagName: string): Promise<string | null> {
+  const tags = await fetchTags(tagName);
+  const exactMatch = tags.find(tag => tag.name.toLowerCase() === tagName.toLowerCase());
+  return exactMatch?.id || null;
+}

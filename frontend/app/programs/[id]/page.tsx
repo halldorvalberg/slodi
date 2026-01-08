@@ -119,7 +119,12 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
 
                 {/* Sidebar */}
                 <aside className={styles.sidebar}>
-                    <ProgramQuickInfo program={program} />
+                    <ProgramQuickInfo
+                        program={{
+                            ...program,
+                            tags: program.tags?.map(tag => ({ id: tag.id, name: tag.name })),
+                        }}
+                    />
                 </aside>
             </div>
 

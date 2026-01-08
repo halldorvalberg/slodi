@@ -84,3 +84,9 @@ class Content(Base):
     content_tags: Mapped[list[ContentTag]] = relationship(
         back_populates="content", cascade="all, delete-orphan"
     )
+
+    # Properties for serialization
+    @property
+    def tags(self):
+        """Return list of Tag objects from content_tags relationship"""
+        return [ct.tag for ct in self.content_tags]

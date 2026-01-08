@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
 from app.domain.content_constraints import DESC_MAX, NAME_MAX, NAME_MIN
 from app.utils import get_current_datetime
+
+if TYPE_CHECKING:
+    from app.schemas.tag import TagOut
 
 NameStr = Annotated[
     str,
@@ -64,3 +67,4 @@ class ContentOut(ContentBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    tags: list["TagOut"] = []

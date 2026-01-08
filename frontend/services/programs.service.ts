@@ -5,6 +5,7 @@
 
 import { buildApiUrl, fetchAndCheck } from "@/lib/api-utils";
 import { fetchWithAuth } from "@/lib/api";
+import { findTagIdByName, addTagToContent } from "@/services/tags.service";
 
 export type Program = {
   id: string;
@@ -26,7 +27,7 @@ export type Program = {
     id: string;
     name: string;
   };
-  tags?: string[];
+  tags?: Array<{ id: string; name: string }>;
   comment_count?: number;
 };
 
@@ -64,6 +65,49 @@ export async function fetchPrograms(workspaceId: string): Promise<Program[]> {
 }
 
 /**
+ * Assign tags to a program by tag names
+ * Looks up tag IDs and assigns them to the program
+ */
+async function assignTagsToProgram(
+  programId: string,
+  tagNames: string[],
+  getToken: () => Promise<string | null>
+): Promise<void> {
+  const DEBUG = true;
+
+  if (DEBUG) {
+    console.log(`Assigning ${tagNames.length} tags to program ${programId}`);
+  }
+
+  // Assign each tag
+  for (const tagName of tagNames) {
+    try {
+      // Find tag ID by name
+      const tagId = await findTagIdByName(tagName);
+
+      if (!tagId) {
+        console.warn(`Tag "${tagName}" not found, skipping`);
+        continue;
+      }
+
+      if (DEBUG) {
+        console.log(`Assigning tag "${tagName}" (${tagId}) to program`);
+      }
+
+      // Add tag to program
+      await addTagToContent(programId, tagId, getToken);
+
+      if (DEBUG) {
+        console.log(`Successfully assigned tag "${tagName}"`);
+      }
+    } catch (error) {
+      console.error(`Failed to assign tag "${tagName}":`, error);
+      // Continue with other tags even if one fails
+    }
+  }
+}
+
+/**
  * Fetch a single program by ID
  */
 export async function fetchProgramById(id: string): Promise<Program> {
@@ -95,12 +139,12 @@ export async function createProgram(
 
   // Backend expects JSON, not FormData
   // TODO: Implement image file upload separately if needed
+  // Note: tags are NOT sent in the create payload - they're added separately after creation
   const payload = {
     name: input.name.trim(),
     description: input.description?.trim() || "",
     public: input.public || false,
     image: input.image?.trim() || null,
-    tags: input.tags || [],
     content_type: "program" as const,
   };
 
@@ -128,7 +172,23 @@ export async function createProgram(
       console.log("Response data:", data);
     }
 
-    return Array.isArray(data) ? data[0] : data;
+    const program = Array.isArray(data) ? data[0] : data;
+
+    // After creating the program, assign tags if provided
+    if (input.tags && input.tags.length > 0) {
+      if (DEBUG_CREATE_PROGRAM) {
+        console.log("=== ASSIGNING TAGS ===");
+        console.log("Tags to assign:", input.tags);
+      }
+
+      await assignTagsToProgram(program.id, input.tags, getToken);
+
+      if (DEBUG_CREATE_PROGRAM) {
+        console.log("Tags assigned successfully");
+      }
+    }
+
+    return program;
   } catch (error: unknown) {
     console.error("=== CREATE PROGRAM ERROR ===");
     console.error("Error:", error);
@@ -197,7 +257,8 @@ export async function toggleProgramLike(
  * Extract unique tags from programs list
  */
 export function extractTags(programs: Program[]): string[] {
-  return Array.from(new Set(programs.flatMap((p) => p.tags || [])));
+  const tagNames = programs.flatMap((p) => (p.tags || []).map(t => t.name));
+  return Array.from(new Set(tagNames));
 }
 
 /**
@@ -227,8 +288,8 @@ export function filterProgramsByTags(
   if (selectedTags.length === 0) return programs;
   
   return programs.filter((p) => {
-    const programTags = p.tags || [];
-    return selectedTags.some((selectedTag) => programTags.includes(selectedTag));
+    const programTagNames = (p.tags || []).map(t => t.name);
+    return selectedTags.some((selectedTag) => programTagNames.includes(selectedTag));
   });
 }
 

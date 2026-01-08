@@ -188,7 +188,7 @@ export default function ProgramBuilderPage() {
                                 id={p.id}
                                 name={p.name}
                                 description={p.description}
-                                tags={p.tags?.map(tag => ({ id: tag, name: tag }))}
+                                tags={p.tags}
                             />
                         ))}
                     </ProgramGrid>
