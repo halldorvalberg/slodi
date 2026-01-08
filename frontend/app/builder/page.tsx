@@ -10,7 +10,6 @@ export default function BuilderPage() {
     const [tagFilter, setTagFilter] = useState("all");
 
     // Use the hook that will fetch from the backend. The hook uses
-    // `NEXT_PUBLIC_API_BASE` (fallbacks to http://localhost:8000) and expects
     // either an array response or `{ programs: Program[] }`.
     const workspaceId = "defaultWorkspace"; // Replace with the actual workspace ID
     const { programs, tags, loading, error } = usePrograms(workspaceId);
