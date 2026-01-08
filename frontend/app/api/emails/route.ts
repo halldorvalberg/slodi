@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         const response = await fetch(`${API_BASE_URL}/emaillist/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+            body: JSON.stringify({ email }),
         });
 
         let data: unknown = null;
@@ -42,50 +42,59 @@ export async function POST(request: NextRequest) {
             data = await response.json();
         }
         catch {
-        // Ignore JSON parsing errors
+            // Ignore JSON parsing errors
         }
 
         if (!response.ok) {
+            // Handle specific error cases
+            if (response.status === 409) {
+                return json(
+                    { message: 'Þetta netfang er þegar á póstlistanum.' },
+                    409
+                );
+            }
             return json(
-                { message: 'Failed to save email', details: data || response.statusText, status: response.status, upstream: data },
+                { message: 'Villa kom upp við skráningu', details: data || response.statusText },
                 response.status
             );
         }
 
         return json(
-            data ?? { message: 'Email saved successfully' },
+            { message: 'Takk fyrir að skrá þig á póstlistann!' },
             201
         );
     } catch (error) {
         console.error('Error connecting to backend API:', error);
         return json(
-            { message: 'Error connecting to backend API', details: (error as Error).message },
+            { message: 'Villa kom upp við tengingu við bakenda', details: (error as Error).message },
+            500
         );
     }
 }
 
-// the get function returns a list of all emails in the emaillist
+// Get all emails in the emaillist (admin function)
 export async function GET() {
     try {
-        console.log("API URL: ", `${API_BASE_URL}/emaillist/`);
-        const url = new URL("/emaillist", API_BASE_URL);
-
-        const res = await fetch(url.toString());
-
-
-        console.log('Received response from backend API with status', res.status);
-
-        // If backend is up but returns error, propagate status + body as-is
-        const data = await res.json();
-
-        return NextResponse.json(data, {
-            status: res.status,
+        const response = await fetch(`${API_BASE_URL}/emaillist/`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
         });
-    } catch (err) {
-        console.error("Error fetching email list:", err);
-        return NextResponse.json(
-            { message: "Failed to fetch email list" },
-            { status: 500 },
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return json(
+                { message: 'Villa kom upp við að sækja póstlista', details: errorData },
+                response.status
+            );
+        }
+
+        const data = await response.json();
+        return json(data, response.status);
+    } catch (error) {
+        console.error('Error fetching email list:', error);
+        return json(
+            { message: 'Villa kom upp við tengingu við bakenda', details: (error as Error).message },
+            500
         );
     }
 }
