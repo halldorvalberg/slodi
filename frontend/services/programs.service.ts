@@ -4,6 +4,7 @@
  */
 
 import { buildApiUrl, fetchAndCheck, fetchAndCheckIs } from "@/lib/api-utils";
+import { fetchWithAuth } from "@/lib/api";
 
 export type Program = {
   id: string;
@@ -36,7 +37,7 @@ export type ProgramCreateInput = {
   image?: string;
   imageFile?: File;
   tags?: string[];
-  workspaceId?: string;
+  workspaceId: string; // Required - workspace to create program in
 };
 
 export type ProgramUpdateInput = {
@@ -75,66 +76,103 @@ export async function fetchProgramById(id: string): Promise<Program> {
 
 /**
  * Create a new program
+ * Requires authentication - backend will set author_id from authenticated user
  */
 export async function createProgram(
-  input: ProgramCreateInput
+  input: ProgramCreateInput,
+  getToken: () => Promise<string | null>
 ): Promise<Program> {
-  const formData = new FormData();
-  
-  formData.append("name", input.name.trim());
-  if (input.description?.trim()) {
-    formData.append("description", input.description.trim());
-  }
-  if (input.public !== undefined) {
-    formData.append("public", String(input.public));
-  }
-  if (input.image?.trim()) {
-    formData.append("image", input.image.trim());
-  }
-  if (input.imageFile) {
-    formData.append("imageFile", input.imageFile);
-  }
-  if (input.tags && input.tags.length > 0) {
-    formData.append("tags", JSON.stringify(input.tags));
+  // Toggle this to enable/disable debug logging for program creation
+  const DEBUG_CREATE_PROGRAM = true;
+
+  console.log("=== CREATE PROGRAM CALLED ===");
+  console.log("DEBUG_CREATE_PROGRAM:", DEBUG_CREATE_PROGRAM);
+
+  if (DEBUG_CREATE_PROGRAM) {
+    console.log("=== CREATE PROGRAM DEBUG ===");
+    console.log("Input:", input);
   }
 
-  const url = buildApiUrl(`/workspaces/${input.workspaceId || 'default'}/programs`);
-  const data = await fetchAndCheckIs<Program | Program[]>(url, {
-    method: "POST",
-    body: formData,
-    credentials: "include",
-  });
+  // Backend expects JSON, not FormData
+  // TODO: Implement image file upload separately if needed
+  const payload = {
+    name: input.name.trim(),
+    description: input.description?.trim() || "",
+    public: input.public || false,
+    image: input.image?.trim() || null,
+    tags: input.tags || [],
+    content_type: "program" as const,
+  };
 
-  return Array.isArray(data) ? data[0] : data;
+  if (DEBUG_CREATE_PROGRAM) {
+    console.log("Payload:", JSON.stringify(payload, null, 2));
+  }
+
+  const url = buildApiUrl(`/workspaces/${input.workspaceId}/programs`);
+
+  if (DEBUG_CREATE_PROGRAM) {
+    console.log("Request URL:", url);
+  }
+
+  try {
+    const data = await fetchWithAuth<Program | Program[]>(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }, getToken);
+
+    if (DEBUG_CREATE_PROGRAM) {
+      console.log("=== CREATE PROGRAM SUCCESS ===");
+      console.log("Response data:", data);
+    }
+
+    return Array.isArray(data) ? data[0] : data;
+  } catch (error: any) {
+    console.error("=== CREATE PROGRAM ERROR ===");
+    console.error("Error:", error);
+
+    // Try to parse error response for more details
+    if (error.message) {
+      console.error("Error message:", error.message);
+    }
+
+    throw error;
+  }
 }
 
 /**
  * Update an existing program
+ * Requires authentication
  */
 export async function updateProgram(
   id: string,
-  input: ProgramUpdateInput
+  input: ProgramUpdateInput,
+  getToken: () => Promise<string | null>
 ): Promise<Program> {
   const url = buildApiUrl(`/programs/${id}`);
-  return fetchAndCheckIs<Program>(url, {
+  return fetchWithAuth<Program>(url, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(input),
-    credentials: "include",
-  });
+  }, getToken);
 }
 
 /**
  * Delete a program
+ * Requires authentication
  */
-export async function deleteProgram(id: string): Promise<void> {
+export async function deleteProgram(
+  id: string,
+  getToken: () => Promise<string | null>
+): Promise<void> {
   const url = buildApiUrl(`/programs/${id}`);
-  await fetchAndCheckIs(url, {
+  await fetchWithAuth(url, {
     method: "DELETE",
-    credentials: "include",
-  });
+  }, getToken);
 }
 
 /**

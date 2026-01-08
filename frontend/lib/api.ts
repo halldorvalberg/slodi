@@ -92,5 +92,12 @@ export async function fetchWithAuth<T>(
     throw new Error(`API error: ${response.statusText}`);
   }
 
-  return response.json();
+  // For DELETE and other methods that may not return JSON
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  // Return empty object for responses without JSON
+  return {} as T;
 }

@@ -55,9 +55,11 @@ export default function ProgramDetailHero({
             <div className={styles.headerRow}>
                 <div className={styles.titleArea}>
                     <h1 className={styles.title}>{program.name}</h1>
-                    <p className={styles.byline}>
-                        eftir <a href={`/users/${program.author.id}`}>{program.author.name}</a>
-                    </p>
+                    {program.author && (
+                        <p className={styles.byline}>
+                            eftir <a href={`/users/${program.author.id}`}>{program.author.name}</a>
+                        </p>
+                    )}
                 </div>
 
                 <div className={styles.actions}>

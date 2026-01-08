@@ -25,7 +25,18 @@ export type UserUpdateInput = {
  * Backend will auto-create user on first login.
  */
 export async function getCurrentUser(token: string): Promise<User> {
+  // Toggle this to enable/disable debug logging for user fetching
+  const DEBUG_GET_USER = false;
+
   const url = buildApiUrl("/users/me");
+
+  if (DEBUG_GET_USER) {
+    console.log("=== getCurrentUser Debug ===");
+    console.log("URL:", url);
+    console.log("Token length:", token.length);
+    console.log("Token starts with:", token.substring(0, 30) + "...");
+    console.log("Token ends with:", "..." + token.substring(token.length - 30));
+  }
 
   const response = await fetch(url, {
     method: "GET",
@@ -35,11 +46,22 @@ export async function getCurrentUser(token: string): Promise<User> {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    throw new Error(`Failed to get user: ${response.statusText}`);
+  if (DEBUG_GET_USER) {
+    console.log("Response status:", response.status);
+    console.log("Response headers:", Object.fromEntries(response.headers.entries()));
   }
 
-  return response.json();
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error("Error response body:", errorBody);
+    throw new Error(`Failed to get user: ${response.status} - ${errorBody}`);
+  }
+
+  const data = await response.json();
+  if (DEBUG_GET_USER) {
+    console.log("User data received:", data);
+  }
+  return data;
 }
 
 /**
@@ -62,7 +84,8 @@ export async function updateCurrentUser(
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to update user: ${response.statusText}`);
+    const errorBody = await response.text();
+    throw new Error(`Failed to update user: ${response.status} - ${errorBody}`);
   }
 
   return response.json();

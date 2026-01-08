@@ -96,11 +96,6 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
                     <li>
                         <Link href="/programs">Dagskrár</Link>
                     </li>
-                    <li>
-                        <a href={`/programs?workspace=${program.workspace_id}`}>
-                            {program.workspace.name}
-                        </a>
-                    </li>
                     <li aria-current="page">{program.name}</li>
                 </ol>
             </nav>

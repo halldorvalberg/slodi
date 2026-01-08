@@ -92,12 +92,16 @@ export default function ProgramQuickInfo({ program }: ProgramQuickInfoProps) {
             <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>🎯 Vinnusvæði</h3>
                 <div className={styles.infoCard}>
-                    <a
-                        href={`/workspaces/${program.workspace.id}`}
-                        className={styles.link}
-                    >
-                        {program.workspace.name}
-                    </a>
+                    {program.workspace ? (
+                        <a
+                            href={`/workspaces/${program.workspace.id}`}
+                            className={styles.link}
+                        >
+                            {program.workspace.name}
+                        </a>
+                    ) : (
+                        <span>Óþekkt vinnusvæði</span>
+                    )}
                 </div>
             </section>
 
@@ -105,9 +109,13 @@ export default function ProgramQuickInfo({ program }: ProgramQuickInfoProps) {
             <section className={styles.section}>
                 <h3 className={styles.sectionTitle}>👤 Höfundur</h3>
                 <div className={styles.infoCard}>
-                    <a href={`/users/${program.author.id}`} className={styles.link}>
-                        {program.author.name}
-                    </a>
+                    {program.author ? (
+                        <a href={`/users/${program.author.id}`} className={styles.link}>
+                            {program.author.name}
+                        </a>
+                    ) : (
+                        <span>Óþekktur höfundur</span>
+                    )}
                 </div>
             </section>
 

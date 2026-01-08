@@ -17,25 +17,48 @@ import {
 } from "@/services/programs.service";
 import { useTags } from "@/hooks/useTags";
 import usePrograms from "@/hooks/usePrograms";
+import { useAuth } from "@/hooks/useAuth";
+import { getOrCreatePersonalWorkspace } from "@/services/workspaces.service";
 
 export default function ProgramBuilderPage() {
+    const { user, getToken, isAuthenticated } = useAuth();
     const [query, setQuery] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [currentPage, setCurrentPage] = useState(1);
     const [showNewProgram, setShowNewProgram] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
+    const [userWorkspaceId, setUserWorkspaceId] = useState<string | null>(null);
 
     const ITEMS_PER_PAGE = 12; // Show 12 programs per page
 
-    // Important: Use a fixed workspace ID for fetching programs, this id is the "public" workspace
-    const workspaceId = "36606c77-5e0d-4fc9-891f-4e0126c6e9a6";
+    // Default public workspace ID for viewing programs (dagskrábankinn)
+    const defaultWorkspaceId = process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE_ID || "";
 
     // Fetch tags from backend using tags.service.ts
     const { tagNames: backendTags, loading: tagsLoading } = useTags();
 
-    // Fetch programs from backend
-    const { programs: backendPrograms, loading: programsLoading, error: programsError } = usePrograms(workspaceId);
+    // Fetch programs from backend (from the default public workspace)
+    const { programs: backendPrograms, loading: programsLoading, error: programsError, refetch } = usePrograms(defaultWorkspaceId);
+
+    // Get or create user's personal workspace on mount
+    useEffect(() => {
+        async function fetchUserWorkspace() {
+            if (!isAuthenticated || !user) return;
+
+            try {
+                const token = await getToken();
+                if (!token) return;
+
+                const workspace = await getOrCreatePersonalWorkspace(user.id, token);
+                setUserWorkspaceId(workspace.id);
+            } catch (error) {
+                console.error("Failed to get user workspace:", error);
+            }
+        }
+
+        fetchUserWorkspace();
+    }, [isAuthenticated, user, getToken]);
 
     const availableTags = backendTags || [];
     const programs = useMemo(() => backendPrograms || [], [backendPrograms]);
@@ -81,6 +104,11 @@ export default function ProgramBuilderPage() {
         setQuery("");
     };
 
+    const handleProgramCreated = async () => {
+        setShowNewProgram(false);
+        await refetch(); // Refresh program list to show new program
+    };
+
     return (
         <section className="builder-page">
             <header>
@@ -105,7 +133,10 @@ export default function ProgramBuilderPage() {
             </button>
 
             <Modal open={showNewProgram} onClose={() => setShowNewProgram(false)} title="Bæta hugmynd í bankann">
-                <NewProgramForm onCreated={() => setShowNewProgram(false)} />
+                <NewProgramForm
+                    workspaceId={userWorkspaceId || defaultWorkspaceId}
+                    onCreated={handleProgramCreated}
+                />
             </Modal>
 
             <div className={styles.mainHeader}>

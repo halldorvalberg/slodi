@@ -15,38 +15,67 @@ type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: Error | null;
   getToken: () => Promise<string | null>;
   refetch: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+type TokenCache = {
+  token: string;
+  expiresAt: number;
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { user: auth0User, isLoading: auth0IsLoading } = useAuth0User();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [tokenCache, setTokenCache] = useState<TokenCache | null>(null);
 
   /**
    * Get fresh access token for API calls
-   * The Next.js Auth0 SDK stores the access token in the session
-   * We can retrieve it from the /api/auth/me endpoint
+   * Caches token for 5 minutes to avoid excessive API calls
    */
   const getToken = useCallback(async (): Promise<string | null> => {
-    try {
-      const response = await fetch("/api/auth/me");
+    // Return cached token if still valid
+    if (tokenCache && tokenCache.expiresAt > Date.now()) {
+      return tokenCache.token;
+    }
 
-      if (!response.ok) {
-        console.error("Failed to get user session");
+    try {
+      const response = await fetch("/api/auth/token");
+
+      if (response.status === 401) {
+        // Token expired or invalid - clear user state
+        setUser(null);
+        setTokenCache(null);
         return null;
       }
 
-      const session = await response.json();
-      return session.accessToken || null;
+      if (!response.ok) {
+        console.error("Failed to get access token from session");
+        return null;
+      }
+
+      const data = await response.json();
+      const token = data.accessToken;
+
+      if (token) {
+        // Cache token for 5 minutes
+        setTokenCache({
+          token,
+          expiresAt: Date.now() + 5 * 60 * 1000,
+        });
+      }
+
+      return token || null;
     } catch (error) {
       console.error("Error getting token:", error);
       return null;
     }
-  }, []);
+  }, [tokenCache]);
 
   /**
    * Fetch user from backend when Auth0 authentication completes
@@ -56,13 +85,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth0User) {
       setUser(null);
       setIsLoading(false);
+      setError(null);
       return;
     }
+
+    setIsLoading(true);
+    setError(null);
 
     try {
       const token = await getToken();
       if (!token) {
-        console.error("No access token available");
+        console.warn(
+          "No access token available - user may not be fully authenticated yet"
+        );
         setUser(null);
         return;
       }
@@ -70,8 +105,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Backend will auto-create user if first login
       const backendUser = await getCurrentUser(token);
       setUser(backendUser);
-    } catch (error) {
+    } catch (err) {
+      const error =
+        err instanceof Error ? err : new Error("Failed to fetch user");
       console.error("Failed to fetch backend user:", error);
+      setError(error);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -86,6 +124,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUser(null);
         setIsLoading(false);
+        setError(null);
+        setTokenCache(null);
       }
     }
   }, [auth0User, auth0IsLoading, fetchBackendUser]);
@@ -98,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated,
         isLoading: isLoading || auth0IsLoading,
+        error,
         getToken,
         refetch: fetchBackendUser,
       }}
