@@ -1,28 +1,28 @@
 /* ── Design tokens as HSL components (enable /opacity utilities) ─────────── */
 :root {
-  /* Base surfaces */
-  --background: 36 41% 83%;
-  /* #e6d8c3 Birch */
-  --foreground: 0 0% 20%;
-  /* #333333 Charcoal */
-  --muted: 205 89% 93%;
-  /* #dceffd Sky Mist */
-  --border: 24 35% 26%;
-  /* #5a3e2b Bark */
+  /* Base surfaces - Neutral grays */
+  --background: 0 0% 98%;
+  /* #fafafa Light neutral gray */
+  --foreground: 0 0% 15%;
+  /* #262626 Dark gray */
+  --muted: 0 0% 95%;
+  /* #f2f2f2 Subtle gray */
+  --border: 0 0% 85%;
+  /* #d9d9d9 Soft gray border */
 
-  /* Brand / Actions */
-  --primary: 92 39% 30%;
-  /* #4b6b2f Moss */
+  /* Brand / Actions - Green accents */
+  --primary: 142 50% 42%;
+  /* #35a65f Fresh green */
   --primary-foreground: 0 0% 100%;
   /* #ffffff */
-  --secondary: 154 43% 18%;
-  /* #1b4332 Pine */
+  --secondary: 160 42% 32%;
+  /* #2f7d5e Darker forest green */
   --secondary-foreground: 0 0% 100%;
   /* #ffffff */
 
   /* Semantic states */
-  --success: 92 39% 30%;
-  /* #4b6b2f Moss */
+  --success: 142 50% 42%;
+  /* #35a65f Fresh green */
   --success-foreground: 0 0% 100%;
   /* #ffffff */
   --warning: 35 100% 64%;
@@ -70,10 +70,10 @@
   --adrir-50:  #F2ECFA;
 
   /* Text helpers */
-  --text-strong: 154 43% 18%;
-  /* #1b4332 Pine */
-  --text-muted: 24 35% 26%;
-  /* #5a3e2b Bark */
+  --text-strong: 0 0% 10%;
+  /* #1a1a1a Strong black */
+  --text-muted: 0 0% 50%;
+  /* #808080 Medium gray */
 
   /* Typography (your preference: Roboto Condensed) */
   --font-sans: "Roboto Condensed", ui-sans-serif, system-ui, -apple-system,
@@ -134,6 +134,115 @@
 
   color-scheme: dark;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LEGACY COMPATIBILITY TOKENS
+   Maps old --color-* naming to current theme tokens for backward compatibility
+   ══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Background colors */
+  --color-background-primary: var(--background);
+  --color-background-secondary: var(--muted);
+  --color-background-tertiary: 0 0% 96%; /* even lighter neutral */
+  
+  /* Text colors */
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--text-muted);
+  --color-text-tertiary: var(--text-muted);
+  
+  /* Brand colors - Green accents */
+  --color-primary: var(--primary);
+  --color-primary-dark: 142 50% 35%; /* darker green */
+  --color-primary-subtle: 142 50% 96%; /* very light green tint */
+  --color-secondary: var(--secondary);
+  --color-secondary-subtle: 160 42% 95%; /* very light forest green */
+  
+  /* Border colors - Neutral */
+  --color-border: var(--border);
+  --color-border-subtle: 0 0% 90%; /* lighter gray */
+  --color-border-strong: 0 0% 70%; /* darker gray */
+  
+  /* Semantic colors */
+  --color-success: var(--success);
+  --color-success-subtle: 92 39% 95%;
+  --color-warning: var(--warning);
+  --color-warning-subtle: 35 100% 95%;
+  --color-error: var(--error);
+  --color-danger: var(--error);
+  --color-danger-subtle: 0 79% 95%;
+  --color-info: var(--info);
+  
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+  
+  /* Font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Line heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 250ms ease-in-out;
+}
+
+:root.dark {
+  /* Background colors for dark theme */
+  --color-background-primary: var(--background);
+  --color-background-secondary: var(--muted);
+  --color-background-tertiary: 24 28% 17%; /* slightly lighter than secondary */
+  
+  /* Text colors for dark theme */
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--text-muted);
+  --color-text-tertiary: 24 20% 60%;
+  
+  /* Brand colors for dark theme */
+  --color-primary: var(--primary);
+  --color-primary-dark: 92 39% 25%;
+  --color-primary-subtle: 92 39% 15%; /* darker in dark mode */
+  --color-secondary: var(--secondary);
+  --color-secondary-subtle: 154 43% 12%;
+  
+  /* Border colors for dark theme */
+  --color-border: var(--border);
+  --color-border-subtle: 24 25% 25%;
+  --color-border-strong: 24 25% 50%;
+  
+  /* Semantic colors for dark theme */
+  --color-success-subtle: 92 39% 15%;
+  --color-warning-subtle: 35 100% 15%;
+  --color-danger-subtle: 0 79% 15%;
+}
+
 /* ── Minimal base (Tailwind-first, no leaks) ─────────────────────────────── */
 @layer base {
   html {
@@ -179,6 +288,7 @@
 /* Reset styles */
 html {
   box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 *,
 *::before,
@@ -194,12 +304,21 @@ body {
   color: hsl(var(--foreground));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Utility classes replaced with standard CSS */
 .antialiased {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Layout helper: main area grows to push footer down */
+.sl-main {
+  flex: 1 0 auto;
+  display: block;
 }
 
 .border {

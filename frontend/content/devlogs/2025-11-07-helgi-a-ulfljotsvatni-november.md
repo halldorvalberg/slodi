@@ -49,13 +49,14 @@ Til að halda utan um áframhaldandi þróun á verkefninu ætlum við að vinna
 Til að tryggja áframhaldandi þróun ætlum við að vinna fjárhagsáætlun fyrir fyrstu tvo fasa verkefnisins sem munu spanna næstu 12 mánuði. Út frá þeirri fjárhagsáætlun getum við mótað styrktarumsókn sem send verður á styrktarsjóð skáta.
 
 ## Afköst helgarinnar
+
 Helgin reyndist afkastamikil og markviss. Við náðum að ljúka helstu grunnverkefnum og leggja traustan grunn fyrir áframhaldandi þróun verkefnisins.
 
 ### Kláruð verkefni
 
 - **Skjalsetning og staðfesting á gagnagrunni**: Uppsetning og skjalsetning gagnagrunns var fullkláruð, sem tryggir að hægt sé að endurbyggja þróunarumhverfið á stöðugan hátt.
 
-- **Póstlisti virkjaður**: Póstlisti var settur í notkun, sem gerir okkur kleift að miðla fréttum og uppfærslum til áhugasamra aðila þegar gagnagrunnurinn fer í loftið. 
+- **Póstlisti virkjaður**: Póstlisti var settur í notkun, sem gerir okkur kleift að miðla fréttum og uppfærslum til áhugasamra aðila þegar gagnagrunnurinn fer í loftið.
 
 ### Verkefni í vinnslu
 

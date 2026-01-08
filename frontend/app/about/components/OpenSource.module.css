@@ -1,0 +1,271 @@
+/* ═══════════════════════════════════════════════════════════
+   OPEN SOURCE SECTION
+   Explains the open source nature of Slóði
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.openSource {
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  background: hsl(var(--sl-color-background));
+}
+
+.container {
+  max-width: var(--sl-primitive-width-5xl);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heading {
+  font-size: var(--sl-primitive-font-size-4xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  text-align: center;
+  margin: 0 0 var(--sl-spacing-stack-lg) 0;
+}
+
+.introduction {
+  font-size: var(--sl-text-body-lg);
+  line-height: var(--sl-line-height-body);
+  color: hsl(var(--sl-color-text-secondary));
+  text-align: center;
+  margin: 0 0 var(--sl-spacing-section) 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BENEFITS LIST
+   ═══════════════════════════════════════════════════════════ */
+
+.benefitsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-component);
+  margin-bottom: var(--sl-spacing-section);
+}
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sl-spacing-stack-lg);
+}
+
+.benefitIcon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-success) / 0.1),
+    hsl(var(--sl-color-success) / 0.2)
+  );
+  border-radius: var(--sl-radius-card);
+  color: hsl(var(--sl-color-success));
+}
+
+.benefitIcon svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+  stroke-width: 1.5;
+}
+
+.benefitContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-xs);
+}
+
+.benefitTitle {
+  font-size: var(--sl-primitive-font-size-xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0;
+}
+
+.benefitDescription {
+  font-size: var(--sl-text-body-md);
+  line-height: var(--sl-line-height-body);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LINKS SECTION
+   ═══════════════════════════════════════════════════════════ */
+
+.linksSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-stack-md);
+  padding: var(--sl-spacing-inset-lg);
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+}
+
+.link {
+  font-size: var(--sl-text-body-lg);
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-primary));
+  text-decoration: none;
+  transition: color 200ms var(--sl-primitive-animation-easing);
+}
+
+.link:hover {
+  color: hsl(var(--sl-color-primary-hover));
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-primary));
+  outline-offset: 4px;
+  border-radius: var(--sl-primitive-border-radius-1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Desktop (1024px and up) - default styles above */
+
+/* Tablet landscape (768px - 1023px) */
+@media (max-width: 1023px) {
+  .openSource {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+    margin-bottom: var(--sl-spacing-stack-md);
+  }
+
+  .introduction {
+    font-size: var(--sl-text-body-md);
+    margin-bottom: var(--sl-spacing-container);
+  }
+
+  .benefitsList {
+    gap: var(--sl-spacing-element);
+    margin-bottom: var(--sl-spacing-container);
+  }
+
+  .benefitIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .benefitIcon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .benefitTitle {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .benefitDescription {
+    font-size: var(--sl-text-body-sm);
+  }
+
+  .link {
+    font-size: var(--sl-text-body-md);
+  }
+}
+
+/* Tablet portrait (641px - 767px) */
+@media (max-width: 767px) {
+  .openSource {
+    padding: var(--sl-spacing-container) var(--sl-spacing-element);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-2xl);
+  }
+
+  .introduction {
+    font-size: var(--sl-text-body-md);
+  }
+
+  .benefitItem {
+    gap: var(--sl-spacing-stack-md);
+  }
+
+  .benefitIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .benefitIcon svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* Mobile (640px and below) */
+@media (max-width: 640px) {
+  .openSource {
+    padding: var(--sl-spacing-component) var(--sl-spacing-element);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-xl);
+    margin-bottom: var(--sl-spacing-stack-md);
+  }
+
+  .introduction {
+    font-size: var(--sl-text-body-sm);
+    margin-bottom: var(--sl-spacing-component);
+  }
+
+  .benefitsList {
+    gap: var(--sl-spacing-element);
+    margin-bottom: var(--sl-spacing-component);
+  }
+
+  .benefitItem {
+    gap: var(--sl-spacing-stack-md);
+  }
+
+  .benefitIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .benefitIcon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .benefitTitle {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .benefitDescription {
+    font-size: var(--sl-text-body-sm);
+  }
+
+  .linksSection {
+    padding: var(--sl-spacing-inset-md);
+  }
+
+  .link {
+    font-size: var(--sl-text-body-sm);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════ */
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+  }
+}

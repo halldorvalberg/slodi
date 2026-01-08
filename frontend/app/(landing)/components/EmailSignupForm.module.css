@@ -1,0 +1,347 @@
+/* ═══════════════════════════════════════════════════════════
+   EMAIL SIGNUP FORM
+   Newsletter subscription form for landing page
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.emailSignup {
+  position: relative;
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-background-secondary)),
+    hsl(var(--sl-color-background))
+  );
+}
+
+.container {
+  max-width: var(--sl-primitive-width-4xl);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-lg);
+  align-items: center;
+  text-align: center;
+  padding: var(--sl-spacing-inset-xl);
+  background: hsl(var(--sl-color-surface));
+  border: 2px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  box-shadow: var(--sl-shadow-card);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADING & DESCRIPTION
+   ═══════════════════════════════════════════════════════════ */
+
+.heading {
+  font-size: var(--sl-primitive-font-size-4xl);
+  font-weight: var(--sl-font-weight-heading);
+  color: hsl(var(--sl-color-text-primary));
+  line-height: var(--sl-line-height-heading);
+  margin: 0;
+}
+
+.description {
+  font-size: var(--sl-text-body-lg);
+  color: hsl(var(--sl-color-text-secondary));
+  line-height: var(--sl-line-height-body);
+  margin: 0;
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-gap-sm);
+  text-align: left;
+  width: 100%;
+  max-width: 500px;
+}
+
+.benefitsList li {
+  font-size: var(--sl-text-body);
+  color: hsl(var(--sl-color-text-primary));
+  padding-left: var(--sl-spacing-inset-lg);
+  position: relative;
+}
+
+.benefitsList li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: hsl(var(--sl-color-primary));
+  font-weight: var(--sl-font-weight-heading);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FORM
+   ═══════════════════════════════════════════════════════════ */
+
+.form {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-md);
+}
+
+.inputGroup {
+  display: flex;
+  gap: var(--sl-spacing-gap-sm);
+  width: 100%;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.input {
+  flex: 1;
+  padding: var(--sl-spacing-inset-md);
+  font-size: var(--sl-text-body);
+  font-family: var(--sl-font-family-body);
+  color: hsl(var(--sl-color-text-primary));
+  background: hsl(var(--sl-color-background));
+  border: 2px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-input);
+  transition: 
+    border-color var(--sl-transition-fast),
+    box-shadow var(--sl-transition-fast);
+}
+
+.input:hover {
+  border-color: hsl(var(--sl-color-border-hover));
+}
+
+.input:focus {
+  outline: none;
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: var(--sl-shadow-focus);
+}
+
+.input:disabled {
+  opacity: var(--sl-opacity-disabled);
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: hsl(var(--sl-color-text-tertiary));
+}
+
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sl-spacing-gap-sm);
+  padding: var(--sl-spacing-inset-md) var(--sl-spacing-inset-lg);
+  font-size: var(--sl-text-body);
+  font-weight: var(--sl-font-weight-emphasis);
+  font-family: var(--sl-font-family-body);
+  color: hsl(var(--sl-color-text-inverse));
+  background: hsl(var(--sl-color-primary));
+  border: none;
+  border-radius: var(--sl-radius-button);
+  cursor: pointer;
+  transition: 
+    background-color var(--sl-transition-fast),
+    transform var(--sl-transition-fast),
+    box-shadow var(--sl-transition-fast);
+  box-shadow: var(--sl-shadow-button);
+  white-space: nowrap;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: hsl(var(--sl-color-primary-hover));
+  box-shadow: var(--sl-shadow-button-hover);
+  transform: translateY(-1px);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid hsl(var(--sl-color-primary) / 0.4);
+  outline-offset: 2px;
+}
+
+.submitButton:disabled {
+  opacity: var(--sl-opacity-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LOADING SPINNER
+   ═══════════════════════════════════════════════════════════ */
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid hsl(var(--sl-color-text-inverse) / 0.3);
+  border-top-color: hsl(var(--sl-color-text-inverse));
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MESSAGES
+   ═══════════════════════════════════════════════════════════ */
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-sm);
+  padding: var(--sl-spacing-inset-md);
+  font-size: var(--sl-text-body-sm);
+  border-radius: var(--sl-radius-base);
+  text-align: left;
+}
+
+.messageIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.messageSuccess {
+  color: hsl(var(--sl-color-success-text));
+  background: hsl(var(--sl-color-success-bg));
+  border: 1px solid hsl(var(--sl-color-success-border));
+}
+
+.messageError {
+  color: hsl(var(--sl-color-error-text));
+  background: hsl(var(--sl-color-error-bg));
+  border: 1px solid hsl(var(--sl-color-error-border));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRIVACY NOTE
+   ═══════════════════════════════════════════════════════════ */
+
+.privacyNote {
+  font-size: var(--sl-text-body-sm);
+  color: hsl(var(--sl-color-text-tertiary));
+  line-height: var(--sl-line-height-body);
+  margin: 0;
+}
+
+.unsubscribeLink {
+  color: hsl(var(--sl-color-primary));
+  text-decoration: none;
+  transition: color var(--sl-transition-fast);
+}
+
+.unsubscribeLink:hover {
+  color: hsl(var(--sl-color-primary-hover));
+  text-decoration: underline;
+}
+
+.unsubscribeLink:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-primary));
+  outline-offset: 2px;
+  border-radius: var(--sl-primitive-radius-xs);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════ */
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .emailSignup {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+  }
+  
+  .description {
+    font-size: var(--sl-text-body);
+  }
+}
+
+/* Tablet portrait */
+@media (max-width: 767px) and (min-width: 641px) {
+  .emailSignup {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+  
+  .content {
+    padding: var(--sl-spacing-inset-lg);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+  }
+  
+  .description {
+    font-size: var(--sl-text-body);
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .emailSignup {
+    padding: var(--sl-spacing-container) var(--sl-spacing-element);
+  }
+  
+  .content {
+    padding: var(--sl-spacing-inset-md);
+    gap: var(--sl-spacing-stack-md);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-2xl);
+  }
+  
+  .description {
+    font-size: var(--sl-text-body-sm);
+  }
+  
+  .inputGroup {
+    flex-direction: column;
+  }
+  
+  .submitButton {
+    width: 100%;
+    min-height: 44px;
+  }
+  
+  .benefitsList li {
+    font-size: var(--sl-text-body-sm);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .submitButton:hover:not(:disabled) {
+    transform: none;
+  }
+  
+  .spinner {
+    animation: none;
+  }
+}

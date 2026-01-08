@@ -1,0 +1,238 @@
+@import "../slodi-tokens.css";
+@import '../slodi-utilities.css';
+
+/* ═══════════════════════════════════════════════════════════════
+   SETTINGS PAGE - Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════════ */
+
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--sl-spacing-section);
+}
+
+.title {
+  font-size: var(--sl-text-heading-1);
+  font-weight: var(--sl-font-weight-bold);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-element) 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-component);
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  padding: var(--sl-spacing-component);
+  box-shadow: var(--sl-shadow-card);
+}
+
+.cardTitle {
+  font-size: var(--sl-text-heading-3);
+  font-weight: var(--sl-font-weight-semibold);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-element) 0;
+}
+
+/* ===== ACCOUNT INFORMATION ===== */
+.accountRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-lg);
+  padding: var(--sl-spacing-inset-md);
+  background: hsl(var(--sl-color-surface-subtle));
+  border-radius: var(--sl-radius-button);
+  margin-bottom: var(--sl-spacing-component);
+}
+
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  border-radius: var(--sl-radius-avatar);
+  object-fit: cover;
+}
+
+.avatarFallback {
+  border-radius: var(--sl-radius-avatar);
+  background: linear-gradient(135deg, hsl(var(--sl-color-primary)) 0%, hsl(var(--sl-color-secondary)) 100%);
+  flex-shrink: 0;
+}
+
+.accountInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-gap-xs);
+}
+
+.accountName {
+  font-size: var(--sl-text-body-lg);
+  font-weight: var(--sl-font-weight-semibold);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0;
+}
+
+.accountEmail {
+  font-size: var(--sl-text-body);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
+}
+
+/* Detail list for additional info */
+.dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sl-spacing-gap-sm) var(--sl-spacing-gap-lg);
+  margin: 0;
+  padding: 0;
+}
+
+.dt {
+  font-size: var(--sl-text-body-sm);
+  font-weight: var(--sl-font-weight-medium);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
+}
+
+.dd {
+  font-size: var(--sl-text-body-sm);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0;
+  font-family: var(--sl-font-mono, monospace);
+}
+
+/* Auth0 managed indicator */
+.auth0Badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-xs);
+  padding: var(--sl-spacing-compact) var(--sl-spacing-gap-sm);
+  background: hsl(var(--sl-color-info) / 0.1);
+  border: 1px solid hsl(var(--sl-color-info) / 0.3);
+  border-radius: var(--sl-radius-badge);
+  font-size: var(--sl-text-body-xs);
+  font-weight: var(--sl-font-weight-medium);
+  color: hsl(var(--sl-color-info));
+}
+
+.auth0Icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-gap-md);
+}
+
+/* ===== THEME TOGGLE ===== */
+.themeToggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sl-spacing-gap-sm);
+}
+
+.themeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-gap-sm);
+  padding: var(--sl-spacing-inset-md);
+  background: hsl(var(--sl-color-surface-subtle));
+  border: 2px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  cursor: pointer;
+  transition: all var(--sl-transition-fast);
+  text-align: center;
+}
+
+.themeOption:hover {
+  background: hsl(var(--sl-color-surface-hover));
+  border-color: hsl(var(--sl-color-primary) / 0.5);
+}
+
+.themeOption:focus-visible {
+  outline: none;
+  box-shadow: var(--sl-shadow-focus);
+}
+
+.themeOptionActive {
+  background: hsl(var(--sl-color-primary-subtle));
+  border-color: hsl(var(--sl-color-primary));
+}
+
+.themeOptionActive:hover {
+  background: hsl(var(--sl-color-primary-subtle));
+  border-color: hsl(var(--sl-color-primary));
+}
+
+.themeIcon {
+  width: 24px;
+  height: 24px;
+  color: hsl(var(--sl-color-text-secondary));
+}
+
+.themeOptionActive .themeIcon {
+  color: hsl(var(--sl-color-primary));
+}
+
+.themeOptionText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.themeOptionLabel {
+  font-size: var(--sl-text-body-sm);
+  font-weight: var(--sl-font-weight-semibold);
+  color: hsl(var(--sl-color-text-primary));
+}
+
+.themeOptionDescription {
+  font-size: var(--sl-text-body-xs);
+  color: hsl(var(--sl-color-text-secondary));
+  line-height: var(--sl-line-height-tight);
+}
+
+/* Account actions */
+.accountActions {
+  margin-top: var(--sl-spacing-component);
+  padding-top: var(--sl-spacing-component);
+  border-top: 1px solid hsl(var(--sl-color-border));
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .main {
+    padding: var(--sl-spacing-component);
+  }
+
+  .accountRow {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .dl {
+    grid-template-columns: 1fr;
+    gap: var(--sl-spacing-gap-xs);
+  }
+
+  .dt {
+    font-weight: var(--sl-font-weight-semibold);
+  }
+
+  .themeToggle {
+    grid-template-columns: 1fr;
+  }
+}

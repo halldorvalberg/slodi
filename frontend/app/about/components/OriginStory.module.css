@@ -1,0 +1,283 @@
+/* ═══════════════════════════════════════════════════════════
+   ORIGIN STORY SECTION
+   Explains why Slóði was created
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.originStory {
+  position: relative;
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  background: hsl(var(--sl-color-background));
+}
+
+.container {
+  max-width: var(--sl-primitive-width-6xl);
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-section);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADING & INTRODUCTION
+   ═══════════════════════════════════════════════════════════ */
+
+.heading {
+  font-size: var(--sl-primitive-font-size-4xl);
+  font-weight: var(--sl-font-weight-heading);
+  color: hsl(var(--sl-color-text-primary));
+  line-height: var(--sl-line-height-heading);
+  margin: 0;
+  text-align: center;
+}
+
+.introduction {
+  font-size: var(--sl-text-body-lg);
+  color: hsl(var(--sl-color-text-secondary));
+  line-height: var(--sl-line-height-body);
+  margin: 0;
+  text-align: center;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHALLENGE GRID
+   ═══════════════════════════════════════════════════════════ */
+
+.challengeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sl-spacing-component);
+  width: 100%;
+}
+
+.challengeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-stack-md);
+  padding: var(--sl-spacing-inset-lg);
+  background: hsl(var(--sl-color-surface));
+  border: 2px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  transition: 
+    transform var(--sl-transition-fast),
+    border-color var(--sl-transition-fast),
+    box-shadow var(--sl-transition-fast);
+  box-shadow: var(--sl-shadow-card);
+}
+
+.challengeCard:hover {
+  transform: translateY(-4px);
+  border-color: hsl(var(--sl-color-error) / 0.5);
+  box-shadow: var(--sl-shadow-card-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ICON
+   ═══════════════════════════════════════════════════════════ */
+
+.iconWrapper {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-error) / 0.1),
+    hsl(var(--sl-color-error) / 0.2)
+  );
+  border-radius: var(--sl-radius-card);
+  color: hsl(var(--sl-color-error));
+}
+
+.iconWrapper svg {
+  width: 32px;
+  height: 32px;
+  stroke-width: 2;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHALLENGE CONTENT
+   ═══════════════════════════════════════════════════════════ */
+
+.challengeTitle {
+  font-size: var(--sl-text-body-lg);
+  font-weight: var(--sl-font-weight-heading);
+  color: hsl(var(--sl-color-text-primary));
+  line-height: var(--sl-line-height-heading);
+  margin: 0;
+  text-align: center;
+}
+
+.challengeDescription {
+  font-size: var(--sl-text-body);
+  color: hsl(var(--sl-color-text-secondary));
+  line-height: var(--sl-line-height-body);
+  margin: 0;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONCLUSION
+   ═══════════════════════════════════════════════════════════ */
+
+.conclusion {
+  display: flex;
+  justify-content: center;
+  padding: var(--sl-spacing-inset-xl);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-primary) / 0.05),
+    hsl(var(--sl-color-primary) / 0.1)
+  );
+  border: 2px solid hsl(var(--sl-color-primary) / 0.2);
+  border-radius: var(--sl-radius-card);
+}
+
+.conclusionText {
+  font-size: var(--sl-primitive-font-size-xl);
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-text-primary));
+  line-height: var(--sl-line-height-body);
+  margin: 0;
+  text-align: center;
+  max-width: 720px;
+}
+
+.conclusionText strong {
+  color: hsl(var(--sl-color-primary));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════ */
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .originStory {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+  
+  .container {
+    gap: var(--sl-spacing-container);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+  }
+  
+  .introduction {
+    font-size: var(--sl-text-body);
+  }
+  
+  .challengeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .conclusionText {
+    font-size: var(--sl-text-body-lg);
+  }
+}
+
+/* Tablet portrait */
+@media (max-width: 767px) and (min-width: 641px) {
+  .originStory {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+  
+  .container {
+    gap: var(--sl-spacing-container);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+  }
+  
+  .introduction {
+    font-size: var(--sl-text-body);
+  }
+  
+  .challengeGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .iconWrapper {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .iconWrapper svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .conclusionText {
+    font-size: var(--sl-text-body-lg);
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .originStory {
+    padding: var(--sl-spacing-container) var(--sl-spacing-element);
+  }
+  
+  .container {
+    gap: var(--sl-spacing-stack-xl);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-2xl);
+  }
+  
+  .introduction {
+    font-size: var(--sl-text-body-sm);
+  }
+  
+  .challengeGrid {
+    grid-template-columns: 1fr;
+    gap: var(--sl-spacing-gap-lg);
+  }
+  
+  .challengeCard {
+    padding: var(--sl-spacing-inset-md);
+  }
+  
+  .iconWrapper {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .iconWrapper svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .challengeTitle {
+    font-size: var(--sl-text-body);
+  }
+  
+  .challengeDescription {
+    font-size: var(--sl-text-body-sm);
+  }
+  
+  .conclusion {
+    padding: var(--sl-spacing-inset-lg);
+  }
+  
+  .conclusionText {
+    font-size: var(--sl-text-body);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .challengeCard:hover {
+    transform: none;
+  }
+}

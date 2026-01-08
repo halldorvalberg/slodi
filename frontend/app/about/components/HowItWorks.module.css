@@ -1,0 +1,235 @@
+/* ═══════════════════════════════════════════════════════════
+   HOW IT WORKS SECTION
+   Three feature cards explaining Slóði's main capabilities
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.howItWorks {
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  background: hsl(var(--sl-color-background));
+}
+
+.container {
+  max-width: var(--sl-primitive-width-6xl);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heading {
+  font-size: var(--sl-primitive-font-size-4xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  text-align: center;
+  margin: 0 0 var(--sl-spacing-section) 0;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sl-spacing-component);
+}
+
+.featureCard {
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  padding: var(--sl-spacing-inset-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 
+    transform 200ms var(--sl-primitive-animation-easing),
+    border-color 200ms var(--sl-primitive-animation-easing),
+    box-shadow 200ms var(--sl-primitive-animation-easing);
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: var(--sl-shadow-card-hover);
+}
+
+.cardIcon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--sl-spacing-stack-lg);
+  color: hsl(var(--sl-color-primary));
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-primary) / 0.1),
+    hsl(var(--sl-color-primary) / 0.2)
+  );
+  border-radius: var(--sl-radius-card);
+}
+
+.cardIcon svg {
+  width: 32px;
+  height: 32px;
+  display: block;
+  stroke-width: 1.5;
+}
+
+.cardTitle {
+  font-size: var(--sl-primitive-font-size-xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-stack-lg) 0;
+  text-align: center;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-sm);
+}
+
+.featureItem {
+  font-size: var(--sl-text-body-md);
+  line-height: var(--sl-line-height-body);
+  color: hsl(var(--sl-color-text-secondary));
+  padding-left: var(--sl-spacing-inset-lg);
+  position: relative;
+}
+
+.featureItem::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: hsl(var(--sl-color-success));
+  font-weight: var(--sl-font-weight-bold);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Desktop (1024px and up) - default styles above */
+
+/* Tablet landscape (768px - 1023px) */
+@media (max-width: 1023px) {
+  .howItWorks {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+    margin-bottom: var(--sl-spacing-container);
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: var(--sl-spacing-component);
+  }
+
+  .cardIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .cardIcon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cardTitle {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .featureItem {
+    font-size: var(--sl-text-body-sm);
+  }
+}
+
+/* Tablet portrait (641px - 767px) */
+@media (max-width: 767px) {
+  .howItWorks {
+    padding: var(--sl-spacing-container) var(--sl-spacing-element);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-2xl);
+    margin-bottom: var(--sl-spacing-component);
+  }
+
+  .featuresGrid {
+    gap: var(--sl-spacing-element);
+  }
+
+  .featureCard {
+    padding: var(--sl-spacing-inset-lg);
+  }
+
+  .cardIcon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: var(--sl-spacing-stack-md);
+  }
+
+  .cardIcon svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* Mobile (640px and below) */
+@media (max-width: 640px) {
+  .howItWorks {
+    padding: var(--sl-spacing-component) var(--sl-spacing-element);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-xl);
+    margin-bottom: var(--sl-spacing-component);
+  }
+
+  .featuresGrid {
+    gap: var(--sl-spacing-element);
+  }
+
+  .featureCard {
+    padding: var(--sl-spacing-inset-md);
+  }
+
+  .cardIcon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: var(--sl-spacing-stack-md);
+  }
+
+  .cardIcon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cardTitle {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .featureItem {
+    font-size: var(--sl-text-body-sm);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════ */
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .featureCard {
+    transition: none;
+  }
+
+  .featureCard:hover {
+    transform: none;
+  }
+}

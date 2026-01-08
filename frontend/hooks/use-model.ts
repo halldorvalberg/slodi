@@ -7,12 +7,12 @@ interface FieldHandler<T> {
   reset: () => void;
 }
 
-interface BaseHandler<T extends Record<string, any>> {
+interface BaseHandler<T extends Record<string, unknown>> {
   set: <K extends keyof T>(key: K, value: T[K]) => void;
   reset: (key?: keyof T) => void;
 }
 
-type EventProxy<T extends Record<string, any>> =
+type EventProxy<T extends Record<string, unknown>> =
   & BaseHandler<T>
   & {
     [K in keyof T]: FieldHandler<T[K]>;
@@ -39,17 +39,17 @@ type EventProxy<T extends Record<string, any>> =
  * @param initialState 
  * @returns [state, event]
  */
-function useModel<T extends Record<string, any>>(
+function useModel<T extends Record<string, unknown>>(
   initialState: T,
 ): [T, EventProxy<T>] {
   const [state, setState] = useState<T>(initialState);
 
-  const createHandler = <K extends keyof T>(key: K): FieldHandler<T[K]> => ({
-    set: (value: T[K]) => setState((prev) => ({ ...prev, [key]: value })),
-    reset: () => setState((prev) => ({ ...prev, [key]: initialState[key] })),
-  });
-
   const event = useMemo(() => {
+    const createHandler = <K extends keyof T>(key: K): FieldHandler<T[K]> => ({
+      set: (value: T[K]) => setState((prev) => ({ ...prev, [key]: value })),
+      reset: () => setState((prev) => ({ ...prev, [key]: initialState[key] })),
+    });
+
     const handler: BaseHandler<T> = {
       set: <K extends keyof T>(key: K, value: T[K]) =>
         setState((prev) => ({ ...prev, [key]: value })),
@@ -70,15 +70,15 @@ function useModel<T extends Record<string, any>>(
         }
         return undefined;
       },
-      set: (target, prop: string | symbol, value: any): boolean => {
+      set: (target, prop: string | symbol, value: unknown): boolean => {
         if (prop in initialState) {
-          setState((prev) => ({ ...prev, [prop as keyof T]: value }));
+          setState((prev) => ({ ...prev, [prop as keyof T]: value as T[keyof T] }));
           return true;
         }
         return false;
       },
     }) as EventProxy<T>;
-  }, []);
+  }, [initialState]);
 
   return [state, event];
 }

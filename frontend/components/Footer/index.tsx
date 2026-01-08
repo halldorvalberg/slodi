@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className={styles.footerRoot}>
       <div className={styles.footerContent}>
         <p className={styles.footerText}>
-          &copy; 2025 Slóði. All rights reserved.
+          &copy; 2025 Slóði. Öll réttindi áskilin.
         </p>
       </div>
     </footer>
