@@ -155,6 +155,7 @@ export default function RootLayout({
             </LikesProvider>
           </ThemeProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
