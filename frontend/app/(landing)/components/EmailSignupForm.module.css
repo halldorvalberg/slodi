@@ -8,7 +8,7 @@
   position: relative;
   padding: var(--sl-spacing-section) var(--sl-spacing-component);
   background: linear-gradient(
-    135deg,
+    180deg,
     hsl(var(--sl-color-background-secondary)),
     hsl(var(--sl-color-background))
   );
