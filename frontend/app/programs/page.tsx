@@ -27,7 +27,6 @@ export default function ProgramBuilderPage() {
     const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [currentPage, setCurrentPage] = useState(1);
     const [showNewProgram, setShowNewProgram] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
     const [userWorkspaceId, setUserWorkspaceId] = useState<string | null>(null);
 
     const ITEMS_PER_PAGE = 12; // Show 12 programs per page
@@ -96,7 +95,6 @@ export default function ProgramBuilderPage() {
 
     const handleSearch = () => {
         // Search is handled by client-side filtering
-        setIsSearching(false);
     };
 
     const handleClearAllFilters = () => {

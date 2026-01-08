@@ -58,10 +58,11 @@ export async function GET() {
     }
 
     return NextResponse.json({ accessToken: token });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to get access token";
     console.error("Error getting access token:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to get access token" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

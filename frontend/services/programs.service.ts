@@ -3,7 +3,7 @@
  * Handles all API calls related to programs
  */
 
-import { buildApiUrl, fetchAndCheck, fetchAndCheckIs } from "@/lib/api-utils";
+import { buildApiUrl, fetchAndCheck } from "@/lib/api-utils";
 import { fetchWithAuth } from "@/lib/api";
 
 export type Program = {
@@ -129,12 +129,12 @@ export async function createProgram(
     }
 
     return Array.isArray(data) ? data[0] : data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("=== CREATE PROGRAM ERROR ===");
     console.error("Error:", error);
 
     // Try to parse error response for more details
-    if (error.message) {
+    if (error instanceof Error && error.message) {
       console.error("Error message:", error.message);
     }
 
