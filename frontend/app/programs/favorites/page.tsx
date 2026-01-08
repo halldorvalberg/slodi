@@ -10,7 +10,7 @@ import ProgramSort, { type SortOption } from "../components/ProgramSort";
 import styles from "../program.module.css";
 
 // Default workspace ID - in production this should come from user context or URL
-const DEFAULT_WORKSPACE_ID = "36606c77-5e0d-4fc9-891f-4e0126c6e9a6";
+const DEFAULT_WORKSPACE_ID = process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE_ID || "";
 
 export default function FavoriteProgramsPage() {
   const { favorites, isLoading: favoritesLoading } = useFavorites();

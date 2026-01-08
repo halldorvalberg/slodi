@@ -2,7 +2,9 @@
  * API utility functions for handling fetch responses and errors
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+// Use relative path for API calls to avoid browser local network permission prompt
+// In production, this will be proxied through Next.js server
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api";
 
 /**
  * Validates if a fetch response is successful

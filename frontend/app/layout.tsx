@@ -10,6 +10,8 @@ import ConditionalLayout from "@/components/ConditionalLayout";
 import { LikesProvider } from "@/contexts/LikesContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { Analytics } from "@vercel/analytics/next"
+
 
 // Geist fonts for code/UI elements
 const geistSans = Geist({
@@ -153,6 +155,7 @@ export default function RootLayout({
             </LikesProvider>
           </ThemeProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
