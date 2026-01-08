@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     test_db_host: str = Field(..., alias="TEST_DB_HOST")
     test_db_url: str = ""
 
+    # Auth0 configuration
+    auth0_domain: str = Field(..., alias="AUTH0_DOMAIN")
+    auth0_audience: str = Field(..., alias="AUTH0_AUDIENCE")
+    auth0_algorithms: list[str] = Field(["RS256"], alias="AUTH0_ALGORITHMS")
+
     def model_post_init(self, __context):
         # Production database URL
         self.db_url = f"postgresql+psycopg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"

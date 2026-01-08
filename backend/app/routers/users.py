@@ -6,8 +6,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth import get_current_user
 from app.core.db import get_session
 from app.core.pagination import Limit, Offset, add_pagination_headers
+from app.models.user import User
 from app.schemas.user import UserCreate, UserOut, UserUpdate
 from app.services.users import UserService
 
@@ -15,6 +17,14 @@ router = APIRouter(prefix="/users", tags=["users"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 DEFAULT_Q = Query(None, min_length=2, description="Case-insensitive search in name/email/auth0_id")
+
+
+@router.get("/me", response_model=UserOut)
+async def get_current_user_endpoint(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    """Get current authenticated user (auto-creates user on first login)"""
+    return current_user
 
 
 @router.get("", response_model=list[UserOut])

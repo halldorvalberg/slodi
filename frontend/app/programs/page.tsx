@@ -11,7 +11,6 @@ import ProgramSort, { type SortOption } from "./components/ProgramSort";
 import Pagination from "./components/Pagination";
 import styles from "./program.module.css";
 import {
-    type Program,
     filterProgramsByQuery,
     filterProgramsByTags,
     sortPrograms
@@ -24,8 +23,8 @@ export default function ProgramBuilderPage() {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [currentPage, setCurrentPage] = useState(1);
-    const [isSearching, setIsSearching] = useState(false);
     const [showNewProgram, setShowNewProgram] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
 
     const ITEMS_PER_PAGE = 12; // Show 12 programs per page
 
@@ -39,7 +38,7 @@ export default function ProgramBuilderPage() {
     const { programs: backendPrograms, loading: programsLoading, error: programsError } = usePrograms(workspaceId);
 
     const availableTags = backendTags || [];
-    const programs = backendPrograms || [];
+    const programs = useMemo(() => backendPrograms || [], [backendPrograms]);
 
     // Filter and sort items
     const filteredAndSortedItems = useMemo(() => {

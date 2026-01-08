@@ -1,47 +1,44 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { useFavorites } from "@/contexts/FavoritesContext";
+import { fetchPrograms, type Program } from "@/services/programs.service";
 import ProgramCard from "@/components/ProgramCard/ProgramCard";
 import ProgramGrid from "../components/ProgramGrid";
 import ProgramSort, { type SortOption } from "../components/ProgramSort";
 import styles from "../program.module.css";
-import SAMPLE_DATA from "../devdata.json";
 
-type Program = {
-  id: string;
-  content_type: "program";
-  name: string;
-  description: string | null;
-  public: boolean;
-  like_count: number;
-  created_at: string;
-  author_id: string;
-  image: string | null;
-  workspace_id: string;
-  author: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  workspace: {
-    id: string;
-    name: string;
-  };
-  tags?: string[];
-  comment_count?: number;
-};
-
-const SAMPLE: Program[] = SAMPLE_DATA as Program[];
+// Default workspace ID - in production this should come from user context or URL
+const DEFAULT_WORKSPACE_ID = "36606c77-5e0d-4fc9-891f-4e0126c6e9a6";
 
 export default function FavoriteProgramsPage() {
-  const { favorites, isLoading } = useFavorites();
+  const { favorites, isLoading: favoritesLoading } = useFavorites();
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [isLoadingPrograms, setIsLoadingPrograms] = useState(true);
+
+  // Fetch programs on mount
+  useEffect(() => {
+    async function loadPrograms() {
+      try {
+        setIsLoadingPrograms(true);
+        const data = await fetchPrograms(DEFAULT_WORKSPACE_ID);
+        setPrograms(data);
+      } catch (error) {
+        console.error("Failed to fetch programs:", error);
+        setPrograms([]);
+      } finally {
+        setIsLoadingPrograms(false);
+      }
+    }
+
+    loadPrograms();
+  }, []);
 
   // Filter programs to only show favorites
   const favoritePrograms = useMemo(() => {
-    const filtered = SAMPLE.filter(program => favorites.has(program.id));
+    const filtered = programs.filter(program => favorites.has(program.id));
     
     // Sort programs
     const sorted = [...filtered].sort((a, b) => {
@@ -60,7 +57,9 @@ export default function FavoriteProgramsPage() {
     });
     
     return sorted;
-  }, [favorites, sortBy]);
+  }, [favorites, sortBy, programs]);
+
+  const isLoading = favoritesLoading || isLoadingPrograms;
 
   if (isLoading) {
     return (

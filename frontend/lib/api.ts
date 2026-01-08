@@ -6,6 +6,10 @@ interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
 }
 
+interface AuthFetchOptions extends Omit<RequestInit, 'headers'> {
+  headers?: Record<string, string>;
+}
+
 export async function apiClient<T>(
   endpoint: string, 
   options: FetchOptions = {}
@@ -54,3 +58,39 @@ export const api = {
   delete: <T>(endpoint: string) =>
     apiClient<T>(endpoint, { method: 'DELETE' }),
 };
+
+/**
+ * Fetch with authentication
+ * Automatically adds Authorization header with Bearer token
+ */
+export async function fetchWithAuth<T>(
+  url: string,
+  options: AuthFetchOptions = {},
+  getToken: () => Promise<string | null>
+): Promise<T> {
+  const token = await getToken();
+
+  if (!token) {
+    throw new Error("No authentication token available");
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      // Token expired or invalid - redirect to login
+      window.location.href = "/auth/login";
+      throw new Error("Authentication required");
+    }
+    throw new Error(`API error: ${response.statusText}`);
+  }
+
+  return response.json();
+}
