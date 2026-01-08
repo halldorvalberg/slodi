@@ -8,6 +8,7 @@ This module provides:
 """
 
 from functools import lru_cache
+import logging
 
 import httpx
 from fastapi import Depends, HTTPException, status
@@ -21,6 +22,9 @@ from app.core.db import get_session
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.services.users import UserService
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 # HTTPBearer extracts the token from Authorization: Bearer <token> header
 security = HTTPBearer()
@@ -74,9 +78,26 @@ def verify_auth0_token(token: str) -> dict:
     Raises:
         HTTPException: If token is invalid, expired, or verification fails
     """
+    # Toggle this to enable/disable debug logging for token verification
+    DEBUG_AUTH = False
+    
     try:
+        if DEBUG_AUTH:
+            logger.info(f"=== Token Verification Debug ===")
+            logger.info(f"Token length: {len(token)}")
+            logger.info(f"Token starts with: {token[:30]}...")
+        
         # Get unverified header to find which key to use
         unverified_header = jwt.get_unverified_header(token)
+        
+        if DEBUG_AUTH:
+            logger.info(f"Unverified header: {unverified_header}")
+            # Decode token without verification to see claims
+            unverified_claims = jwt.get_unverified_claims(token)
+            logger.info(f"Token audience (aud): {unverified_claims.get('aud')}")
+            logger.info(f"Token issuer (iss): {unverified_claims.get('iss')}")
+            logger.info(f"Expected audience: {settings.auth0_audience}")
+            logger.info(f"Expected issuer: https://{settings.auth0_domain}/")
 
         # Get the key from JWKS
         jwks = get_auth0_jwks()
@@ -95,38 +116,57 @@ def verify_auth0_token(token: str) -> dict:
                 break
 
         if not rsa_key:
+            logger.error("Unable to find appropriate signing key")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unable to find appropriate signing key"
             )
 
+        if DEBUG_AUTH:
+            logger.info("RSA key found, attempting to decode token...")
+
         # Verify the token signature and claims
+        # Note: Auth0 tokens may have multiple audiences (API + userinfo endpoint)
+        # python-jose handles this by checking if our audience is in the list
         payload = jwt.decode(
             token,
             rsa_key,
             algorithms=settings.auth0_algorithms,
             audience=settings.auth0_audience,
-            issuer=f"https://{settings.auth0_domain}/"
+            issuer=f"https://{settings.auth0_domain}/",
+            options={
+                "verify_aud": True,
+                "verify_exp": True,
+                "verify_iat": True,
+                "verify_iss": True,
+            }
         )
 
+        if DEBUG_AUTH:
+            logger.info(f"Token verified successfully! User: {payload.get('sub')}")
         return payload
 
     except ExpiredSignatureError as e:
+        logger.error(f"Token expired: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has expired"
         ) from e
     except JWTClaimsError as e:
+        logger.error(f"JWT claims error: {str(e)}")
+        logger.error(f"This usually means audience or issuer mismatch")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token claims (audience or issuer mismatch)"
+            detail=f"Invalid token claims: {str(e)}"
         ) from e
     except JWTError as e:
+        logger.error(f"JWT error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {str(e)}"
         ) from e
     except Exception as e:
+        logger.error(f"Unexpected error during token verification: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Token verification failed: {str(e)}"
@@ -174,13 +214,43 @@ async def get_current_user(
     # Extract user info from verified token
     auth0_id = payload.get("sub")
     email = payload.get("email")
-    name = payload.get("name") or payload.get("email", "")  # Fallback to email if name not provided
+    name = payload.get("name")
 
-    if not auth0_id or not email:
+    if not auth0_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token missing required claims (sub or email)"
+            detail="Token missing required claim (sub)"
         )
+
+    # If email is missing from token, fetch it from Auth0 userinfo endpoint
+    if not email:
+        try:
+            userinfo_url = f"https://{settings.auth0_domain}/userinfo"
+            response = httpx.get(
+                userinfo_url,
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=10.0
+            )
+            response.raise_for_status()
+            userinfo = response.json()
+            email = userinfo.get("email")
+            if not name:
+                name = userinfo.get("name")
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Failed to fetch user info from Auth0: {str(e)}"
+            ) from e
+
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unable to retrieve user email"
+        )
+
+    # Use email as fallback for name if still not set
+    if not name:
+        name = email
 
     # Get or create user
     user_service = UserService(session)

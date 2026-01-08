@@ -37,7 +37,11 @@ class ContentBase(BaseModel):
 
 
 class ContentCreate(ContentBase):
-    pass
+    # Override author_id to make it optional - backend sets this from authenticated user
+    author_id: UUID | None = None
+    # Override like_count and created_at with defaults
+    like_count: int = 0
+    created_at: dt.datetime = Field(default_factory=get_current_datetime)
 
 
 class ContentUpdate(BaseModel):
