@@ -1,0 +1,191 @@
+/* ═══════════════════════════════════════════════════════════
+   VISION & MISSION SECTION
+   Four cards showcasing Slóði's core values
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.visionMission {
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  background: hsl(var(--sl-color-background));
+}
+
+.container {
+  max-width: var(--sl-primitive-width-6xl);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heading {
+  font-size: var(--sl-primitive-font-size-4xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  text-align: center;
+  margin: 0 0 var(--sl-spacing-section) 0;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sl-spacing-component);
+}
+
+.visionCard {
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  padding: var(--sl-spacing-inset-xl);
+  text-align: center;
+  transition: 
+    transform 200ms var(--sl-primitive-animation-easing),
+    border-color 200ms var(--sl-primitive-animation-easing),
+    box-shadow 200ms var(--sl-primitive-animation-easing);
+}
+
+.visionCard:hover {
+  transform: translateY(-4px);
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: var(--sl-shadow-card-hover);
+}
+
+.cardIcon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--sl-spacing-stack-lg);
+  color: hsl(var(--sl-color-primary));
+}
+
+.cardIcon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke-width: 1.5;
+}
+
+.cardTitle {
+  font-size: var(--sl-primitive-font-size-xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-stack-md) 0;
+}
+
+.cardDescription {
+  font-size: var(--sl-text-body-md);
+  line-height: var(--sl-line-height-body);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Desktop (1024px and up) - default styles above */
+
+/* Tablet landscape (768px - 1023px) */
+@media (max-width: 1023px) {
+  .visionMission {
+    padding: var(--sl-spacing-section-sm) var(--sl-spacing-component);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+    margin-bottom: var(--sl-spacing-section-sm);
+  }
+
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sl-spacing-inline-md);
+  }
+
+  .cardIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .cardTitle {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .cardDescription {
+    font-size: var(--sl-text-body-sm);
+  }
+}
+
+/* Tablet portrait (641px - 767px) */
+@media (max-width: 767px) {
+  .visionMission {
+    padding: var(--sl-spacing-section-sm) var(--sl-spacing-component-sm);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-2xl);
+    margin-bottom: var(--sl-spacing-section-sm);
+  }
+
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sl-spacing-inline-sm);
+  }
+
+  .visionCard {
+    padding: var(--sl-spacing-inset-lg);
+  }
+
+  .cardIcon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: var(--sl-spacing-stack-md);
+  }
+}
+
+/* Mobile (640px and below) */
+@media (max-width: 640px) {
+  .visionMission {
+    padding: var(--sl-spacing-section-sm) var(--sl-spacing-component-sm);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-xl);
+    margin-bottom: var(--sl-spacing-section-sm);
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--sl-spacing-inline-sm);
+  }
+
+  .visionCard {
+    padding: var(--sl-spacing-inset-lg);
+  }
+
+  .cardIcon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: var(--sl-spacing-stack-md);
+  }
+
+  .cardTitle {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .cardDescription {
+    font-size: var(--sl-text-body-sm);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════ */
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .visionCard {
+    transition: none;
+  }
+
+  .visionCard:hover {
+    transform: none;
+  }
+}

@@ -41,36 +41,37 @@ export const metadata: Metadata = {
     "Markmið Slóða er að styðja við foringja í skátastarfi með því að gera dagskrárgerð einfaldari, markvissari og skipulagðari. Safnaðu saman dagskrárhugmyndum, settu saman skipulagða dagskrá og greindu fjölbreytni.",
   keywords: [
     "skátar",
-    "scouts",
-    "dagskrá",
-    "foreldrar",
-    "skátaforrit",
-    "íslenskir skátar",
-    "youth program",
+   "dagskrá",
+    "dagskrárvefur",
+    "dagskrárbanki",
+    "skátaforingjar",
+    "skátafélög",
+    "skátarnir",
+    "Slóði",
   ],
-  authors: [{ name: "Slóði Team" }],
+  authors: [{ name: "Slóða teymið", url: "https://slodi.is" }],
   creator: "Slóði",
   openGraph: {
     type: "website",
     locale: "is_IS",
     url: "https://slodi.is",
     siteName: "Slóði",
-    title: "Slóði - Skátaforrit",
+    title: "Slóði - Meira en bara dagskrárvefur",
     description:
-      "Dagskrárgerð fyrir íslenska skáta. Einfalt, markviss, skipulagt.",
+      "Dagskrárgerð fyrir skátaforingja. Einfalt, markviss, skipulagt.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Slóði - Skátaforrit",
+        alt: "Slóði - Dagskrárvefurinn 2.0",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Slóði - Skátaforrit",
-    description: "Dagskrárgerð fyrir íslenska skáta",
+    title: "Slóði - Meira en bara dagskrárvefur",
+    description: "Dagskrárgerð fyrir skátaforingja. Einfalt, markviss, skipulagt.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -99,16 +100,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="is" suppressHydrationWarning>
-      <head>
-        {/* Preload critical fonts */}
-        <link
-          rel="preload"
-          href="/fonts/roboto-condensed-v25-latin-regular.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body
         className={cn(
           // Font variables

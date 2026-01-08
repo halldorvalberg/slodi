@@ -21,6 +21,14 @@
   overflow-x: hidden;
   z-index: var(--sl-z-fixed);
   transition: width var(--sl-transition-base);
+  
+  /* Hide scrollbar while maintaining scroll functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* Collapsed state */
@@ -171,6 +179,18 @@
 
 .navItemActive:hover {
   background: hsl(var(--sl-color-primary-subtle));
+}
+
+/* Disabled state */
+.navItemDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.navItemDisabled:hover {
+  background: transparent;
+  color: hsl(var(--sl-color-text-secondary));
 }
 
 /* Icon */

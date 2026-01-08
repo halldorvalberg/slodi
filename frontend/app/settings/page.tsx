@@ -1,10 +1,12 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { ShieldCheck } from "lucide-react";
 import { auth0 } from "@/lib/auth0";
 import styles from "./settings.module.css";
 import Button from "@/components/Button/Button";
 import EmailListDownloadButton from "./email-download-service";
+import ThemeToggle from "./ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -44,24 +46,37 @@ export default async function SettingsPage() {
           <h2 className={styles.cardTitle}>Aðgangurinn þinn</h2>
           <div className={styles.accountRow}>
             <Avatar src={user.picture} alt={user.name ?? "Notandi"} />
-            <div>
+            <div className={styles.accountInfo}>
               <p className={styles.accountName}>{user.name ?? "—"}</p>
               <p className={styles.accountEmail}>{user.email ?? "—"}</p>
             </div>
           </div>
-          <dl className={styles.dl}></dl>
+
+          <div className={styles.auth0Badge}>
+            <ShieldCheck className={styles.auth0Icon} aria-hidden="true" />
+            <span>Auðkennt með Auth0</span>
+          </div>
+          
+          <div className={styles.accountActions}>
+            <Button as="a" href="/auth/logout" variant="danger" fullWidth>
+              Skrá út
+            </Button>
+          </div>
         </div>
 
         <div className={styles.card}>
-          <h2 className={styles.cardTitle}>Aðgerðir</h2>
-          <div className={styles.actions}>
-            {EMAIL_LIST.includes(user.email ?? "") && (
-              <EmailListDownloadButton allowed={true} />
-            )}
-            <Button href="/" variant="secondary">Fara á forsíðu</Button>
-            <Button as="a" href="/auth/logout" variant="danger">Skrá út</Button>
-          </div>
+          <h2 className={styles.cardTitle}>Útlit</h2>
+          <ThemeToggle />
         </div>
+
+        {EMAIL_LIST.includes(user.email ?? "") && (
+          <div className={styles.card}>
+            <h2 className={styles.cardTitle}>Stjórnun</h2>
+            <div className={styles.actions}>
+              <EmailListDownloadButton allowed={true} />
+            </div>
+          </div>
+        )}
       </section>
     </main>
   );

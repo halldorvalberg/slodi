@@ -171,13 +171,26 @@
 .statusBadge {
   display: inline-block;
   padding: var(--sl-spacing-compact) var(--sl-spacing-gap-md);
-  background: hsl(var(--sl-color-info-subtle));
-  color: hsl(var(--sl-color-info));
   border-radius: var(--sl-radius-badge);
   font-size: var(--sl-text-body-sm);
   font-weight: var(--sl-font-weight-medium);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.statusPlanned {
+  background: hsl(var(--sl-color-info-subtle));
+  color: hsl(var(--sl-color-info));
+}
+
+.statusInProgress {
+  background: hsl(var(--sl-color-warning-subtle));
+  color: hsl(var(--sl-color-warning));
+}
+
+.statusReady {
+  background: hsl(var(--sl-color-success-subtle));
+  color: hsl(var(--sl-color-success));
 }
 
 /* ===== TIMELINE ===== */

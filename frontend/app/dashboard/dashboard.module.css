@@ -2,6 +2,106 @@
 @import './../../app/slodi-utilities.css';
 
 /* ═══════════════════════════════════════════════════════════════
+   DASHBOARD PAGE - Minimalist & Cute
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboardPage {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--sl-spacing-section);
+}
+
+.title {
+  font-size: var(--sl-text-heading-1);
+  font-weight: var(--sl-font-weight-bold);
+  color: hsl(var(--sl-color-text-primary));
+  margin-bottom: var(--sl-spacing-element);
+}
+
+.subtitle {
+  font-size: var(--sl-text-body-lg);
+  color: hsl(var(--sl-color-text-secondary));
+  margin-bottom: var(--sl-spacing-section);
+}
+
+/* Program Bank Card */
+.programBankCard {
+  display: block;
+  text-decoration: none;
+  background: linear-gradient(135deg, hsl(var(--sl-color-primary-subtle)) 0%, hsl(var(--sl-color-surface)) 100%);
+  border: 2px solid hsl(var(--sl-color-primary) / 0.2);
+  border-radius: var(--sl-radius-card);
+  padding: var(--sl-spacing-component);
+  transition: all var(--sl-transition-base);
+  box-shadow: var(--sl-shadow-card);
+}
+
+.programBankCard:hover {
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: var(--sl-shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.programBankCard:focus-visible {
+  outline: none;
+  box-shadow: var(--sl-shadow-focus), var(--sl-shadow-card-hover);
+}
+
+.cardContent {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-lg);
+}
+
+.sparkleIcon {
+  width: 32px;
+  height: 32px;
+  color: hsl(var(--sl-color-primary));
+  flex-shrink: 0;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+.cardText {
+  flex: 1;
+}
+
+.cardTitle {
+  font-size: var(--sl-text-heading-3);
+  font-weight: var(--sl-font-weight-semibold);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-gap-xs) 0;
+}
+
+.cardDescription {
+  font-size: var(--sl-text-body);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
+}
+
+.arrowIcon {
+  width: 24px;
+  height: 24px;
+  color: hsl(var(--sl-color-primary));
+  flex-shrink: 0;
+  transition: transform var(--sl-transition-fast);
+}
+
+.programBankCard:hover .arrowIcon {
+  transform: translateX(4px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
    SIDEBAR NAVIGATION - Using Slóði Design Tokens
    ═══════════════════════════════════════════════════════════════ */
 
