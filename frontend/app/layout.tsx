@@ -98,16 +98,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="is" suppressHydrationWarning>
-      <head>
-        {/* Preload critical fonts */}
-        <link
-          rel="preload"
-          href="/fonts/roboto-condensed-v25-latin-regular.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body
         className={cn(
           // Font variables
