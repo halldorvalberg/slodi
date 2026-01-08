@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
 from app.domain.content_constraints import DESC_MAX, NAME_MAX, NAME_MIN
 from app.utils import get_current_datetime
+
+if TYPE_CHECKING:
+    from app.schemas.tag import TagOut
 
 NameStr = Annotated[
     str,
@@ -37,7 +40,11 @@ class ContentBase(BaseModel):
 
 
 class ContentCreate(ContentBase):
-    pass
+    # Override author_id to make it optional - backend sets this from authenticated user
+    author_id: UUID | None = None
+    # Override like_count and created_at with defaults
+    like_count: int = 0
+    created_at: dt.datetime = Field(default_factory=get_current_datetime)
 
 
 class ContentUpdate(BaseModel):
@@ -60,3 +67,4 @@ class ContentOut(ContentBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    tags: list["TagOut"] = []

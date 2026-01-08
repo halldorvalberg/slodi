@@ -10,43 +10,69 @@ import ProgramFilters from "./components/ProgramFilters";
 import ProgramSort, { type SortOption } from "./components/ProgramSort";
 import Pagination from "./components/Pagination";
 import styles from "./program.module.css";
-import SAMPLE_DATA from "./devdata.json"; // Sample data for development when backend is not running
 import {
-    type Program,
     filterProgramsByQuery,
     filterProgramsByTags,
     sortPrograms
 } from "@/services/programs.service";
 import { useTags } from "@/hooks/useTags";
-
-const SAMPLE: Program[] = SAMPLE_DATA as Program[];
+import usePrograms from "@/hooks/usePrograms";
+import { useAuth } from "@/hooks/useAuth";
+import { getOrCreatePersonalWorkspace } from "@/services/workspaces.service";
 
 export default function ProgramBuilderPage() {
+    const { user, getToken, isAuthenticated } = useAuth();
     const [query, setQuery] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<SortOption>('newest');
     const [currentPage, setCurrentPage] = useState(1);
-    const [isSearching, setIsSearching] = useState(false);
     const [showNewProgram, setShowNewProgram] = useState(false);
+    const [userWorkspaceId, setUserWorkspaceId] = useState<string | null>(null);
 
-    const ITEMS_PER_PAGE = 12; // Show 12 programs per page for demo
+    const ITEMS_PER_PAGE = 12; // Show 12 programs per page
+
+    // Default public workspace ID for viewing programs (dagskrábankinn)
+    const defaultWorkspaceId = process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE_ID || "";
 
     // Fetch tags from backend using tags.service.ts
     const { tagNames: backendTags, loading: tagsLoading } = useTags();
 
+    // Fetch programs from backend (from the default public workspace)
+    const { programs: backendPrograms, loading: programsLoading, error: programsError, refetch } = usePrograms(defaultWorkspaceId);
+
+    // Get or create user's personal workspace on mount
+    useEffect(() => {
+        async function fetchUserWorkspace() {
+            if (!isAuthenticated || !user) return;
+
+            try {
+                const token = await getToken();
+                if (!token) return;
+
+                const workspace = await getOrCreatePersonalWorkspace(user.id, token);
+                setUserWorkspaceId(workspace.id);
+            } catch (error) {
+                console.error("Failed to get user workspace:", error);
+            }
+        }
+
+        fetchUserWorkspace();
+    }, [isAuthenticated, user, getToken]);
+
     const availableTags = backendTags || [];
+    const programs = useMemo(() => backendPrograms || [], [backendPrograms]);
 
     // Filter and sort items
     const filteredAndSortedItems = useMemo(() => {
         // Apply tag filter
-        let filtered = filterProgramsByTags(SAMPLE, selectedTags);
+        let filtered = filterProgramsByTags(programs, selectedTags);
 
         // Apply search filter
         filtered = filterProgramsByQuery(filtered, query);
 
         // Apply sort
         return sortPrograms(filtered, sortBy);
-    }, [query, selectedTags, sortBy]);
+    }, [programs, query, selectedTags, sortBy]);
 
     // Pagination calculations
     const totalPages = Math.ceil(filteredAndSortedItems.length / ITEMS_PER_PAGE);
@@ -68,13 +94,17 @@ export default function ProgramBuilderPage() {
     }, [currentPage]);
 
     const handleSearch = () => {
-        // Could trigger API call here when backend is ready
-        setIsSearching(false);
+        // Search is handled by client-side filtering
     };
 
     const handleClearAllFilters = () => {
         setSelectedTags([]);
         setQuery("");
+    };
+
+    const handleProgramCreated = async () => {
+        setShowNewProgram(false);
+        await refetch(); // Refresh program list to show new program
     };
 
     return (
@@ -101,7 +131,10 @@ export default function ProgramBuilderPage() {
             </button>
 
             <Modal open={showNewProgram} onClose={() => setShowNewProgram(false)} title="Bæta hugmynd í bankann">
-                <NewProgramForm onCreated={() => setShowNewProgram(false)} />
+                <NewProgramForm
+                    workspaceId={userWorkspaceId || defaultWorkspaceId}
+                    onCreated={handleProgramCreated}
+                />
             </Modal>
 
             <div className={styles.mainHeader}>
@@ -140,9 +173,11 @@ export default function ProgramBuilderPage() {
                 <main className={styles.main}>
                     <ProgramGrid
                         isEmpty={filteredAndSortedItems.length === 0}
-                        isLoading={isSearching}
+                        isLoading={programsLoading}
                         emptyMessage={
-                            query.trim() || selectedTags.length > 0
+                            programsError
+                                ? "Villa kom upp við að sækja dagskrár"
+                                : query.trim() || selectedTags.length > 0
                                 ? "Engar dagskrár fundust með þessari leit"
                                 : "Engar dagskrár í boði"
                         }
@@ -153,7 +188,7 @@ export default function ProgramBuilderPage() {
                                 id={p.id}
                                 name={p.name}
                                 description={p.description}
-                                tags={p.tags?.map(tag => ({ id: tag, name: tag }))}
+                                tags={p.tags}
                             />
                         ))}
                     </ProgramGrid>

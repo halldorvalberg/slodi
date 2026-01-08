@@ -10,7 +10,11 @@ import ThemeToggle from "./ThemeToggle";
 
 export const dynamic = "force-dynamic";
 
-const EMAIL_LIST = ["halldor@svanir.is", "signy.kristin8@gmail.com"];
+const EMAIL_LIST =
+  (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter((email) => email.length > 0);
 
 async function getBaseUrl() {
   const env = process.env.APP_BASE_URL;

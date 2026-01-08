@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   background: linear-gradient(
-    135deg,
+    180deg,
     hsl(var(--sl-color-background)),
     hsl(var(--sl-color-background-secondary))
   );

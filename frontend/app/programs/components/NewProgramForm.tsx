@@ -7,13 +7,16 @@ import type { Program } from "@/services/programs.service";
 import { createProgram } from "@/services/programs.service";
 import { useTags } from "@/hooks/useTags";
 import { handleApiErrorIs } from "@/lib/api-utils";
+import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
+  workspaceId: string; // User's personal workspace ID (used for private programs)
   onCreated?: (program: Program) => void;
   onCancel?: () => void;
 };
 
-export default function NewProgramForm({ onCreated, onCancel }: Props) {
+export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Props) {
+  const { getToken } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
@@ -57,6 +60,13 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
     setLoading(true);
     
     try {
+      // Determine which workspace to use based on public/private
+      // If public: use the default workspace (dagskrábankinn)
+      // If private: use the user's personal workspace (passed as workspaceId prop)
+      const targetWorkspaceId = isPublic
+        ? (process.env.NEXT_PUBLIC_DEFAULT_WORKSPACE_ID || workspaceId)
+        : workspaceId;
+
       const program = await createProgram({
         name: name.trim(),
         description: description.trim(),
@@ -64,7 +74,8 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
         image: image.trim(),
         imageFile: imageFile || undefined,
         tags: selectedTags.length > 0 ? selectedTags : undefined,
-      });
+        workspaceId: targetWorkspaceId,
+      }, getToken); // Pass token getter for authentication
       
       // Reset form
       handleReset();
@@ -279,8 +290,8 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
           </div>
           <p className={styles.toggleHint}>
             {isPublic
-              ? 'Þessi hugmynd verður sýnileg öllum í dagskrábankanum'
-              : 'Aðeins þú og meðlimir vinnusvæðisins geta séð þessa hugmynd'
+              ? 'Þessi hugmynd verður bætt við dagskrábankann og verður sýnileg öllum'
+              : 'Þessi hugmynd verður geymd í þínu persónulega vinnusvæði'
             }
           </p>
         </div>

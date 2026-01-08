@@ -1,40 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import SAMPLE_DATA from "../devdata.json";
+import { fetchProgramById, type Program } from "@/services/programs.service";
 import ProgramDetailHero from "../components/ProgramDetailHero";
 import ProgramDetailTabs from "../components/ProgramDetailTabs";
 import ProgramQuickInfo from "../components/ProgramQuickInfo";
 import styles from "./program-detail.module.css";
-
-type Program = {
-    id: string;
-    content_type: "program";
-    name: string;
-    description: string | null;
-    public: boolean;
-    like_count: number;
-    created_at: string;
-    author_id: string;
-    image: string | null;
-    workspace_id: string;
-    author: {
-        id: string;
-        name: string;
-        email: string;
-    };
-    workspace: {
-        id: string;
-        name: string;
-    };
-    tags?: string[];
-    comment_count?: number;
-};
-
-const SAMPLE: Program[] = SAMPLE_DATA as Program[];
 
 interface ProgramDetailPageProps {
     params: Promise<{
@@ -45,10 +19,39 @@ interface ProgramDetailPageProps {
 export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
     const router = useRouter();
     const { id } = React.use(params);
-    const program = SAMPLE.find((p) => p.id === id);
 
-    const [likeCount, setLikeCount] = useState(program?.like_count || 0);
+    const [program, setProgram] = useState<Program | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [likeCount, setLikeCount] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
+
+    useEffect(() => {
+        async function fetchProgram() {
+            try {
+                setIsLoading(true);
+                const data = await fetchProgramById(id);
+                setProgram(data);
+                setLikeCount(data.like_count || 0);
+            } catch (error) {
+                console.error("Failed to fetch program:", error);
+                setProgram(null);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchProgram();
+    }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className={styles.container}>
+                <div style={{ padding: "2rem", textAlign: "center" }}>
+                    Hleð dagskrá...
+                </div>
+            </div>
+        );
+    }
 
     if (!program) {
         notFound();
@@ -93,11 +96,6 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
                     <li>
                         <Link href="/programs">Dagskrár</Link>
                     </li>
-                    <li>
-                        <a href={`/programs?workspace=${program.workspace_id}`}>
-                            {program.workspace.name}
-                        </a>
-                    </li>
                     <li aria-current="page">{program.name}</li>
                 </ol>
             </nav>
@@ -121,7 +119,12 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
 
                 {/* Sidebar */}
                 <aside className={styles.sidebar}>
-                    <ProgramQuickInfo program={program} />
+                    <ProgramQuickInfo
+                        program={{
+                            ...program,
+                            tags: program.tags?.map(tag => ({ id: tag.id, name: tag.name })),
+                        }}
+                    />
                 </aside>
             </div>
 

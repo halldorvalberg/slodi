@@ -8,7 +8,7 @@ import styles from "./settings.module.css";
 type ThemeMode = "light" | "dark" | "system";
 
 export default function ThemeToggle() {
-    const { theme, setTheme } = useTheme();
+    const { setTheme } = useTheme();
     const [selectedMode, setSelectedMode] = useState<ThemeMode>("system");
 
     // Initialize from localStorage

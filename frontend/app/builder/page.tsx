@@ -18,7 +18,7 @@ export default function BuilderPage() {
     const filtered = useMemo(() => {
         if (!programs) return [] as ProgramType[];
         return (programs as ProgramType[]).filter((p: ProgramType) => {
-            if (tagFilter !== "all" && !(p.tags || []).includes(tagFilter)) return false;
+            if (tagFilter !== "all" && !(p.tags || []).some(tag => tag.name === tagFilter)) return false;
             if (!query) return true;
             const q = query.trim().toLowerCase();
             return p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q);
@@ -66,12 +66,12 @@ export default function BuilderPage() {
                         <div>Engar dagskrár fannst fyrir valin skilyrði.</div>
                     ) : (
                         filtered.map((p) => (
-                            <ProgramCard 
-                                key={p.id} 
-                                id={p.id} 
-                                name={p.name} 
-                                description={p.description} 
-                                tags={p.tags?.map(tag => ({ id: tag, name: tag }))} 
+                            <ProgramCard
+                                key={p.id}
+                                id={p.id}
+                                name={p.name}
+                                description={p.description}
+                                tags={p.tags}
                             />
                         ))
                     )}

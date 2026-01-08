@@ -9,6 +9,7 @@ import ThemeKeyboardShortcuts from "@/components/ThemeKeyboardShortcuts";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import { LikesProvider } from "@/contexts/LikesContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Geist fonts for code/UI elements
 const geistSans = Geist({
@@ -119,37 +120,39 @@ export default function RootLayout({
         )}
       >
         {/* Theme Provider for dark mode, patrol themes, etc. */}
-        <ThemeProvider>
-          <LikesProvider>
-            <FavoritesProvider>
-              {/* Keyboard shortcuts for theme switching */}
-              <ThemeKeyboardShortcuts />
+        <AuthProvider>
+          <ThemeProvider>
+            <LikesProvider>
+              <FavoritesProvider>
+                {/* Keyboard shortcuts for theme switching */}
+                <ThemeKeyboardShortcuts />
 
-              {/* Conditional Layout: decides whether to show header/footer or dashboard layout */}
-              <ConditionalLayout>{children}</ConditionalLayout>
+                {/* Conditional Layout: decides whether to show header/footer or dashboard layout */}
+                <ConditionalLayout>{children}</ConditionalLayout>
 
-              {/* Toast Notifications Container - for future expansion */}
-              <div
-                id="toast-container"
-                className={cn(
-                  "fixed",
-                  "top-4",
-                  "right-4",
-                  "z-[9999]",
-                  "pointer-events-none",
-                  "flex",
-                  "flex-col",
-                  "gap-2",
-                  "max-w-md",
-                  "w-full"
-                )}
-                role="region"
-                aria-live="polite"
-                aria-label="Tilkynningar"
-              />
-            </FavoritesProvider>
-          </LikesProvider>
-        </ThemeProvider>
+                {/* Toast Notifications Container - for future expansion */}
+                <div
+                  id="toast-container"
+                  className={cn(
+                    "fixed",
+                    "top-4",
+                    "right-4",
+                    "z-[9999]",
+                    "pointer-events-none",
+                    "flex",
+                    "flex-col",
+                    "gap-2",
+                    "max-w-md",
+                    "w-full"
+                  )}
+                  role="region"
+                  aria-live="polite"
+                  aria-label="Tilkynningar"
+                />
+              </FavoritesProvider>
+            </LikesProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -7,13 +7,20 @@ import type { Program } from "@/services/programs.service";
 import { createProgram } from "@/services/programs.service";
 import { useTags } from "@/hooks/useTags";
 import { handleApiErrorIs } from "@/lib/api-utils";
+import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
+  workspaceId: string;
   onCreated?: (program: Program) => void;
   onCancel?: () => void;
 };
 
-export default function NewProgramForm({ onCreated, onCancel }: Props) {
+export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Props) {
+  // Toggle this to enable/disable debug logging for this component
+  const DEBUG_NEW_PROGRAM_FORM = true;
+  const LOG_PREFIX = "[NewProgramForm]";
+
+  const { getToken } = useAuth();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
@@ -41,22 +48,40 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
 
   // Get available tags
   const { tagNames: availableTags } = useTags();
-  
+
   // Placeholder tags for development
   const PLACEHOLDER_TAGS = ["útivist", "innileikur", "list", "sköpun", "matreiðsla", "leikur", "fræðsla", "náttúrufræði"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
+
+    if (DEBUG_NEW_PROGRAM_FORM) {
+      console.log(`${LOG_PREFIX} === FORM SUBMIT STARTED ===`);
+      console.log(`${LOG_PREFIX} Name:`, name);
+      console.log(`${LOG_PREFIX} Description:`, description);
+      console.log(`${LOG_PREFIX} Public:`, isPublic);
+      console.log(`${LOG_PREFIX} Image URL:`, image);
+      console.log(`${LOG_PREFIX} Image File:`, imageFile?.name || "none");
+      console.log(`${LOG_PREFIX} Tags:`, selectedTags);
+      console.log(`${LOG_PREFIX} Workspace ID:`, workspaceId);
+    }
+
     if (!name.trim()) {
       setError("Heiti hugmyndar er nauðsynlegt");
+      if (DEBUG_NEW_PROGRAM_FORM) {
+        console.log(`${LOG_PREFIX} Validation failed: name is required`);
+      }
       return;
     }
 
     setLoading(true);
-    
+
     try {
+      if (DEBUG_NEW_PROGRAM_FORM) {
+        console.log(`${LOG_PREFIX} Calling createProgram...`);
+      }
+
       const program = await createProgram({
         name: name.trim(),
         description: description.trim(),
@@ -64,16 +89,27 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
         image: image.trim(),
         imageFile: imageFile || undefined,
         tags: selectedTags.length > 0 ? selectedTags : undefined,
-      });
-      
+        workspaceId, // Required workspace ID
+      }, getToken); // Pass token getter for authentication
+
+      if (DEBUG_NEW_PROGRAM_FORM) {
+        console.log(`${LOG_PREFIX} Program created successfully:`, program);
+      }
+
       // Reset form
       handleReset();
-      
+
       onCreated?.(program);
     } catch (err) {
+      if (DEBUG_NEW_PROGRAM_FORM) {
+        console.error(`${LOG_PREFIX} Error creating program:`, err);
+      }
       setError(handleApiErrorIs(err));
     } finally {
       setLoading(false);
+      if (DEBUG_NEW_PROGRAM_FORM) {
+        console.log(`${LOG_PREFIX} Form submit completed`);
+      }
     }
   };
 
@@ -114,8 +150,8 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
   };
 
   const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     );
@@ -191,13 +227,13 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
         <label className={styles.label}>
           Mynd
         </label>
-        
+
         {imagePreview ? (
           <div className={styles.imagePreview}>
-            <Image 
-              src={imagePreview} 
-              alt="Preview" 
-              width={400} 
+            <Image
+              src={imagePreview}
+              alt="Preview"
+              width={400}
               height={250}
               className={styles.previewImage}
             />
@@ -228,7 +264,7 @@ export default function NewProgramForm({ onCreated, onCancel }: Props) {
             </label>
           </div>
         )}
-        
+
         {/* Image URL fallback */}
         <div className={styles.orDivider}>
           <span>eða</span>

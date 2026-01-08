@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Allow a sensible default during local development/build so the route
 // doesn't throw at build time when env vars aren't provided.
-const API_BASE_URL = process.env.API_BASE_URL ?? 'http://127.0.0.1:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:8000';
 
 if (!process.env.API_BASE_URL) {
     // Not fatal — warn so developers know they should set it for non-dev envs.
