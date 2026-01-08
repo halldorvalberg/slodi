@@ -1,7 +1,55 @@
+'use client';
+
 import { Calendar } from "lucide-react";
 import styles from "./TimelineSection.module.css";
 
+interface TimelineEvent {
+  title: string;
+  date: string;
+  targetDate: Date;
+  location?: string;
+  notes: string[];
+}
+
 export default function TimelineSection() {
+  const now = new Date();
+
+  const events: TimelineEvent[] = [
+    {
+      title: "Kynning á verkefni",
+      date: "Janúar 2026",
+      targetDate: new Date(2026, 0, 10),
+      location: "Neisti",
+      notes: ["Smiðja um dagskrárgerð og safna endurgjöf frá foringjum"]
+    },
+    {
+      title: "Útgáfa á lágmarksafurð",
+      date: "Mars 2026",
+      targetDate: new Date(2026, 2, 31),
+      location: "Skátaþing",
+      notes: [
+        "Markmiðið er að kynna lágmarksafurðina fyrir sjálfboðaliðum skátahreyfingarinnar.",
+        "Vinnuópar endurnýjaðir"
+      ]
+    },
+    {
+      title: "Kynning á verkefni",
+      date: "Ágúst 2026",
+      targetDate: new Date(2026, 7, 31),
+      location: "Kveikja",
+      notes: [
+        "Kynna verkfærið fyrir stjórnum og foringjum félagas",
+        "Vinnuópar endurnýjaðir"
+      ]
+    },
+    {
+      title: "Opinber útgáfa",
+      date: "Apríl 2027",
+      targetDate: new Date(2027, 3, 30),
+      notes: ["Vinnuhópar ljúka störfum"]
+    }
+  ];
+
   return (
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>
@@ -9,59 +57,28 @@ export default function TimelineSection() {
         Tímalína
       </h2>
       <div className={styles.timeline}>
-        <div className={styles.timelineItem}>
-          <div className={styles.timelineDot}></div>
-          <div className={styles.timelineContent}>
-            <h3 className={styles.timelineTitle}>Kynning á verkefni</h3>
-            <time className={styles.timelineDate}>Janúar 2026</time>
-            <p className={styles.timelineLocation}>Neisti</p>
-            <p className={styles.timelineNote}>
-              Smiðja um dagskrárgerð og safna endurgjöf frá foringjum
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.timelineItem}>
-          <div className={styles.timelineDot}></div>
-          <div className={styles.timelineContent}>
-            <h3 className={styles.timelineTitle}>Útgáfa á lágmarksafurð</h3>
-            <time className={styles.timelineDate}>Mars 2026</time>
-            <p className={styles.timelineLocation}>Skátaþing</p>
-            <p className={styles.timelineNote}>
-              Markmiðið er að kynna lágmarksafurðina fyrir sjálfboðaliðum skátahreyfingarinnar.
-            </p>
-            <p className={styles.timelineNote}>
-              Vinnuópar endurnýjaðir
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.timelineItem}>
-          <div className={styles.timelineDot}></div>
-          <div className={styles.timelineContent}>
-            <h3 className={styles.timelineTitle}>Kynning á verkefni</h3>
-            <time className={styles.timelineDate}>Ágúst 2026</time>
-            <p className={styles.timelineLocation}>Kveikja</p>
-            <p className={styles.timelineNote}>
-              Kynna verkfærið fyrir stjórnum og foringjum félagas
-            </p>
-            <p className={styles.timelineNote}>
-              Vinnuópar endurnýjaðir
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.timelineItem}>
-          <div className={styles.timelineDot}></div>
-          <div className={styles.timelineContent}>
-            <h3 className={styles.timelineTitle}>Opinber útgáfa</h3>
-            <time className={styles.timelineDate}>Apríl 2027</time>
-            <p className={styles.timelineNote}>
-              Vinnuhópar ljúka störfum
-            </p>
-          </div>
-        </div>
+        {events.map((event, index) => {
+          const hasPassed = now > event.targetDate;
+          return (
+            <div key={index} className={styles.timelineItem}>
+              <div className={`${styles.timelineDot} ${!hasPassed ? styles.timelineDotFuture : ''}`}></div>
+              <div className={styles.timelineContent}>
+                <h3 className={styles.timelineTitle}>{event.title}</h3>
+                <time className={styles.timelineDate}>{event.date}</time>
+                {event.location && (
+                  <p className={styles.timelineLocation}>{event.location}</p>
+                )}
+                {event.notes.map((note, noteIndex) => (
+                  <p key={noteIndex} className={styles.timelineNote}>
+                    {note}
+                  </p>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 }
+

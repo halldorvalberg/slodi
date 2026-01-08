@@ -30,12 +30,14 @@
 .timeline::before {
   content: "";
   position: absolute;
-  left: 22;
-  top: 5;
+  left: 22px;
+  top: 5px;
   bottom: 0;
   width: 2px;
   background: hsl(var(--sl-color-border));
+
 }
+
 
 .timelineItem {
   position: relative;
@@ -58,6 +60,11 @@
   border-radius: 50%;
   box-shadow: 0 0 0 2px hsl(var(--sl-color-primary));
   z-index: 1;
+}
+
+.timelineDotFuture {
+  background: hsl(var(--sl-color-text-tertiary));
+  box-shadow: 0 0 0 2px hsl(var(--sl-color-text-tertiary));
 }
 
 .timelineContent {
@@ -114,6 +121,10 @@
 @media (max-width: 768px) {
   .timeline {
     padding-left: var(--sl-spacing-element);
+  }
+
+  .timeline::before {
+    left: 14px;
   }
 
   .timelineItem {
