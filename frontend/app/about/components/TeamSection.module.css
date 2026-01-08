@@ -1,0 +1,323 @@
+/* ═══════════════════════════════════════════════════════════
+   TEAM SECTION
+   Shows project leaders and GitHub contributors
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.teamSection {
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  background: hsl(var(--sl-color-background-secondary));
+}
+
+.container {
+  max-width: var(--sl-primitive-width-5xl);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heading {
+  font-size: var(--sl-primitive-font-size-4xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  text-align: center;
+  margin: 0 0 var(--sl-spacing-stack-lg) 0;
+}
+
+.introduction {
+  font-size: var(--sl-text-body-lg);
+  line-height: var(--sl-line-height-body);
+  color: hsl(var(--sl-color-text-secondary));
+  text-align: center;
+  margin: 0 0 var(--sl-spacing-section) 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEADERS SECTION
+   ═══════════════════════════════════════════════════════════ */
+
+.leadersSection {
+  margin-bottom: var(--sl-spacing-section);
+}
+
+.subheading {
+  font-size: var(--sl-primitive-font-size-2xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-stack-lg) 0;
+}
+
+.leadersList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-md);
+  padding: var(--sl-spacing-inset-lg);
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+}
+
+.leader {
+  font-size: var(--sl-text-body-md);
+  line-height: var(--sl-line-height-body);
+  color: hsl(var(--sl-color-text-secondary));
+}
+
+.leader strong {
+  color: hsl(var(--sl-color-text-primary));
+  font-weight: var(--sl-font-weight-emphasis);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTRIBUTORS SECTION
+   ═══════════════════════════════════════════════════════════ */
+
+.contributorsSection {
+  margin-bottom: var(--sl-spacing-section);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-stack-md);
+  padding: var(--sl-spacing-inset-xl);
+  color: hsl(var(--sl-color-text-secondary));
+  font-size: var(--sl-text-body-md);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid hsl(var(--sl-color-border));
+  border-top-color: hsl(var(--sl-color-primary));
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  padding: var(--sl-spacing-inset-lg);
+  background: hsl(var(--sl-color-error) / 0.1);
+  border: 1px solid hsl(var(--sl-color-error) / 0.3);
+  border-radius: var(--sl-radius-card);
+  color: hsl(var(--sl-color-error));
+  font-size: var(--sl-text-body-md);
+  text-align: center;
+}
+
+.contributorsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--sl-spacing-stack-md);
+}
+
+.contributorCard {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-stack-md);
+  padding: var(--sl-spacing-inset-md);
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  text-decoration: none;
+  transition: 
+    transform 200ms var(--sl-primitive-animation-easing),
+    border-color 200ms var(--sl-primitive-animation-easing),
+    box-shadow 200ms var(--sl-primitive-animation-easing);
+}
+
+.contributorCard:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: var(--sl-shadow-card);
+}
+
+.contributorCard:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-primary));
+  outline-offset: 2px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.contributorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.contributorName {
+  font-size: var(--sl-text-body-md);
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-text-primary));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contributorStats {
+  font-size: var(--sl-text-body-sm);
+  color: hsl(var(--sl-color-text-secondary));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CALL TO ACTION
+   ═══════════════════════════════════════════════════════════ */
+
+.callToAction {
+  padding: var(--sl-spacing-inset-xl);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-primary) / 0.05),
+    hsl(var(--sl-color-primary) / 0.1)
+  );
+  border: 1px solid hsl(var(--sl-color-primary) / 0.2);
+  border-radius: var(--sl-radius-card);
+  text-align: center;
+}
+
+.ctaHeading {
+  font-size: var(--sl-primitive-font-size-xl);
+  font-weight: var(--sl-font-weight-heading);
+  line-height: var(--sl-line-height-heading);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-stack-md) 0;
+}
+
+.ctaText {
+  font-size: var(--sl-text-body-md);
+  line-height: var(--sl-line-height-body);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE STYLES
+   ═══════════════════════════════════════════════════════════ */
+
+/* Desktop (1024px and up) - default styles above */
+
+/* Tablet landscape (768px - 1023px) */
+@media (max-width: 1023px) {
+  .teamSection {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+  }
+
+  .introduction {
+    font-size: var(--sl-text-body-md);
+    margin-bottom: var(--sl-spacing-container);
+  }
+
+  .leadersSection,
+  .contributorsSection {
+    margin-bottom: var(--sl-spacing-container);
+  }
+
+  .subheading {
+    font-size: var(--sl-primitive-font-size-xl);
+  }
+
+  .contributorsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+/* Tablet portrait (641px - 767px) */
+@media (max-width: 767px) {
+  .teamSection {
+    padding: var(--sl-spacing-container) var(--sl-spacing-element);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-2xl);
+  }
+
+  .contributorsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--sl-spacing-stack-sm);
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Mobile (640px and below) */
+@media (max-width: 640px) {
+  .teamSection {
+    padding: var(--sl-spacing-component) var(--sl-spacing-element);
+  }
+
+  .heading {
+    font-size: var(--sl-primitive-font-size-xl);
+    margin-bottom: var(--sl-spacing-stack-md);
+  }
+
+  .introduction {
+    font-size: var(--sl-text-body-sm);
+    margin-bottom: var(--sl-spacing-component);
+  }
+
+  .leadersSection,
+  .contributorsSection {
+    margin-bottom: var(--sl-spacing-component);
+  }
+
+  .subheading {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .contributorsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .callToAction {
+    padding: var(--sl-spacing-inset-lg);
+  }
+
+  .ctaHeading {
+    font-size: var(--sl-primitive-font-size-lg);
+  }
+
+  .ctaText {
+    font-size: var(--sl-text-body-sm);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════ */
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+
+  .contributorCard {
+    transition: none;
+  }
+
+  .contributorCard:hover {
+    transform: none;
+  }
+}

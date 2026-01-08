@@ -1,0 +1,228 @@
+/* ═══════════════════════════════════════════════════════════
+   ABOUT HERO SECTION
+   Introduction to Slóði on the about page
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.hero {
+  position: relative;
+  padding: var(--sl-spacing-section) var(--sl-spacing-component);
+  background: var(--sl-color-background);
+  border-bottom: 1px solid hsl(var(--sl-color-border));
+}
+
+.container {
+  max-width: var(--sl-primitive-width-6xl);
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sl-spacing-section);
+  align-items: center;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTENT AREA
+   ═══════════════════════════════════════════════════════════ */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-lg);
+  max-width: 640px;
+}
+
+.heading {
+  font-size: var(--sl-primitive-font-size-5xl);
+  font-weight: var(--sl-font-weight-heading);
+  color: hsl(var(--sl-color-text-primary));
+  line-height: var(--sl-line-height-heading);
+  margin: 0;
+}
+
+.subheading {
+  font-size: var(--sl-primitive-font-size-2xl);
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-primary));
+  line-height: var(--sl-line-height-relaxed);
+  margin: 0;
+}
+
+.description {
+  font-size: var(--sl-text-body-lg);
+  color: hsl(var(--sl-color-text-secondary));
+  line-height: var(--sl-line-height-body);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VISUAL AREA
+   ═══════════════════════════════════════════════════════════ */
+
+.visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.iconWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-stack-xl);
+  padding: var(--sl-spacing-inset-xl);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-surface)),
+    hsl(var(--sl-color-background-secondary))
+  );
+  border: 2px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  box-shadow: var(--sl-shadow-card);
+}
+
+.icon {
+  width: 120px;
+  height: 120px;
+  color: hsl(var(--sl-color-primary));
+  stroke-width: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BADGES
+   ═══════════════════════════════════════════════════════════ */
+
+.badgeWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-spacing-gap-sm);
+  justify-content: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sl-spacing-inset-sm) var(--sl-spacing-inset-md);
+  background: hsl(var(--sl-color-primary) / 0.1);
+  border: 1px solid hsl(var(--sl-color-primary) / 0.3);
+  border-radius: var(--sl-radius-badge);
+}
+
+.badgeText {
+  font-size: var(--sl-text-body-sm);
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-primary));
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════ */
+
+/* Desktop: Two columns */
+@media (min-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .content {
+    max-width: 100%;
+  }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-4xl);
+  }
+  
+  .subheading {
+    font-size: var(--sl-primitive-font-size-xl);
+  }
+  
+  .description {
+    font-size: var(--sl-text-body);
+  }
+  
+  .icon {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Tablet portrait */
+@media (max-width: 767px) and (min-width: 641px) {
+  .hero {
+    padding: var(--sl-spacing-container) var(--sl-spacing-component);
+  }
+  
+  .container {
+    gap: var(--sl-spacing-container);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+  }
+  
+  .subheading {
+    font-size: var(--sl-primitive-font-size-xl);
+  }
+  
+  .description {
+    font-size: var(--sl-text-body);
+  }
+  
+  .icon {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .hero {
+    padding: var(--sl-spacing-container) var(--sl-spacing-element);
+  }
+  
+  .container {
+    gap: var(--sl-spacing-stack-xl);
+  }
+  
+  .content {
+    gap: var(--sl-spacing-stack-md);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-3xl);
+  }
+  
+  .subheading {
+    font-size: var(--sl-text-body-lg);
+  }
+  
+  .description {
+    font-size: var(--sl-text-body-sm);
+  }
+  
+  .iconWrapper {
+    padding: var(--sl-spacing-inset-lg);
+  }
+  
+  .icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .badgeWrapper {
+    gap: var(--sl-spacing-gap-xs);
+  }
+  
+  .badgeText {
+    font-size: var(--sl-text-caption);
+  }
+}
