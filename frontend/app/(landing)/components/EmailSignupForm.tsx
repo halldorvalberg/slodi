@@ -34,21 +34,22 @@ export default function EmailSignupForm() {
         body: JSON.stringify({ email }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         setStatus("success");
-        setMessage("Takk fyrir að skrá þig á póstlistann!");
+        setMessage(data.message || "Takk fyrir að skrá þig á póstlistann!");
         setEmail("");
+      } else if (response.status === 409) {
+        setStatus("error");
+        setMessage("Þetta netfang er þegar á póstlistanum.");
       } else {
         setStatus("error");
-        setMessage(
-          "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
-        );
+        setMessage(data.message || "Ekki tókst að skrá þig á póstlistann. Reyndu aftur síðar.");
       }
     } catch {
       setStatus("error");
-      setMessage(
-        "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
-      );
+      setMessage("Ekki tókst að tengjast. Reyndu aftur síðar.");
     }
   };
 
