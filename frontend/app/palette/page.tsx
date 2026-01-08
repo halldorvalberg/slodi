@@ -24,15 +24,21 @@ const Section: React.FC<React.PropsWithChildren<{ title: string; subtitle?: stri
 );
 
 /** Swatch using CSS variables directly */
-const Swatch: React.FC<{ name: string; bgToken: string; note?: string }> = ({ name, bgToken, note }) => {
+const Swatch: React.FC<{ name: string; token: string; note?: string; showValue?: boolean }> = ({
+    name,
+    token,
+    note,
+    showValue = true
+}) => {
     const [cssValue, setCssValue] = useState<string>("");
     const id = useId();
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (ref.current) {
-            const color = getComputedStyle(ref.current).backgroundColor;
-            setCssValue(color);
+            const computed = getComputedStyle(ref.current);
+            const bg = computed.backgroundColor;
+            setCssValue(bg);
         }
     }, []);
 
@@ -42,253 +48,641 @@ const Swatch: React.FC<{ name: string; bgToken: string; note?: string }> = ({ na
                 ref={ref}
                 id={id}
                 className={styles.swatchBlock}
-                style={{ background: `hsl(var(${bgToken}))` }}
+                style={{ background: `hsl(var(${token}))` }}
                 aria-label={`${name} litasýni`}
             />
             <div className={styles.swatchMeta}>
                 <div className={styles.swatchRow}>
                     <span className={styles.swatchName}>{name}</span>
-                    <code className={styles.swatchCode}>{cssValue}</code>
                 </div>
+                <code className={styles.swatchToken}>{token}</code>
+                {showValue && <code className={styles.swatchCode}>{cssValue}</code>}
                 {note && <div className={styles.swatchNote}>{note}</div>}
             </div>
         </div>
     );
 };
 
-/** Buttons use tokens */
-const UIButton: React.FC<{
-    variant?: "primary" | "secondary" | "ghost" | "outline";
-    children: React.ReactNode;
-}> = ({ variant = "primary", children }) => {
-    if (variant === "primary") {
-        return <button className={cx(styles.btn, styles.btnPrimary)}>{children}</button>;
-    }
-    if (variant === "secondary") {
-        return <button className={cx(styles.btn, styles.btnSecondary)}>{children}</button>;
-    }
-    if (variant === "outline") {
-        return <button className={cx(styles.btn, styles.btnOutline)}>{children}</button>;
-    }
-    return <button className={cx(styles.btn, styles.btnGhost)}>{children}</button>;
-};
-
-/** Banners use semantic tokens */
-const UIBanner: React.FC<{ tone: "success" | "warning" | "error" | "info"; title: string; body: string }> = ({
-    tone,
-    title,
-    body,
+/** Token inspector - shows token name and computed value */
+const TokenInspector: React.FC<{ token: string; label: string; type?: 'color' | 'spacing' | 'text' }> = ({
+    token,
+    label,
+    type = 'color'
 }) => {
-    const toneClass =
-        tone === "success"
-            ? styles.bannerSuccess
-            : tone === "warning"
-                ? styles.bannerWarning
-                : tone === "error"
-                    ? styles.bannerError
-                    : styles.bannerInfo;
+    const [value, setValue] = useState<string>("");
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (ref.current) {
+            const computed = getComputedStyle(document.documentElement);
+            const val = computed.getPropertyValue(token).trim();
+            setValue(val);
+        }
+    }, [token]);
 
     return (
-        <div className={cx(styles.banner, toneClass)}>
-            <div className={styles.bannerTitle}>{title}</div>
-            <div className={styles.bannerBody}>{body}</div>
+        <div className={styles.tokenInspector} ref={ref}>
+            <div className={styles.tokenLabel}>{label}</div>
+            <div className={styles.tokenDetails}>
+                <code className={styles.tokenName}>{token}</code>
+                <code className={styles.tokenValue}>{value}</code>
+            </div>
+            {type === 'color' && (
+                <div
+                    className={styles.tokenPreview}
+                    style={{ background: `hsl(var(${token}))` }}
+                />
+            )}
+            {type === 'spacing' && (
+                <div className={styles.tokenSpacingPreview}>
+                    <div
+                        className={styles.tokenSpacingBar}
+                        style={{ width: `var(${token})` }}
+                    />
+                </div>
+            )}
         </div>
     );
 };
 
-/** Dark mode toggle adds or removes .dark on <html> */
-const ToggleDark: React.FC = () => {
-    const [isDark, setIsDark] = useState(false);
-    useEffect(() => {
-        setIsDark(document.documentElement.classList.contains("dark"));
-    }, []);
-    const toggle = () => {
-        document.documentElement.classList.toggle("dark");
-        setIsDark((v) => !v);
-    };
+/** Buttons use Slóði tokens */
+const UIButton: React.FC<{
+    variant?: "primary" | "secondary" | "ghost";
+    size?: "sm" | "md" | "lg";
+    children: React.ReactNode;
+}> = ({ variant = "primary", size = "md", children }) => {
+    const variantClass =
+        variant === "primary" ? styles.btnPrimary :
+            variant === "secondary" ? styles.btnSecondary :
+                styles.btnGhost;
+
+    const sizeClass =
+        size === "sm" ? styles.btnSm :
+            size === "lg" ? styles.btnLg :
+                styles.btnMd;
+
     return (
-        <button onClick={toggle} className={cx(styles.btn, styles.btnOutline)}>
-            {isDark ? "Skipta í ljóst" : "Skipta í dökkt"}
+        <button className={cx(styles.btn, variantClass, sizeClass)}>
+            {children}
         </button>
     );
 };
 
+/** Alerts/Banners use semantic tokens */
+const UIAlert: React.FC<{
+    tone: "success" | "warning" | "error" | "info";
+    title: string;
+    body: string
+}> = ({ tone, title, body }) => {
+    const toneClass =
+        tone === "success" ? styles.alertSuccess :
+            tone === "warning" ? styles.alertWarning :
+                tone === "error" ? styles.alertError :
+                    styles.alertInfo;
+
+    return (
+        <div className={cx(styles.alert, toneClass)}>
+            <div className={styles.alertTitle}>{title}</div>
+            <div className={styles.alertBody}>{body}</div>
+        </div>
+    );
+};
+
+/** Patrol badge */
+const PatrolBadge: React.FC<{ name: string; token: string; fgToken: string }> = ({
+    name,
+    token,
+    fgToken
+}) => {
+    return (
+        <span
+            className={styles.patrolBadge}
+            style={{
+                background: `hsl(var(${token}))`,
+                color: `hsl(var(${fgToken}))`
+            }}
+        >
+            {name}
+        </span>
+    );
+};
+
+/** Dark mode toggle */
+// const ToggleDark: React.FC = () => {
+//     const [isDark, setIsDark] = useState(false);
+
+//     useEffect(() => {
+//         setIsDark(document.documentElement.classList.contains("dark"));
+//     }, []);
+
+//     const toggle = () => {
+//         document.documentElement.classList.toggle("dark");
+//         setIsDark((v) => !v);
+//     };
+
+//     return (
+//         <button onClick={toggle} className={cx(styles.btn, styles.btnSecondary)}>
+//             {isDark ? "☀️ Ljóst" : "🌙 Dökkt"}
+//         </button>
+//     );
+// };
+
+/** Theme selector */
+const ThemeSelector: React.FC = () => {
+    const [theme, setTheme] = useState<string>("light");
+
+    const themes = [
+        { value: "light", label: "☀️ Ljóst", attr: null },
+        { value: "dark", label: "🌙 Dökkt", attr: "dark" },
+        { value: "forest-night", label: "🌲 Skóganótt", attr: "forest-night" },
+        { value: "campfire", label: "🔥 Bál", attr: "campfire" },
+        { value: "northern-lights", label: "✨ Norðurljós", attr: "northern-lights" }
+    ];
+
+    const handleChange = (newTheme: string) => {
+        const selected = themes.find(t => t.value === newTheme);
+        if (!selected) return;
+
+        // Remove all themes
+        document.documentElement.classList.remove("dark");
+        document.documentElement.removeAttribute("data-theme");
+
+        // Apply new theme
+        if (selected.attr === "dark") {
+            document.documentElement.classList.add("dark");
+        } else if (selected.attr) {
+            document.documentElement.setAttribute("data-theme", selected.attr);
+        }
+
+        setTheme(newTheme);
+    };
+
+    return (
+        <div className={styles.themeSelector}>
+            {themes.map(t => (
+                <button
+                    key={t.value}
+                    onClick={() => handleChange(t.value)}
+                    className={cx(
+                        styles.themeButton,
+                        theme === t.value && styles.themeButtonActive
+                    )}
+                >
+                    {t.label}
+                </button>
+            ))}
+        </div>
+    );
+};
+
 export default function PalettePage() {
-    const forest = [
-        { name: "Mosi", token: "--primary" },
-        { name: "Fura", token: "--secondary" },
-        { name: "Börkur", token: "--border" },
-        { name: "Birki", token: "--background" },
-        { name: "Kol", token: "--foreground" },
+    // Nature colors (primitives shown as semantics)
+    const natureColors = [
+        { name: "Birki (Bakgrunnur)", token: "--sl-color-background", note: "Aðalbakgrunnur" },
+        { name: "Mosi (Aðallitur)", token: "--sl-color-primary", note: "Aðalaðgerðir" },
+        { name: "Fura (Aukalitur)", token: "--sl-color-secondary", note: "Aukaáhersla" },
+        { name: "Börkur (Rammi)", token: "--sl-color-border", note: "Rammar og skil" },
+        { name: "Yfirborð", token: "--sl-color-surface", note: "Kort og spjöld" }
     ];
 
-    const playful = [
-        { name: "Skýmóða", token: "--muted" },
-        { name: "Bál", token: "--warning" },
-        { name: "Mynta", token: "--info" },
-    ];
-
+    // Scout patrol colors
     const scouts = [
-        { name: "Drekar", token: "--drekar", fg: "--on-drekar", note: "Sveitarlitur" },
-        { name: "Fálkar", token: "--falkar", fg: "--on-falkar", note: "Sveitarlitur" },
-        { name: "Drótt", token: "--drott", fg: "--on-drott", note: "Sveitarlitur" },
-        { name: "Rekkar", token: "--rekkar", fg: "--on-rekkar", note: "Sveitarlitur" },
-        { name: "Róver", token: "--rover", fg: "--on-rover", note: "Sveitarlitur" },
-        { name: "Aðrir", token: "--adrir", fg: "--on-adrir", note: "Sveitarlitur" },
+        {
+            name: "Drekar",
+            base: "--sl-color-patrol-drekar",
+            fg: "--sl-color-patrol-drekar-foreground",
+            hover: "--sl-color-patrol-drekar-hover",
+            subtle: "--sl-color-patrol-drekar-subtle"
+        },
+        {
+            name: "Fálkar",
+            base: "--sl-color-patrol-falkar",
+            fg: "--sl-color-patrol-falkar-foreground",
+            hover: "--sl-color-patrol-falkar-hover",
+            subtle: "--sl-color-patrol-falkar-subtle"
+        },
+        {
+            name: "Drótt",
+            base: "--sl-color-patrol-drott",
+            fg: "--sl-color-patrol-drott-foreground",
+            hover: "--sl-color-patrol-drott-hover",
+            subtle: "--sl-color-patrol-drott-subtle"
+        },
+        {
+            name: "Rekkar",
+            base: "--sl-color-patrol-rekkar",
+            fg: "--sl-color-patrol-rekkar-foreground",
+            hover: "--sl-color-patrol-rekkar-hover",
+            subtle: "--sl-color-patrol-rekkar-subtle"
+        },
+        {
+            name: "Rover",
+            base: "--sl-color-patrol-rover",
+            fg: "--sl-color-patrol-rover-foreground",
+            hover: "--sl-color-patrol-rover-hover",
+            subtle: "--sl-color-patrol-rover-subtle"
+        },
+        {
+            name: "Aðrir",
+            base: "--sl-color-patrol-adrir",
+            fg: "--sl-color-patrol-adrir-foreground",
+            hover: "--sl-color-patrol-adrir-hover",
+            subtle: "--sl-color-patrol-adrir-subtle"
+        }
     ];
 
-    const systemRoles = [
-        { title: "Bakgrunnur", bg: "--background", fg: "--foreground" },
-        { title: "Aðallitur", bg: "--primary", fg: "--primary-foreground" },
-        { title: "Aukalitur", bg: "--secondary", fg: "--secondary-foreground" },
+    // Semantic state colors
+    const semanticColors = [
+        { name: "Árangur", token: "--sl-color-success", subtle: "--sl-color-success-subtle" },
+        { name: "Aðvörun", token: "--sl-color-warning", subtle: "--sl-color-warning-subtle" },
+        { name: "Villa", token: "--sl-color-error", subtle: "--sl-color-error-subtle" },
+        { name: "Upplýsingar", token: "--sl-color-info", subtle: "--sl-color-info-subtle" }
     ];
 
-    const comboBackgrounds = ["--background", "--background", "--muted", "--primary", "--secondary", "--border", "--foreground"];
-    const comboTexts = ["--foreground", "--foreground", "--primary", "--primary-foreground", "--background", "--background"];
+    // Text colors
+    const textColors = [
+        { name: "Aðaltexti", token: "--sl-color-text-primary" },
+        { name: "Aukatexti", token: "--sl-color-text-secondary" },
+        { name: "Þriðji texti", token: "--sl-color-text-tertiary" },
+        { name: "Óvirkur", token: "--sl-color-text-disabled" },
+        { name: "Tengill", token: "--sl-color-text-link" }
+    ];
+
+    // Spacing tokens
+    const spacingTokens = [
+        { name: "Síða", token: "--sl-spacing-page", value: "128px" },
+        { name: "Hluti", token: "--sl-spacing-section", value: "96px" },
+        { name: "Gámur", token: "--sl-spacing-container", value: "64px" },
+        { name: "Íhlutur", token: "--sl-spacing-component", value: "24px" },
+        { name: "Eining", token: "--sl-spacing-element", value: "16px" },
+        { name: "Í röð", token: "--sl-spacing-inline", value: "8px" },
+        { name: "Þétt", token: "--sl-spacing-compact", value: "4px" }
+    ];
+
+    // Typography tokens
+    const typographyTokens = [
+        { name: "Fyrirsögn 1", token: "--sl-text-heading-1", sample: "Aðalfyrirsögn" },
+        { name: "Fyrirsögn 2", token: "--sl-text-heading-2", sample: "Undirfyrirsögn" },
+        { name: "Fyrirsögn 3", token: "--sl-text-heading-3", sample: "Þriðja stig" },
+        { name: "Meginmál stórt", token: "--sl-text-body-lg", sample: "Stór meginmálstexti" },
+        { name: "Meginmál", token: "--sl-text-body", sample: "Venjulegur meginmálstexti" },
+        { name: "Meginmál lítið", token: "--sl-text-body-sm", sample: "Lítill meginmálstexti" },
+        { name: "Myndatexti", token: "--sl-text-caption", sample: "Myndatexti og skýringar" }
+    ];
 
     return (
         <div className={styles.page}>
             <header className={styles.header}>
                 <div className={styles.headerInner}>
-                    <h1 className={styles.pageTitle}>Litir og samsetningar</h1>
+                    <h1 className={styles.pageTitle}>Slóði Litakerfi</h1>
+                    <p className={styles.pageSubtitle}>Eftirfarandi síða er til að prufa litasamsetningar og sýna notkun huta ef þeim 909 hönnunartáknum (tokens) sem við höfum skilgreint fyrir þróun kerfisins. Einnig er þetta vetvangur sem hægt er að nýta til að prufa mismunandi þemu kerfisins og sjá hvernig litirnir virka með hvorum öðrum í misumandi samhengjum</p>
                     <div className={styles.headerActions}>
-                        <ToggleDark />
+                        <ThemeSelector />
                     </div>
                 </div>
             </header>
 
             <main className={styles.main}>
-                <Section title="Kerfislitir" subtitle="Grunnyfirborð og aðgerðarlitir út frá skógarpallettu">
-                    <div className={styles.grid3}>
-                        {systemRoles.map((r) => (
-                            <Card key={r.title}>
+                {/* Introduction */}
+                <Section
+                    title="Hvað er Slóði?"
+                    subtitle="Þriggja-þrepa hönnunartáknkerfi byggt á bestu starfsvenjum iðnaðarins"
+                >
+                    <Card>
+                        <div className={styles.intro}>
+                            <div className={styles.introSection}>
+                                <h3 className={styles.introTitle}>🏔️ Þrep 1: Frumefni (Primitives)</h3>
+                                <p className={styles.introText}>
+                                    Hrá gildi sem eru samhengislaus. Notast aldrei beint í íhlutum.
+                                </p>
+                                <code className={styles.introCode}>--sl-primitive-moss-600: 92 39% 30%</code>
+                            </div>
+
+                            <div className={styles.introSection}>
+                                <h3 className={styles.introTitle}>🎨 Þrep 2: Merkingarfræði (Semantics)</h3>
+                                <p className={styles.introText}>
+                                    Samhengismeðvituð tákn sem vísa í frumefni. Notast beint í hönnun.
+                                </p>
+                                <code className={styles.introCode}>--sl-color-primary: var(--sl-primitive-moss-600)</code>
+                            </div>
+
+                            <div className={styles.introSection}>
+                                <h3 className={styles.introTitle}>🔧 Þrep 3: Íhlutir (Components)</h3>
+                                <p className={styles.introText}>
+                                    Íhlutatengd tákn sem vísa í merkingarfræði. Notast innan íhluta.
+                                </p>
+                                <code className={styles.introCode}>--sl-button-background-primary: var(--sl-color-primary)</code>
+                            </div>
+                        </div>
+                    </Card>
+                </Section>
+
+                {/* Brand Colors */}
+                <Section
+                    title="Náttúrulitirnir"
+                    subtitle="Byggir á íslenskri víðernu - birki, mosa, furu og berki"
+                >
+                    <div className={styles.grid5}>
+                        {natureColors.map((c) => (
+                            <Swatch key={c.name} name={c.name} token={c.token} note={c.note} />
+                        ))}
+                    </div>
+                </Section>
+
+                {/* Semantic States */}
+                <Section
+                    title="Merkingarstaðar"
+                    subtitle="Litir fyrir árangur, aðvaranir, villur og upplýsingar"
+                >
+                    <div className={styles.grid4}>
+                        {semanticColors.map((c) => (
+                            <Card key={c.name}>
                                 <div
-                                    className={styles.roleHead}
+                                    className={styles.semanticBlock}
+                                    style={{ background: `hsl(var(${c.token}))` }}
+                                >
+                                    <span className={styles.semanticLabel}>{c.name}</span>
+                                </div>
+                                <div className={styles.semanticInfo}>
+                                    <code className={styles.semanticToken}>{c.token}</code>
+                                    <div
+                                        className={styles.semanticSubtle}
+                                        style={{ background: `hsl(var(${c.subtle}))` }}
+                                    >
+                                        Léttur bakgrunnur
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </Section>
+
+                {/* Patrol Colors */}
+                <Section
+                    title="Skátasveitarlitir"
+                    subtitle="Fullkomið kerfi fyrir allar 6 sveitir með afbrigðum"
+                >
+                    <div className={styles.grid3}>
+                        {scouts.map((s) => (
+                            <Card key={s.name} className={styles.patrolCard}>
+                                <div
+                                    className={styles.patrolHeader}
                                     style={{
-                                        background: `hsl(var(${r.bg}))`,
-                                        color: `hsl(var(${r.fg}))`,
+                                        background: `hsl(var(${s.base}))`,
+                                        color: `hsl(var(${s.fg}))`
                                     }}
                                 >
-                                    <div className={styles.roleLabel}>{r.title}</div>
-                                    <div className={styles.roleGlyph}>Aa</div>
-                                    <div className={styles.roleButtons}>
-                                        <UIButton variant="primary">Aðgerð</UIButton>
-                                        <UIButton variant="secondary">Aukaaðgerð</UIButton>
-                                        <UIButton variant="outline">Útlína</UIButton>
+                                    <h3 className={styles.patrolName}>{s.name}</h3>
+                                    <div className={styles.patrolBadgeDemo}>
+                                        <PatrolBadge name={s.name} token={s.base} fgToken={s.fg} />
                                     </div>
                                 </div>
-                                <div className={styles.roleBody}>
-                                    <p className={styles.muted}>Nota fyrir {r.title.toLowerCase()} yfirborð og íhluti.</p>
+                                <div className={styles.patrolVariants}>
+                                    <div className={styles.patrolVariant}>
+                                        <span className={styles.variantLabel}>Grunnlitur</span>
+                                        <code className={styles.variantToken}>{s.base}</code>
+                                        <div
+                                            className={styles.variantSwatch}
+                                            style={{ background: `hsl(var(${s.base}))` }}
+                                        />
+                                    </div>
+                                    <div className={styles.patrolVariant}>
+                                        <span className={styles.variantLabel}>Sveimunartengsl</span>
+                                        <code className={styles.variantToken}>{s.hover}</code>
+                                        <div
+                                            className={styles.variantSwatch}
+                                            style={{ background: `hsl(var(${s.hover}))` }}
+                                        />
+                                    </div>
+                                    <div className={styles.patrolVariant}>
+                                        <span className={styles.variantLabel}>Léttur bakgrunnur</span>
+                                        <code className={styles.variantToken}>{s.subtle}</code>
+                                        <div
+                                            className={styles.variantSwatch}
+                                            style={{ background: `hsl(var(${s.subtle}))` }}
+                                        />
+                                    </div>
                                 </div>
                             </Card>
                         ))}
                     </div>
                 </Section>
 
-                <Section title="Skógarhlutlausir" subtitle="Nota fyrir bakgrunn, kort, töflur og aðra hlutlausa flöt">
-                    <div className={styles.grid5}>
-                        {forest.map((c) => (
-                            <Swatch key={c.name} name={c.name} bgToken={c.token} />
-                        ))}
-                    </div>
+                {/* Text Colors */}
+                <Section
+                    title="Textalitirnir"
+                    subtitle="Stigveldi texta frá aðal til óvirkra"
+                >
+                    <Card>
+                        <div className={styles.textDemo}>
+                            {textColors.map((t) => (
+                                <div key={t.name} className={styles.textRow}>
+                                    <div
+                                        className={styles.textSample}
+                                        style={{ color: `hsl(var(${t.token}))` }}
+                                    >
+                                        Kæmi ný öxi hér, ykist þjófum nú bæði víl og ádrepa
+                                    </div>
+                                    <div className={styles.textInfo}>
+                                        <span className={styles.textName}>{t.name}</span>
+                                        <code className={styles.textToken}>{t.token}</code>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
                 </Section>
 
-                <Section title="Skemmtilegir litir" subtitle="Nota fyrir ábendingar, tilkynningar og áherslur">
-                    <div className={styles.grid6}>
-                        {playful.map((c) => (
-                            <Swatch key={c.name} name={c.name} bgToken={c.token} />
-                        ))}
-                    </div>
-                </Section>
+                {/* Components Showcase */}
+                <Section
+                    title="Íhlutir"
+                    subtitle="Raunverulegir íhlutir byggðir með táknum"
+                >
+                    <Card>
+                        <div className={styles.componentShowcase}>
+                            <div className={styles.componentGroup}>
+                                <h4 className={styles.componentTitle}>Hnappar</h4>
+                                <div className={styles.componentRow}>
+                                    <UIButton variant="primary">Aðalhnappur</UIButton>
+                                    <UIButton variant="secondary">Aukahnappur</UIButton>
+                                    <UIButton variant="ghost">Dulinn</UIButton>
+                                </div>
+                                <div className={styles.componentRow}>
+                                    <UIButton variant="primary" size="sm">Lítill</UIButton>
+                                    <UIButton variant="primary" size="md">Miðlungs</UIButton>
+                                    <UIButton variant="primary" size="lg">Stór</UIButton>
+                                </div>
+                            </div>
 
-                <Section title="Skátasveitarlitir" subtitle="Notað til að greina sveitir út frá litum þeirra. Byggir á litastaðli Bandalagsins">
-                    <div className={styles.grid6}>
-                        {scouts.map((c) => (
-                            <Card key={c.name} className={styles.swatch}>
-                                <div
-                                    className={styles.swatchBlock}
-                                    style={{ background: `var(${c.token})` }}
-                                    aria-label={`${c.name} litasýni`}
+                            <div className={styles.componentGroup}>
+                                <h4 className={styles.componentTitle}>Innsláttarreitir</h4>
+                                <input
+                                    type="text"
+                                    className={styles.input}
+                                    placeholder="Venjulegur innsláttarreitur"
                                 />
-                                <div className={styles.swatchMeta}>
-                                    <div className={styles.swatchRow}>
-                                        <span className={styles.swatchName}>{c.name}</span>
-                                        <code className={styles.swatchCode}>
-                                            {`var(${c.token})`}
-                                        </code>
-                                    </div>
-                                    {c.note && <div className={styles.swatchNote}>{c.note}</div>}
+                                <input
+                                    type="email"
+                                    className={cx(styles.input, styles.inputError)}
+                                    placeholder="Innsláttarreitur með villu"
+                                />
+                            </div>
+
+                            <div className={styles.componentGroup}>
+                                <h4 className={styles.componentTitle}>Merki</h4>
+                                <div className={styles.componentRow}>
+                                    {scouts.map(s => (
+                                        <PatrolBadge
+                                            key={s.name}
+                                            name={s.name}
+                                            token={s.base}
+                                            fgToken={s.fg}
+                                        />
+                                    ))}
                                 </div>
-                            </Card>
+                            </div>
+                        </div>
+                    </Card>
+                </Section>
+
+                {/* Alerts */}
+                <Section title="Viðvaranir og tilkynningar">
+                    <div className={styles.grid2}>
+                        <UIAlert
+                            tone="success"
+                            title="Tókst"
+                            body="Aðgerð kláraðist án vandræða."
+                        />
+                        <UIAlert
+                            tone="warning"
+                            title="Aðvörun"
+                            body="Athugaðu þetta áður en þú heldur áfram."
+                        />
+                        <UIAlert
+                            tone="error"
+                            title="Villa"
+                            body="Eitthvað fór úrskeiðis. Reyndu aftur."
+                        />
+                        <UIAlert
+                            tone="info"
+                            title="Upplýsingar"
+                            body="Hér eru viðbótarupplýsingar fyrir notendur."
+                        />
+                    </div>
+                </Section>
+
+                {/* Spacing */}
+                <Section
+                    title="Bili"
+                    subtitle="4px grunnkvarði fyrir samræmt rými"
+                >
+                    <div className={styles.spacingList}>
+                        {spacingTokens.map((s) => (
+                            <div key={s.name} className={styles.spacingItem}>
+                                <div className={styles.spacingInfo}>
+                                    <span className={styles.spacingName}>{s.name}</span>
+                                    <code className={styles.spacingToken}>{s.token}</code>
+                                    <span className={styles.spacingValue}>{s.value}</span>
+                                </div>
+                                <div className={styles.spacingVisual}>
+                                    <div
+                                        className={styles.spacingBar}
+                                        style={{ width: `var(${s.token})` }}
+                                    />
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </Section>
 
-                <Section title="Túlkun skilaboða">
-                    <div className={styles.grid2}>
-                        <UIBanner tone="success" title="Tókst" body="Aðgerð kláraðist án vandræða." />
-                        <UIBanner tone="warning" title="Aðvörun" body="Athugaðu þetta áður en þú heldur áfram." />
-                        <UIBanner tone="error" title="Villa" body="Eitthvað fór úrskeiðis. Reyndu aftur." />
-                        <UIBanner tone="info" title="Upplýsingar" body="Hér eru viðbótarupplýsingar fyrir notendur." />
-                    </div>
-                </Section>
-
-                <Section title="Samsetningar" subtitle="Algengar samsetningar bakgrunns og texta til að meta læsileika">
-                    <div className={styles.grid2}>
-                        {comboBackgrounds.map((bg, i) => (
-                            <Card key={i}>
-                                <div className={styles.comboHead} style={{ background: `hsl(var(${bg}))` }}>
-                                    <div className={styles.comboGrid}>
-                                        {comboTexts.map((txt, j) => (
-                                            <div
-                                                key={j}
-                                                className={styles.comboCell}
-                                                style={{ color: `hsl(var(${txt}))`, background: `hsl(var(${bg}))` }}
-                                            >
-                                                <div className={styles.comboLabel}>
-                                                    {bg.replace("--", "")} / {txt.replace("--", "")}
-                                                </div>
-                                                <p className={styles.comboSample}>Kæmi ný öxi hér, ykist þjófum nú bæði víl og ádrepa.</p>
-                                            </div>
-                                        ))}
-                                    </div>
+                {/* Typography */}
+                <Section
+                    title="Leturstærðir"
+                    subtitle="Kvarði fyrir fyrirsagnir og meginmál"
+                >
+                    <div className={styles.typographyList}>
+                        {typographyTokens.map((t) => (
+                            <div key={t.name} className={styles.typographyItem}>
+                                <div
+                                    className={styles.typographySample}
+                                    style={{ fontSize: `var(${t.token})` }}
+                                >
+                                    {t.sample}
                                 </div>
-                                <div className={styles.cardNote}>Bakgrunnur: {bg}</div>
-                            </Card>
+                                <div className={styles.typographyInfo}>
+                                    <span className={styles.typographyName}>{t.name}</span>
+                                    <code className={styles.typographyToken}>{t.token}</code>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 </Section>
 
+                {/* Token Inspector */}
+                <Section
+                    title="Táknaskoðari"
+                    subtitle="Skoðaðu reiknuð gildi tákna í rauntíma"
+                >
+                    <div className={styles.grid3}>
+                        <TokenInspector
+                            token="--sl-color-primary"
+                            label="Aðallitur"
+                            type="color"
+                        />
+                        <TokenInspector
+                            token="--sl-spacing-component"
+                            label="Íhlutabil"
+                            type="spacing"
+                        />
+                        <TokenInspector
+                            token="--sl-text-body"
+                            label="Meginmálsstærð"
+                            type="text"
+                        />
+                    </div>
+                </Section>
 
-
-                <Section title="Sveitarlitir á aðallitum" subtitle="Hvernig sveitalitir hegða sér á aðallitum">
+                {/* Patrol Colors on Different Backgrounds */}
+                <Section
+                    title="Sveitarlitir á mismunandi bakgrunni"
+                    subtitle="Hvernig sveitalitir hegða sér á aðallitum"
+                >
                     <div className={styles.grid2}>
-                        {["--primary", "--secondary", "--background", "--muted"].map((bg) => (
-                            <Card key={bg}>
-                                <div className={styles.patrolHead} style={{ background: `hsl(var(${bg}))` }}>
-                                    <div className={styles.patrolGrid}>
+                        {[
+                            { name: "Aðalbakgrunnur", token: "--sl-color-background" },
+                            { name: "Yfirborð", token: "--sl-color-surface" },
+                            { name: "Aðallitur", token: "--sl-color-primary" },
+                            { name: "Aukalitur", token: "--sl-color-secondary" }
+                        ].map((bg) => (
+                            <Card key={bg.token}>
+                                <div
+                                    className={styles.patrolBgTest}
+                                    style={{ background: `hsl(var(${bg.token}))` }}
+                                >
+                                    <div className={styles.patrolBgLabel}>{bg.name}</div>
+                                    <div className={styles.patrolBgGrid}>
                                         {scouts.map((s) => (
-                                            <div key={s.name} className={styles.patrolCell} style={{
-                                                background: `var(${s.token})`,
-                                                color: `var(${s.fg})`,
-                                            }}>
-                                                <div className={styles.patrolName}>{s.name}</div>
-                                                <p className={styles.patrolDesc}>Merki eða aðgerðahnappur</p>
+                                            <div key={s.name} className={styles.patrolBgItem}>
+                                                <PatrolBadge
+                                                    name={s.name}
+                                                    token={s.base}
+                                                    fgToken={s.fg}
+                                                />
                                             </div>
                                         ))}
                                     </div>
                                 </div>
-                                <div className={styles.cardNote}>Bakgrunnur: {bg.replace("--", "")}</div>
                             </Card>
                         ))}
                     </div>
                 </Section>
             </main>
 
-
-
             <footer className={styles.footer}>
-                Byggt á litaspilsbreytum í HSL. Prófaðu myrkan ham til að skoða bæði þemu.
+                <div className={styles.footerInner}>
+                    <p>Slóði Design System · 909 hönnunartákn · Byggt á HSL breytum</p>
+                    <p>Prófaðu mismunandi þemu til að sjá hvernig kerfið aðlagast</p>
+                </div>
             </footer>
         </div>
     );

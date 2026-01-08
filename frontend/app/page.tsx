@@ -1,21 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { BookOpen, Hammer, BarChart3 } from "lucide-react";
 import styles from "./page.module.css";
+import Link from "next/link";
+import HeroSection from "./(landing)/components/HeroSection";
+import EmailSignupForm from "./(landing)/components/EmailSignupForm";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-function isValidEmail(value: string): boolean {
-  if (typeof value !== "string") return false;
-  if (value.length < 3 || value.length > 320) return false;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(value);
-}
-
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-
   useEffect(() => {
     async function checkApiConnection() {
       try {
@@ -42,90 +36,81 @@ export default function Home() {
     checkApiConnection();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isValidEmail(email)) {
-      return setMessage("Vinsamlegast sláðu inn gilt netfang.");
-    }
-    try {
-      const response = await fetch("/api/emails", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      if (response.ok) {
-        setMessage("Takk fyrir að skrá þig á póstlistann!");
-        setEmail("");
-      } else {
-        setMessage(
-          "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
-        );
-      }
-    } catch (err) {
-      setMessage(
-        "Nei heyrðu! Þú ert það snemma á ferðinni að við erum ekki einu sinni komin með gagnagrunn til að hýsa netfangið þitt :0  Vandró."
-      );
+  const scrollToEmailSignup = () => {
+    const emailSection = document.querySelector('#email-signup');
+    if (emailSection) {
+      emailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
   return (
     <div className={styles.page}>
-      <div className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div>
-            <h1 className={styles.title}>Slóði</h1>
+      {/* Hero Section */}
+      <HeroSection onEmailSignupClick={scrollToEmailSignup} />
+
+      {/* Old Hero Section - keeping for now */}
+      <div className={styles.hero} style={{ display: 'none' }}>
+        <div className={styles.heroContent}>
+          <div className={styles.heroText}>
+            <h1 className={styles.title}>
+              <span className={styles.titleMain}>Slóði</span>
+              <span className={styles.titleSub}>Dagskrárgerð fyrir skátaforingja</span>
+            </h1>
 
             <p className={styles.subtitle}>
               Markmið Slóða er að styðja við foringja í skátastarfi með því að gera
-              dagskrárgerð einfaldari, markvissari og skipulagðari. Með því að safna
-              saman dagskrárhugmyndum, bjóða upp á verkfæri til að setja saman
-              skipulagða dagskrá og greina fjölbreytni í dagskránni tryggir Slóði að
-              skátar fái innihaldsríka og fjölbreytta skátadagskrá.
+              dagskrárgerð <strong>einfaldari</strong>, <strong>markvissari</strong> og <strong>skipulagðari</strong>.
             </p>
+
+            <p className={styles.description}>
+              Safnaðu saman dagskrárhugmyndum, settu saman skipulagða dagskrá og
+              greindu fjölbreytni til að tryggja að skátar fái innihaldsríka og
+              fjölbreytta skátadagskrá.
+            </p>
+
+            {/* Feature Pills */}
+            <div className={styles.features}>
+              <div className={styles.featurePill}>
+                <BookOpen className={styles.featureIcon} />
+                <span>Dagskrárbankinn</span>
+              </div>
+              <div className={styles.featurePill}>
+                <Hammer className={styles.featureIcon} />
+                <span>Vinnubekkurinn</span>
+              </div>
+              <div className={styles.featurePill}>
+                <BarChart3 className={styles.featureIcon} />
+                <span>Greiningartæki</span>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className={styles.ctaButtons}>
+              <Link href="/about" className={styles.ctaButtonPrimary}>
+                Læra meira
+              </Link>
+              <Link href="/dashboard" className={styles.ctaButtonSecondary}>
+                Skoða mælaborð
+              </Link>
+            </div>
+          </div>
+
+          {/* Hero Image/Illustration Placeholder */}
+          <div className={styles.heroIllustration}>
+            <div className={styles.illustrationCard}>
+              <div className={styles.illustrationIcon}>🏕️</div>
+              <p className={styles.illustrationText}>
+                Gert af skátum fyrir skáta
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className={styles.signup}>
-        <form
-          onSubmit={handleSubmit}
-          className={styles.form}
-          aria-label="Email subscription form"
-        >
-          <p className={styles.formLead} aria-live="polite">
-            Skráðu þig á póstlista til að fá nýjustu upplýsingar um verkefnið
-          </p>
+      {/* Email Signup Section */}
+      <EmailSignupForm />
 
-          <div className={styles.inputWrap}>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Netfang"
-              className={styles.input}
-              required
-              aria-label="Email address"
-            />
 
-            <button
-              type="submit"
-              className={styles.submit}
-              title="Submit"
-              aria-label="Submit email"
-            >
-              Skrá mig
-            </button>
-          </div>
-
-          {message && (
-            <p className={styles.message} aria-live="assertive">
-              {message}
-            </p>
-          )}
-        </form>
-      </div>
     </div>
   );
 }

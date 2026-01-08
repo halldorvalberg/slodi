@@ -1,0 +1,369 @@
+/* ═══════════════════════════════════════════════════════════
+   UNSUBSCRIBE PAGE
+   Email list unsubscribe functionality
+   Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════ */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sl-spacing-component);
+  background: linear-gradient(
+    135deg,
+    hsl(var(--sl-color-background)),
+    hsl(var(--sl-color-background-secondary))
+  );
+}
+
+.container {
+  max-width: var(--sl-primitive-width-md);
+  width: 100%;
+}
+
+.card {
+  background: hsl(var(--sl-color-surface));
+  border: 2px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card);
+  padding: var(--sl-spacing-inset-xl);
+  box-shadow: var(--sl-shadow-card);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--sl-spacing-inset-xl);
+  color: hsl(var(--sl-color-text-secondary));
+  font-size: var(--sl-text-body-lg);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADING & DESCRIPTION
+   ═══════════════════════════════════════════════════════════ */
+
+.heading {
+  font-size: var(--sl-primitive-font-size-3xl);
+  font-weight: var(--sl-font-weight-heading);
+  color: hsl(var(--sl-color-text-primary));
+  line-height: var(--sl-line-height-heading);
+  margin: 0 0 var(--sl-spacing-stack-lg) 0;
+  text-align: center;
+}
+
+.description {
+  font-size: var(--sl-text-body);
+  color: hsl(var(--sl-color-text-secondary));
+  line-height: var(--sl-line-height-body);
+  margin: 0 0 var(--sl-spacing-stack-xl) 0;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FORM
+   ═══════════════════════════════════════════════════════════ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-stack-lg);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-gap-sm);
+}
+
+.label {
+  font-size: var(--sl-text-body-sm);
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-text-primary));
+}
+
+.input {
+  padding: var(--sl-spacing-inset-md);
+  font-size: var(--sl-text-body);
+  font-family: var(--sl-font-family-body);
+  color: hsl(var(--sl-color-text-primary));
+  background: hsl(var(--sl-color-background));
+  border: 2px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-input);
+  transition: 
+    border-color var(--sl-transition-fast),
+    box-shadow var(--sl-transition-fast);
+}
+
+.input:hover {
+  border-color: hsl(var(--sl-color-border-hover));
+}
+
+.input:focus {
+  outline: none;
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: var(--sl-shadow-focus);
+}
+
+.input:disabled {
+  opacity: var(--sl-opacity-disabled);
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: hsl(var(--sl-color-text-tertiary));
+}
+
+.submitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sl-spacing-gap-sm);
+  padding: var(--sl-spacing-inset-md) var(--sl-spacing-inset-lg);
+  font-size: var(--sl-text-body);
+  font-weight: var(--sl-font-weight-emphasis);
+  font-family: var(--sl-font-family-body);
+  color: hsl(var(--sl-color-text-inverse));
+  background: hsl(var(--sl-color-error));
+  border: none;
+  border-radius: var(--sl-radius-button);
+  cursor: pointer;
+  transition: 
+    background-color var(--sl-transition-fast),
+    transform var(--sl-transition-fast),
+    box-shadow var(--sl-transition-fast);
+  box-shadow: var(--sl-shadow-button);
+}
+
+.submitButton:hover:not(:disabled) {
+  background: hsl(var(--sl-color-error-hover));
+  box-shadow: var(--sl-shadow-button-hover);
+  transform: translateY(-1px);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid hsl(var(--sl-color-error) / 0.4);
+  outline-offset: 2px;
+}
+
+.submitButton:disabled {
+  opacity: var(--sl-opacity-disabled);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SPINNER
+   ═══════════════════════════════════════════════════════════ */
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid hsl(var(--sl-color-text-inverse) / 0.3);
+  border-top-color: hsl(var(--sl-color-text-inverse));
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MESSAGES
+   ═══════════════════════════════════════════════════════════ */
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-sm);
+  padding: var(--sl-spacing-inset-md);
+  font-size: var(--sl-text-body-sm);
+  border-radius: var(--sl-radius-base);
+  color: hsl(var(--sl-color-error-text));
+  background: hsl(var(--sl-color-error-bg));
+  border: 1px solid hsl(var(--sl-color-error-border));
+}
+
+.messageIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUCCESS STATE
+   ═══════════════════════════════════════════════════════════ */
+
+.successContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-stack-lg);
+  text-align: center;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  color: hsl(var(--sl-color-success));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.successIcon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.successMessage {
+  font-size: var(--sl-primitive-font-size-2xl);
+  font-weight: var(--sl-font-weight-heading);
+  color: hsl(var(--sl-color-success-text));
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: var(--sl-spacing-gap-md);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--sl-spacing-stack-md);
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sl-spacing-inset-md) var(--sl-spacing-inset-lg);
+  font-size: var(--sl-text-body);
+  font-weight: var(--sl-font-weight-emphasis);
+  border-radius: var(--sl-radius-button);
+  text-decoration: none;
+  transition: 
+    background-color var(--sl-transition-fast),
+    border-color var(--sl-transition-fast),
+    transform var(--sl-transition-fast),
+    box-shadow var(--sl-transition-fast);
+}
+
+.primaryButton {
+  color: hsl(var(--sl-color-text-inverse));
+  background: hsl(var(--sl-color-primary));
+  border: 2px solid transparent;
+  box-shadow: var(--sl-shadow-button);
+}
+
+.primaryButton:hover {
+  background: hsl(var(--sl-color-primary-hover));
+  box-shadow: var(--sl-shadow-button-hover);
+  transform: translateY(-1px);
+}
+
+.secondaryButton {
+  color: hsl(var(--sl-color-text-primary));
+  background: transparent;
+  border: 2px solid hsl(var(--sl-color-border));
+}
+
+.secondaryButton:hover {
+  background: hsl(var(--sl-color-surface-hover));
+  border-color: hsl(var(--sl-color-border-hover));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════ */
+
+.footer {
+  margin-top: var(--sl-spacing-stack-xl);
+  padding-top: var(--sl-spacing-stack-lg);
+  border-top: 1px solid hsl(var(--sl-color-border));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sl-spacing-gap-md);
+}
+
+.footerText {
+  font-size: var(--sl-text-body-sm);
+  color: hsl(var(--sl-color-text-tertiary));
+  margin: 0;
+  text-align: center;
+}
+
+.backLink {
+  font-size: var(--sl-text-body-sm);
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-primary));
+  text-decoration: none;
+  transition: color var(--sl-transition-fast);
+}
+
+.backLink:hover {
+  color: hsl(var(--sl-color-primary-hover));
+  text-decoration: underline;
+}
+
+.backLink:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-primary));
+  outline-offset: 2px;
+  border-radius: var(--sl-primitive-radius-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════ */
+
+/* Mobile */
+@media (max-width: 640px) {
+  .page {
+    padding: var(--sl-spacing-element);
+  }
+  
+  .card {
+    padding: var(--sl-spacing-inset-lg);
+  }
+  
+  .heading {
+    font-size: var(--sl-primitive-font-size-2xl);
+  }
+  
+  .successMessage {
+    font-size: var(--sl-primitive-font-size-xl);
+  }
+  
+  .successIcon {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .primaryButton:hover,
+  .submitButton:hover:not(:disabled) {
+    transform: none;
+  }
+  
+  .spinner {
+    animation: none;
+  }
+}

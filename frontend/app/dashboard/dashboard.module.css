@@ -1,172 +1,493 @@
-.main {
-    max-width: 48rem;
-    /* ≈ max-w-3xl */
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem;
-    /* py-10 px-6 */
-    color: hsl(var(--foreground));
-    background: transparent;
+@import './../../app/slodi-tokens.css';
+@import './../../app/slodi-utilities.css';
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD PAGE - Minimalist & Cute
+   ═══════════════════════════════════════════════════════════════ */
+
+.dashboardPage {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--sl-spacing-section);
 }
 
 .title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.875rem;
-    /* text-3xl */
-    line-height: 1.2;
-    font-weight: 600;
-    /* font-semibold */
-    color: hsl(var(--text-strong, var(--foreground)));
+  font-size: var(--sl-text-heading-1);
+  font-weight: var(--sl-font-weight-bold);
+  color: hsl(var(--sl-color-text-primary));
+  margin-bottom: var(--sl-spacing-element);
 }
 
-/* Section spacing */
-.section {
-    margin-top: 2rem;
-    /* mt-8 */
+.subtitle {
+  font-size: var(--sl-text-body-lg);
+  color: hsl(var(--sl-color-text-secondary));
+  margin-bottom: var(--sl-spacing-section);
 }
 
-/* Card */
-.card {
-    border: 1px solid hsl(var(--border) / 0.35);
-    border-radius: 0.75rem;
-    /* rounded-xl */
-    padding: 1rem;
-    /* p-4 */
-    background: hsl(var(--background));
+/* Program Bank Card */
+.programBankCard {
+  display: block;
+  text-decoration: none;
+  background: linear-gradient(135deg, hsl(var(--sl-color-primary-subtle)) 0%, hsl(var(--sl-color-surface)) 100%);
+  border: 2px solid hsl(var(--sl-color-primary) / 0.2);
+  border-radius: var(--sl-radius-card);
+  padding: var(--sl-spacing-component);
+  transition: all var(--sl-transition-base);
+  box-shadow: var(--sl-shadow-card);
 }
 
-.card+.card {
-    margin-top: 1.5rem;
-    /* space-y-6 equivalent */
+.programBankCard:hover {
+  border-color: hsl(var(--sl-color-primary));
+  box-shadow: var(--sl-shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.programBankCard:focus-visible {
+  outline: none;
+  box-shadow: var(--sl-shadow-focus), var(--sl-shadow-card-hover);
+}
+
+.cardContent {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-lg);
+}
+
+.sparkleIcon {
+  width: 32px;
+  height: 32px;
+  color: hsl(var(--sl-color-primary));
+  flex-shrink: 0;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+.cardText {
+  flex: 1;
 }
 
 .cardTitle {
-    margin: 0;
-    font-size: 1.125rem;
-    /* text-lg */
-    font-weight: 500;
-    /* font-medium */
-    color: hsl(var(--text-strong, var(--foreground)));
+  font-size: var(--sl-text-heading-3);
+  font-weight: var(--sl-font-weight-semibold);
+  color: hsl(var(--sl-color-text-primary));
+  margin: 0 0 var(--sl-spacing-gap-xs) 0;
 }
 
-/* Account row */
-.accountRow {
-    margin-top: 1rem;
-    /* mt-4 */
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    /* gap-4 */
+.cardDescription {
+  font-size: var(--sl-text-body);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
 }
 
-.accountName {
-    font-size: 1rem;
-    /* text-base */
-    font-weight: 500;
-    /* font-medium */
-    margin: 0;
+.arrowIcon {
+  width: 24px;
+  height: 24px;
+  color: hsl(var(--sl-color-primary));
+  flex-shrink: 0;
+  transition: transform var(--sl-transition-fast);
 }
 
-.accountEmail {
-    font-size: 0.875rem;
-    /* text-sm */
-    color: hsl(var(--text-muted, var(--foreground)));
-    margin: 0.1rem 0 0 0;
+.programBankCard:hover .arrowIcon {
+  transform: translateX(4px);
 }
 
-/* Definition list grid stub kept for future fields */
-.dl {
-    margin-top: 1rem;
-    /* mt-4 */
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    /* gap-2 */
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR NAVIGATION - Using Slóði Design Tokens
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ===== SIDEBAR CONTAINER ===== */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: var(--sl-navbar-height, 64px);
+  bottom: 0;
+  width: 240px;
+  background: hsl(var(--sl-color-surface));
+  border-right: 1px solid hsl(var(--sl-color-border));
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: var(--sl-z-fixed);
+  transition: width var(--sl-transition-base);
 }
 
-@media (min-width: 640px) {
-    .dl {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        /* sm:grid-cols-2 */
-    }
+/* Collapsed state */
+.sidebarCollapsed {
+  width: 64px;
 }
 
-/* Actions */
-.actions {
-    margin-top: 1rem;
-    /* mt-4 */
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    /* gap-3 */
+/* ===== COLLAPSE BUTTON ===== */
+.collapseButton {
+  position: absolute;
+  top: var(--sl-spacing-element);
+  right: -12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 100; /* FIX: Higher z-index to stay above separators */
+  transition: var(--sl-transition-fast);
+  box-shadow: var(--sl-shadow-card);
 }
 
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
+.collapseButton:hover {
+  background: hsl(var(--sl-color-surface-hover));
+  box-shadow: var(--sl-shadow-card-hover);
+}
+
+.collapseButton:focus-visible {
+  outline: none;
+  box-shadow: var(--sl-shadow-focus);
+}
+
+.collapseIcon {
+  width: 16px;
+  height: 16px;
+  color: hsl(var(--sl-color-text-secondary));
+}
+
+/* ===== NAVIGATION ===== */
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: var(--sl-spacing-component) 0;
+  flex: 1;
+  overflow-y: auto;
+  position: relative; /* FIX: Create stacking context for proper z-index */
+}
+
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-gap-xs);
+  position: relative; /* FIX: Ensure proper stacking */
+  z-index: 1; /* FIX: Lower than collapse button */
+}
+
+/* Personal section pinned to bottom */
+.personalList {
+  margin-top: auto;
+}
+
+/* ===== NAV ITEMS ===== */
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-md);
+  padding: var(--sl-spacing-inset-md);
+  margin: 0 var(--sl-spacing-inline);
+  border-radius: var(--sl-radius-button);
+  color: hsl(var(--sl-color-text-secondary));
+  text-decoration: none;
+  font-size: var(--sl-text-body);
+  font-weight: var(--sl-font-weight-medium);
+  line-height: var(--sl-line-height-normal);
+  transition: var(--sl-transition-fast);
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+
+.navItem:hover {
+  background: hsl(var(--sl-color-surface-hover));
+  color: hsl(var(--sl-color-text-primary));
+}
+
+.navItem:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px hsl(var(--sl-color-primary));
+}
+
+/* Active state */
+.navItemActive {
+  background: hsl(var(--sl-color-primary-subtle));
+  color: hsl(var(--sl-color-primary));
+  font-weight: var(--sl-font-weight-semibold);
+  border-left: 3px solid hsl(var(--sl-color-primary));
+  padding-left: calc(var(--sl-spacing-inset-md) - 3px);
+}
+
+.navItemActive:hover {
+  background: hsl(var(--sl-color-primary-subtle));
+}
+
+/* Icon */
+.navIcon {
+  width: var(--sl-size-icon-md);
+  height: var(--sl-size-icon-md);
+  flex-shrink: 0;
+}
+
+/* Label */
+.navLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badge (notification count) */
+.navBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--sl-spacing-compact);
+  background: hsl(var(--sl-color-error));
+  color: hsl(var(--sl-color-text-inverse));
+  border-radius: var(--sl-radius-badge);
+  font-size: var(--sl-primitive-font-size-2xs);
+  font-weight: var(--sl-font-weight-bold);
+  line-height: 1;
+}
+
+/* ===== SEPARATOR ===== */
+.navSeparator {
+  height: 1px;
+  background: hsl(var(--sl-color-border-subtle));
+  margin: var(--sl-spacing-element) var(--sl-spacing-component);
+  position: relative; /* FIX: Create stacking context */
+  z-index: 1; /* FIX: Lower than collapse button */
+}
+
+/* ===== USER SECTION ===== */
+.userSection {
+  margin: var(--sl-spacing-element) var(--sl-spacing-inline);
+}
+
+.userLink {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-spacing-gap-md);
+  padding: var(--sl-spacing-inset-md);
+  border-radius: var(--sl-radius-button);
+  color: hsl(var(--sl-color-text-primary));
+  text-decoration: none;
+  font-size: var(--sl-text-body);
+  font-weight: var(--sl-font-weight-medium);
+  transition: var(--sl-transition-fast);
+}
+
+.userLink:hover {
+  background: hsl(var(--sl-color-surface-hover));
+}
+
+.userLink:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px hsl(var(--sl-color-primary));
+}
+
+.userLinkActive {
+  background: hsl(var(--sl-color-primary-subtle));
+  color: hsl(var(--sl-color-primary));
+}
+
+.userAvatar {
+  width: var(--sl-size-icon-lg);
+  height: var(--sl-size-icon-lg);
+  border-radius: var(--sl-radius-avatar);
+  border: 2px solid hsl(var(--sl-color-border));
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.userAvatarPlaceholder {
+  width: var(--sl-size-icon-lg);
+  height: var(--sl-size-icon-lg);
+  border-radius: var(--sl-radius-avatar);
+  background: hsl(var(--sl-color-primary));
+  color: hsl(var(--sl-color-text-inverse));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--sl-text-body-lg);
+  font-weight: var(--sl-font-weight-bold);
+  flex-shrink: 0;
+}
+
+.userName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== SKIP LINK (Accessibility) ===== */
+.skipLink {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  padding: var(--sl-spacing-inset-md);
+  background: hsl(var(--sl-color-primary));
+  color: hsl(var(--sl-color-text-inverse));
+  text-decoration: none;
+  font-weight: var(--sl-font-weight-semibold);
+  z-index: 9999;
+  transition: var(--sl-transition-fast);
+}
+
+.skipLink:focus {
+  top: 0;
+  box-shadow: var(--sl-shadow-focus);
+}
+
+/* ===== COLLAPSED STATE ADJUSTMENTS ===== */
+.sidebarCollapsed .navLabel,
+.sidebarCollapsed .userName,
+.sidebarCollapsed .navBadge {
+  display: none;
+}
+
+.sidebarCollapsed .navItem,
+.sidebarCollapsed .userLink {
+  justify-content: center;
+  padding: var(--sl-spacing-inset-md);
+  margin: 0 var(--sl-spacing-compact);
+}
+
+.sidebarCollapsed .navItemActive {
+  border-left: none;
+  border-bottom: 3px solid hsl(var(--sl-color-primary));
+  padding: var(--sl-spacing-inset-md);
+}
+
+.sidebarCollapsed .userSection {
+  margin: var(--sl-spacing-element) var(--sl-spacing-compact);
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Tablet: Force collapsed mode */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .sidebar {
+    width: 64px;
+  }
+
+  .navLabel,
+  .userName,
+  .navBadge {
+    display: none;
+  }
+
+  .navItem,
+  .userLink {
     justify-content: center;
-    font: inherit;
-    font-size: 0.875rem;
-    /* text-sm */
-    padding: 0.5rem 1rem;
-    /* px-4 py-2 */
-    border-radius: 0.5rem;
-    border: 1px solid hsl(var(--border) / 0.35);
-    background: hsl(var(--muted) / 0.25);
-    color: hsl(var(--foreground));
-    text-decoration: none;
-    transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    padding: var(--sl-spacing-inset-md);
+    margin: 0 var(--sl-spacing-compact);
+  }
+
+  .navItemActive {
+    border-left: none;
+    border-bottom: 3px solid hsl(var(--sl-color-primary));
+    padding: var(--sl-spacing-inset-md);
+  }
+
+  .userSection {
+    margin: var(--sl-spacing-element) var(--sl-spacing-compact);
+  }
+
+  .collapseButton {
+    display: none;
+  }
 }
 
-.btn:hover {
-    background: hsl(var(--muted) / 0.45);
+/* Mobile: Hide sidebar by default (use drawer/hamburger) */
+@media (max-width: 767px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--sl-transition-base);
+  }
+
+  .sidebar[data-open="true"] {
+    transform: translateX(0);
+    box-shadow: var(--sl-shadow-modal);
+  }
+
+  /* Full width on mobile when open */
+  .sidebar[data-open="true"] {
+    width: 280px;
+  }
+
+  .collapseButton {
+    display: none;
+  }
 }
 
-.btn:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px hsl(var(--primary));
+/* ===== DARK MODE ADJUSTMENTS ===== */
+/* Tokens handle most of dark mode, but can add specific overrides here */
+
+:global(.dark) .sidebar {
+  /* Optional: add subtle inner shadow in dark mode */
+  box-shadow: inset -1px 0 0 0 hsl(var(--sl-color-border-subtle));
 }
 
-/* Semantic button accents */
-.btnDanger {
-    color: hsl(var(--error));
+:global(.dark) .collapseButton {
+  /* Ensure button is visible in dark mode */
+  background: hsl(var(--sl-color-surface-secondary));
 }
 
-.btnDanger:hover {
-    background: hsl(var(--error) / 0.12);
-    /* like red-50 */
+/* ===== SCROLLBAR STYLING ===== */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
 }
 
-.btnInfo {
-    color: hsl(var(--info-foreground, 0 0% 20%));
-    /* safe default if token absent */
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.btnInfo:hover {
-    background: hsl(var(--info) / 0.12);
-    /* like blue-50 */
+.sidebar::-webkit-scrollbar-thumb {
+  background: hsl(var(--sl-color-border));
+  border-radius: var(--sl-primitive-radius-sm);
 }
 
-/* Avatar */
-.avatar {
-    inline-size: 56px;
-    block-size: 56px;
-    border-radius: 999px;
-    overflow: hidden;
-    background: hsl(var(--muted));
-    /* fallback bg */
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--sl-color-border-strong));
 }
 
-.avatarImg {
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    border-radius: 999px;
+/* ===== PRINT STYLES ===== */
+@media print {
+  .sidebar {
+    display: none;
+  }
 }
 
-.avatarFallback {
-    inline-size: 56px;
-    block-size: 56px;
-    border-radius: 999px;
-    background: hsl(var(--muted) / 0.6);
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .navItem,
+  .userLink,
+  .collapseButton {
+    transition: none;
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  .navItemActive {
+    outline: 2px solid currentColor;
+  }
+
+  .navItem:focus-visible,
+  .userLink:focus-visible {
+    outline: 3px solid currentColor;
+  }
 }
