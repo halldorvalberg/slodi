@@ -26,7 +26,7 @@ def create_app() -> FastAPI:
     # Add CORS middleware
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],  # Frontend origin
+        allow_origins=["http://localhost:3000", "https://api.slodi.is"],  # Frontend origin # TODO MAKE THIS AN ENVIROMENT VARIABLE
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
