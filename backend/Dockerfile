@@ -5,6 +5,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
   postgresql-client \
+  curl \
   && rm -rf /var/lib/apt/lists/*
 
 # Install uv
@@ -45,6 +46,6 @@ RUN chmod +x /app/entrypoint.sh
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD uv run python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
+  CMD curl --fail http://localhost:8000/health || exit 1
 
 ENTRYPOINT ["/app/entrypoint.sh"]
