@@ -9,8 +9,6 @@
     display: flex;
     border-bottom: 2px solid var(--color-border);
     background: var(--color-background-secondary);
-    overflow-x: auto;
-    scrollbar-width: thin;
 }
 
 .tab {

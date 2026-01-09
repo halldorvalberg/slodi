@@ -88,10 +88,6 @@
     position: sticky;
     top: var(--space-6);
     align-self: start;
-    max-height: calc(100vh - 96px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--color-border)) transparent;
 }
 
 /* Back Button */

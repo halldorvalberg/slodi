@@ -74,3 +74,13 @@ class UserOut(UserBase):
     id: UUID
     email: EmailConstrained
     auth0_id: Auth0Id
+
+
+class UserNested(BaseModel):
+    """Minimal user info for embedding in other schemas."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    name: NameStr
+    email: EmailConstrained

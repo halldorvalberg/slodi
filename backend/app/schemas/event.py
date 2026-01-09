@@ -11,6 +11,12 @@ from app.models.content import ContentType
 from app.utils import get_current_datetime
 
 from .content import ContentCreate, ContentOut, ContentUpdate
+from .tag import TagOut  # Import to resolve forward reference
+from .user import UserNested  # Import for nested author
+from .workspace import WorkspaceNested  # Import for nested workspace
+
+# Rebuild model to resolve forward references
+ContentOut.model_rebuild()
 
 LocationStr = Annotated[
     str, StringConstraints(max_length=LOCATION_MAX, strip_whitespace=True)
@@ -72,4 +78,5 @@ class EventOut(ContentOut):
     end_dt: dt.datetime | None = None
     location: LocationStr | None = None
     workspace_id: UUID
+    workspace: WorkspaceNested
     program_id: UUID | None

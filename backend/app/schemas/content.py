@@ -11,6 +11,7 @@ from app.utils import get_current_datetime
 
 if TYPE_CHECKING:
     from app.schemas.tag import TagOut
+    from app.schemas.user import UserNested
 
 NameStr = Annotated[
     str,
@@ -67,4 +68,6 @@ class ContentOut(ContentBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    author: "UserNested"
     tags: list["TagOut"] = []
+    comment_count: int = 0
