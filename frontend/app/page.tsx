@@ -7,7 +7,7 @@ import Link from "next/link";
 import HeroSection from "./(landing)/components/HeroSection";
 import EmailSignupForm from "./(landing)/components/EmailSignupForm";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export default function Home() {
   useEffect(() => {

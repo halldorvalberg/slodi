@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 function json(body: unknown, status = 200) {
     return NextResponse.json(body, { status });
 }

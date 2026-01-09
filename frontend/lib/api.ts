@@ -1,6 +1,6 @@
 // API client utilities
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_RUL;
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
