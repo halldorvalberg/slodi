@@ -19,6 +19,7 @@ import { useTags } from "@/hooks/useTags";
 import usePrograms from "@/hooks/usePrograms";
 import { useAuth } from "@/hooks/useAuth";
 import { getOrCreatePersonalWorkspace } from "@/services/workspaces.service";
+import SAMPLE_DATA from "./devdata.json";
 
 export default function ProgramBuilderPage() {
     const { user, getToken, isAuthenticated } = useAuth();
@@ -60,7 +61,12 @@ export default function ProgramBuilderPage() {
     }, [isAuthenticated, user, getToken]);
 
     const availableTags = backendTags || [];
-    const programs = useMemo(() => backendPrograms || [], [backendPrograms]);
+    const programs = useMemo(() => {
+        if (programsError || !backendPrograms || backendPrograms.length === 0) {
+            return SAMPLE_DATA;
+        }
+        return backendPrograms;
+    }, [backendPrograms, programsError]);
 
     // Filter and sort items
     const filteredAndSortedItems = useMemo(() => {
