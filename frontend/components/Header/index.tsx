@@ -1,60 +1,128 @@
+"use client";
+
 import Link from "next/link";
-import { auth0 } from "@/lib/auth0";
-import AccountButton from "../AccountButton";
-import MobileNav from "../MobileNav";
+import { useState } from "react";
+import styles from "./header.module.css";
+import { useUser } from "@auth0/nextjs-auth0";
 
-type LeanUser = { name: string; picture: string | null; email: string | null } | null;
 
-export default async function Header() {
-  const session = await auth0.getSession();
-  const user: LeanUser = session?.user
-    ? {
-      name: session.user.name ?? session.user.nickname ?? "Account",
-      picture: session.user.picture ?? null,
-      email: session.user.email ?? null,
-    }
-    : null;
+export default function Header() {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const openDrawer = () => setIsDrawerOpen(true);
+  const closeDrawer = () => setIsDrawerOpen(false);
+  const { user } = useUser();
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--color-background)] text-[var(--color-foreground)] border-b">
-      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
-        <Link href="/" className="font-medium">Slóði</Link>
+    <header className={styles.headerRoot}>
+      <div className={styles.headerContent}>
+        <Link href="/" className={styles.brandLink}>
+          Slóði
+        </Link>
 
-        <nav className="ml-auto hidden md:flex items-center gap-6">
-          <Link className="inline-flex items-center gap-1 hover:underline" href="/">Heim</Link>
-          <Link className="inline-flex items-center gap-1 hover:underline" href="/about">Um Slóða</Link>
-          <Link
+        {/* Desktop navigation */}
+        <nav className={`${styles.primaryNav} ${styles.primaryNavDesktop}`}>
+          <Link href="/" className={styles.primaryNavLink}>
+            Heim
+          </Link>
+          <Link href="/about" className={styles.primaryNavLink}>
+            Um Slóða
+          </Link>
+          <a
             href="https://github.com/halldorvalberg/slodi"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 hover:underline"
+            className={styles.primaryNavLink}
           >
             Github
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-4 w-4"
-              aria-hidden="true"
+          </a>
+
+          {user ? (
+            <Link
+              href="/dashboard"
+              className={styles.primaryNavLink}
             >
-              <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
-            </svg>
-          </Link>
-          <AccountButton user={user} />
+              Stjórnborð
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className={styles.primaryNavLink}
+            >
+              Innskráning
+            </Link>
+          )
+          }
         </nav>
 
-        {/* Mobile: hamburger sits on the right; include AccountButton inside the sheet */}
-        <div className="ml-auto md:hidden flex items-center gap-2">
-          <MobileNav user={user} />
-        </div>
+        {/* Mobile menu toggle */}
+        <button
+          type="button"
+          className={styles.menuToggleButton}
+          onClick={openDrawer}
+          aria-label="Opna valmynd"
+          aria-haspopup="true"
+          aria-expanded={isDrawerOpen}
+          aria-controls="main-menu-drawer"
+        >
+          ☰
+        </button>
+
+        {/* Drawer overlay */}
+        {isDrawerOpen && (
+          <div
+            className={styles.drawerOverlay}
+            onClick={closeDrawer}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Mobile drawer */}
+        <aside
+          id="main-menu-drawer"
+          className={`${styles.drawerPanel} ${isDrawerOpen ? styles.drawerPanelOpen : ""
+            }`}
+          aria-hidden={!isDrawerOpen}
+        >
+          <nav className={styles.drawerNav}>
+            <Link href="/" className={styles.drawerNavLink} onClick={closeDrawer}>
+              Heim
+            </Link>
+            <Link href="/about" className={styles.drawerNavLink} onClick={closeDrawer}>
+              Um Slóða
+            </Link>
+            <a
+              href="https://github.com/halldorvalberg/slodi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.drawerNavLink}
+              onClick={closeDrawer}
+            >
+              Github
+            </a>
+
+            {user ? (
+              <Link
+                href="/dashboard"
+                className={styles.drawerNavLink}
+                onClick={closeDrawer}
+              >
+                Stjórnborð
+              </Link>
+            ) : (
+              <Link
+                href="/auth/login"
+                className={styles.drawerNavLink}
+                onClick={closeDrawer}
+              >
+                Innskráning
+              </Link>
+            )
+            }
+
+          </nav>
+        </aside>
       </div>
     </header>
   );
 }
-

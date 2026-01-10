@@ -1,96 +1,116 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
+import { BookOpen, Hammer, BarChart3 } from "lucide-react";
+import styles from "./page.module.css";
+import Link from "next/link";
+import HeroSection from "./(landing)/components/HeroSection";
+import EmailSignupForm from "./(landing)/components/EmailSignupForm";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setMessage("Vinsamlegast sláðu inn gilt netfang.");
-      return;
+  useEffect(() => {
+    async function checkApiConnection() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/healthz`);
+        if (response.status === 200) {
+          console.log(
+            "%c[Omnissiah Status]: API is reachable. Praise the Machine Spirit!",
+            "color: green; font-weight: bold;"
+          );
+        } else {
+          console.log(
+            "%c[Omnissiah Status]: API is not reachable. Invoke the Rites of Debugging.",
+            "color: red; font-weight: bold;"
+          );
+        }
+      } catch (error) {
+        console.log(
+          "%c[Omnissiah Status]: API is not reachable. Invoke the Rites of Debugging." + String(error),
+          "color: red; font-weight: bold;"
+        );
+      }
     }
 
-    try {
-      const response = await fetch("/api/save-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+    checkApiConnection();
+  }, []);
 
-      if (response.ok) {
-        setMessage("Takk fyrir að skrá þig á póstlistann!");
-        setEmail("");
-      } else {
-        setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
-      }
-    } catch {
-      setMessage("Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur síðar.");
+  const scrollToEmailSignup = () => {
+    const emailSection = document.querySelector('#email-signup');
+    if (emailSection) {
+      emailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
   return (
-    <div className="font-sans flex flex-col overflow-hidden relative min-h-[85vh] max-h-[85vh]">
-      <div className="flex-grow flex items-center justify-center min-h-[30vh] mt-8 z-10 max-h-[35vh]">
-        <div className="text-center w-4/5 sm:w-3/5 flex items-center justify-center h-full">
-          <div>
-            <h1 className="text-6xl font-bold uppercase">Slóði</h1>
-            <p className="text-sm text-justify mt-4">
+    <div className={styles.page}>
+      {/* Hero Section */}
+      <HeroSection onEmailSignupClick={scrollToEmailSignup} />
+
+      {/* Old Hero Section - keeping for now */}
+      <div className={styles.hero} style={{ display: 'none' }}>
+        <div className={styles.heroContent}>
+          <div className={styles.heroText}>
+            <h1 className={styles.title}>
+              <span className={styles.titleMain}>Slóði</span>
+              <span className={styles.titleSub}>Dagskrárgerð fyrir skátaforingja</span>
+            </h1>
+
+            <p className={styles.subtitle}>
               Markmið Slóða er að styðja við foringja í skátastarfi með því að gera
-              dagskrárgerð einfaldari, markvissari og skipulagðari. Með því að safna
-              saman dagskrárhugmyndum, bjóða upp á verkfæri til að setja saman
-              skipulagða dagskrá og greina fjölbreytni í dagskránni tryggir Slóði að
-              skátar fái innihaldsríka og fjölbreytta skátadagskrá.
+              dagskrárgerð <strong>einfaldari</strong>, <strong>markvissari</strong> og <strong>skipulagðari</strong>.
             </p>
+
+            <p className={styles.description}>
+              Safnaðu saman dagskrárhugmyndum, settu saman skipulagða dagskrá og
+              greindu fjölbreytni til að tryggja að skátar fái innihaldsríka og
+              fjölbreytta skátadagskrá.
+            </p>
+
+            {/* Feature Pills */}
+            <div className={styles.features}>
+              <div className={styles.featurePill}>
+                <BookOpen className={styles.featureIcon} />
+                <span>Dagskrárbankinn</span>
+              </div>
+              <div className={styles.featurePill}>
+                <Hammer className={styles.featureIcon} />
+                <span>Vinnubekkurinn</span>
+              </div>
+              <div className={styles.featurePill}>
+                <BarChart3 className={styles.featureIcon} />
+                <span>Greiningartæki</span>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className={styles.ctaButtons}>
+              <Link href="/about" className={styles.ctaButtonPrimary}>
+                Læra meira
+              </Link>
+              <Link href="/dashboard" className={styles.ctaButtonSecondary}>
+                Skoða mælaborð
+              </Link>
+            </div>
+          </div>
+
+          {/* Hero Image/Illustration Placeholder */}
+          <div className={styles.heroIllustration}>
+            <div className={styles.illustrationCard}>
+              <div className={styles.illustrationIcon}>🏕️</div>
+              <p className={styles.illustrationText}>
+                Gert af skátum fyrir skáta
+              </p>
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex-grow flex items-center justify-center bg-background text-text max-h-[30vh]">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center w-4/5 sm:w-1/2"
-          aria-label="Email subscription form"
-        >
-          <p
-            className="text-lg mb-4 text-center"
-            aria-live="polite"
-          >
-            Skráðu þig á póstlista til að fá nýjustu upplýsingar um verkefnið
-          </p>
-          <div className="relative w-full">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Netfang"
-              className="border border-text rounded p-2 w-full pr-12 bg-background text-text"
-              required
-              aria-label="Email address"
-            />
-            <button
-              type="submit"
-              className="absolute inset-y-0 right-0 flex items-center px-4 border border-primary text-primary bg-transparent rounded-r hover:cursor-pointer"
-              title="Submit"
-              aria-label="Submit email"
-            >
-              Skrá mig
-            </button>
-          </div>
-          {message && (
-            <p
-              className="mt-4 text-sm text-secondary"
-              aria-live="assertive"
-            >
-              {message}
-            </p>
-          )}
-        </form>
-      </div>
+
+      {/* Email Signup Section */}
+      <EmailSignupForm />
+
+
     </div>
   );
 }

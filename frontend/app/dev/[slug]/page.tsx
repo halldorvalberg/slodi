@@ -1,10 +1,10 @@
-// app/dev/[slug]/page.tsx
 import path from "path";
 import { notFound } from "next/navigation";
 import { mdToHtmlLite } from "@/lib/markdown-lite";
 import { getNeighbors } from "@/lib/devlogs";
 import { promises as fs } from "fs";
 import Link from "next/link";
+import styles from "./devpost.module.css";
 
 export const runtime = "nodejs";
 export const dynamic = "force-static";
@@ -46,9 +46,9 @@ function formatDate(d?: string): string | undefined {
 export default async function DevPostPage({
     params,
 }: {
-    params: Promise<{ slug: string }>;
+        params: { slug: string }; // app router passes a plain object; no Promise needed
 }) {
-    const { slug } = await params;
+    const { slug } = params;
 
     const file = path.join(process.cwd(), "content", "devlogs", `${slug}.md`);
     try {
@@ -65,42 +65,47 @@ export default async function DevPostPage({
     const { prev, next } = getNeighbors(slug);
 
     return (
-        <main className="mx-auto max-w-3xl px-4 py-8">
+        <main className={styles.main}>
             {/* Post header */}
-            <header className="mb-8">
-                {meta.title && <h1 className="text-3xl font-bold tracking-tight">{meta.title}</h1>}
+            <header className={styles.postHeader}>
+                {meta.title && <h1 className={styles.title}>{meta.title}</h1>}
 
                 {(niceDate || meta.author) && (
-                    <p className="mt-2 text-sm">
-                        {niceDate ? <>Dags: <time>{niceDate}</time></> : null}
+                    <p className={styles.meta}>
+                        {niceDate ? (
+                            <>
+                                Dags: <time>{niceDate}</time>
+                            </>
+                        ) : null}
                         {niceDate && meta.author ? " · " : null}
                         {meta.author ? <>Höfundur: {meta.author}</> : null}
                     </p>
                 )}
 
-                {meta.summary && <p className="mt-4 text-base">{meta.summary}</p>}
+                {meta.summary && <p className={styles.summary}>{meta.summary}</p>}
             </header>
 
             {/* Post content */}
-            <article className="md-content">
+            <article className={styles.content}>
                 <div dangerouslySetInnerHTML={{ __html: html }} />
             </article>
 
             {/* Footer navigation */}
-            <nav className="mt-10 flex items-center justify-between border-t pt-4">
+            <nav className={styles.footerNav} aria-label="Færslunavigering">
                 <Link
                     href="/dev"
-                    className="rounded border px-3 py-2 text-sm hover:bg-muted"
+                    className={styles.btn}
                     aria-label="Til baka á Devlog"
+                    title="Til baka á Devlog"
                 >
                     Til baka
                 </Link>
 
-                <div className="flex items-center gap-2">
+                <div className={styles.navGroup}>
                     {prev && (
                         <Link
                             href={`/dev/${prev.slug}`}
-                            className="rounded border px-3 py-2 text-sm hover:bg-muted"
+                            className={styles.btn}
                             aria-label="Fyrri færsla"
                             title={prev.title}
                         >
@@ -110,7 +115,7 @@ export default async function DevPostPage({
                     {next && (
                         <Link
                             href={`/dev/${next.slug}`}
-                            className="rounded border px-3 py-2 text-sm hover:bg-muted"
+                            className={styles.btn}
                             aria-label="Næsta færsla"
                             title={next.title}
                         >
