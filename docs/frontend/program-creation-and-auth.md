@@ -183,11 +183,13 @@ const handleProgramCreated = () => {
 **Endpoint:** `GET /users/me`
 
 **Headers:**
+
 ```
 Authorization: Bearer {auth0_access_token}
 ```
 
 **Backend Behavior:**
+
 1. Verify Auth0 token
 2. Extract `auth0_id` from verified token
 3. Look up user by `auth0_id`
@@ -195,6 +197,7 @@ Authorization: Bearer {auth0_access_token}
 5. Return user data
 
 **Response:**
+
 ```json
 {
   "id": "uuid-here",
@@ -259,7 +262,7 @@ export async function getCurrentUser(accessToken: string): Promise<User> {
   return fetchAndCheck<User>(url, {
     method: "GET",
     headers: {
-      "Authorization": `Bearer ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
     credentials: "include",
   });
@@ -269,14 +272,14 @@ export async function getCurrentUser(accessToken: string): Promise<User> {
  * Update current user profile
  */
 export async function updateCurrentUser(
-  accessToken: string, 
+  accessToken: string,
   updates: UserUpdateInput
 ): Promise<User> {
   const url = buildApiUrl("/users/me");
   return fetchAndCheck<User>(url, {
     method: "PATCH",
     headers: {
-      "Authorization": `Bearer ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(updates),
@@ -344,6 +347,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 #### ⚠️ SECURITY: Backend-Controlled User Creation
 
 **❌ WRONG APPROACH - Client-Side User Creation:**
+
 ```tsx
 // ❌ BAD: Frontend decides to create users
 if (!backendUser) {
@@ -356,6 +360,7 @@ if (!backendUser) {
 ```
 
 **Problem:** Anyone can call your `POST /users` endpoint with any `auth0_id`. An attacker could:
+
 - Create fake users with arbitrary auth0_ids
 - Impersonate other users
 - Pollute your database
@@ -388,18 +393,18 @@ async def get_current_user(
     session: AsyncSession = Depends(get_session)
 ) -> User:
     token = credentials.credentials
-    
+
     try:
         # Verify token with Auth0
         payload = verify_auth0_token(token)
         auth0_id = payload["sub"]
         email = payload["email"]
         name = payload.get("name", email)
-        
+
         # Get or create user
         user_service = UserService(session)
         user = await user_service.get_by_auth0_id(auth0_id)
-        
+
         if not user:
             # Auto-create user (SAFE because token is verified)
             user = await user_service.create({
@@ -407,9 +412,9 @@ async def get_current_user(
                 "email": email,
                 "name": name
             })
-        
+
         return user
-        
+
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -437,7 +442,13 @@ async def create_program(
 
 ```tsx
 // contexts/AuthContext.tsx
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { getCurrentUser, type User } from "@/services/users.service";
 
@@ -537,8 +548,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         getToken, // Expose token getter for API calls
         refetch: fetchBackendUser,
-      }}
-    >
+      }}>
       {children}
     </AuthContext.Provider>
   );
@@ -556,16 +566,19 @@ export function useAuth() {
 **Step-by-Step Process**
 
 1. **User Clicks Login**
+
    - Redirects to Auth0 login page
    - User authenticates with Auth0
    - Auth0 redirects back with authorization code
 
 2. **Auth0 SDK Handles Callback**
+
    - Exchanges code for tokens automatically
    - Stores tokens securely (managed by SDK)
    - Triggers `auth0IsAuthenticated = true`
 
 3. **Fetch Backend User**
+
    - Get fresh token with `getAccessTokenSilently()`
    - Call `GET /users/me` with token
    - Backend verifies token and auto-creates user if needed
@@ -581,7 +594,7 @@ export function useAuth() {
      getToken: () => Promise<string | null>
    ): Promise<T> {
      const token = await getToken();
-     
+
      if (!token) {
        throw new Error("No authentication token available");
      }
@@ -590,7 +603,7 @@ export function useAuth() {
        ...options,
        headers: {
          ...options.headers,
-         "Authorization": `Bearer ${token}`,
+         Authorization: `Bearer ${token}`,
        },
        credentials: "include",
      });
@@ -630,12 +643,12 @@ export function useAuth() {
     */
    export async function getCurrentUser(token: string): Promise<User> {
      const url = buildApiUrl("/users/me");
-     
+
      // Special case: this is called during auth, so we pass token directly
      const response = await fetch(url, {
        method: "GET",
        headers: {
-         "Authorization": `Bearer ${token}`,
+         Authorization: `Bearer ${token}`,
        },
        credentials: "include",
      });
@@ -657,27 +670,31 @@ export function useAuth() {
      getToken: () => Promise<string | null>
    ): Promise<Program> {
      const url = buildApiUrl(`/workspaces/${input.workspaceId}/programs`);
-     
+
      const formData = new FormData();
      formData.append("name", input.name);
      formData.append("description", input.description || "");
      formData.append("public", String(input.public ?? true));
      // Don't send author_id - backend uses authenticated user
-     
+
      if (input.imageFile) {
        formData.append("image", input.imageFile);
      } else if (input.image) {
        formData.append("image", input.image);
      }
-     
+
      if (input.tags?.length) {
-       input.tags.forEach(tag => formData.append("tags", tag));
+       input.tags.forEach((tag) => formData.append("tags", tag));
      }
 
-     return fetchWithAuth<Program>(url, {
-       method: "POST",
-       body: formData,
-     }, getToken);
+     return fetchWithAuth<Program>(
+       url,
+       {
+         method: "POST",
+         body: formData,
+       },
+       getToken
+     );
    }
 
    export type ProgramCreateInput = {
@@ -708,16 +725,19 @@ export function useAuth() {
        setIsSubmitting(true);
 
        try {
-         const program = await createProgram({
-           name: name.trim(),
-           description: description.trim(),
-           public: isPublic,
-           image: image.trim(),
-           imageFile: imageFile || undefined,
-           tags: selectedTags.length > 0 ? selectedTags : undefined,
-           workspaceId: props.workspaceId,
-           // No authorId needed - backend uses authenticated user
-         }, getToken); // Pass token getter function
+         const program = await createProgram(
+           {
+             name: name.trim(),
+             description: description.trim(),
+             public: isPublic,
+             image: image.trim(),
+             imageFile: imageFile || undefined,
+             tags: selectedTags.length > 0 ? selectedTags : undefined,
+             workspaceId: props.workspaceId,
+             // No authorId needed - backend uses authenticated user
+           },
+           getToken
+         ); // Pass token getter function
 
          props.onCreated?.(program);
        } catch (error) {
@@ -761,7 +781,7 @@ export function useAuth() {
    ):
        # Override author_id with authenticated user (never trust client)
        body.author_id = current_user.id
-       
+
        svc = ProgramService(session)
        return await svc.create_under_workspace(workspace_id, body)
    ```
@@ -771,8 +791,9 @@ export function useAuth() {
 1. **Token Management Strategy**
 
    **🎯 RECOMMENDED APPROACH: Auth0 SDK Token Management**
-   
+
    For Slóði, we use the simpler and more secure approach:
+
    - Auth0 SDK handles token storage and refresh automatically
    - Frontend never stores tokens (Auth0 SDK manages them internally)
    - Fresh tokens obtained via `getAccessTokenSilently()` for each API request
@@ -780,23 +801,25 @@ export function useAuth() {
    - No need for backend session cookies or custom token refresh logic
 
    **❌ WRONG: Storing tokens in localStorage/state**
+
    ```tsx
    // ❌ BAD: Storing tokens is vulnerable to XSS
    setUser({
      id: backendUser.id,
      accessToken, // VULNERABLE TO XSS
    });
-   localStorage.setItem('token', accessToken); // EVEN WORSE
+   localStorage.setItem("token", accessToken); // EVEN WORSE
    ```
 
    **✅ CORRECT: Let Auth0 SDK manage tokens**
+
    ```tsx
    // ✅ GOOD: Auth0 SDK handles token storage securely
    const { getAccessTokenSilently } = useAuth0();
-   
+
    // Get fresh token when needed
    const token = await getAccessTokenSilently();
-   
+
    // Frontend only stores public user info
    setUser({
      id: backendUser.id,
@@ -808,6 +831,7 @@ export function useAuth() {
    ```
 
    **Why this approach?**
+
    - Auth0 SDK handles token refresh automatically
    - No XSS vulnerability (tokens not in accessible storage)
    - Simpler implementation (no session management needed)
@@ -827,7 +851,7 @@ export function useAuth() {
        AUTH0_DOMAIN: str
        AUTH0_AUDIENCE: str
        AUTH0_ALGORITHMS: list[str] = ["RS256"]
-       
+
        class Config:
            env_file = ".env"
 
@@ -843,9 +867,9 @@ export function useAuth() {
    import httpx
    from functools import lru_cache
    from app.core.config import settings
-   
+
    security = HTTPBearer()
-   
+
    @lru_cache()
    def get_auth0_jwks():
        """Fetch and cache Auth0 public keys for JWT verification"""
@@ -853,7 +877,7 @@ export function useAuth() {
        response = httpx.get(jwks_url)
        response.raise_for_status()
        return response.json()
-   
+
    def verify_auth0_token(token: str) -> dict:
        """
        Verify Auth0 JWT token:
@@ -866,7 +890,7 @@ export function useAuth() {
        try:
            # Get unverified header to find which key to use
            unverified_header = jwt.get_unverified_header(token)
-           
+
            # Get the key from JWKS
            jwks = get_auth0_jwks()
            rsa_key = {}
@@ -880,13 +904,13 @@ export function useAuth() {
                        "e": key["e"]
                    }
                    break
-           
+
            if not rsa_key:
                raise HTTPException(
                    status_code=status.HTTP_401_UNAUTHORIZED,
                    detail="Unable to find appropriate key"
                )
-           
+
            # Verify the token
            payload = jwt.decode(
                token,
@@ -895,9 +919,9 @@ export function useAuth() {
                audience=settings.AUTH0_AUDIENCE,
                issuer=f"https://{settings.AUTH0_DOMAIN}/"
            )
-           
+
            return payload
-           
+
        except jwt.ExpiredSignatureError:
            raise HTTPException(
                status_code=status.HTTP_401_UNAUTHORIZED,
@@ -918,7 +942,7 @@ export function useAuth() {
                status_code=status.HTTP_401_UNAUTHORIZED,
                detail=f"Token verification failed: {str(e)}"
            )
-   
+
    async def get_current_user(
        credentials: HTTPAuthorizationCredentials = Depends(security),
        session: AsyncSession = Depends(get_session)
@@ -931,26 +955,26 @@ export function useAuth() {
        4. Returns authenticated User object
        """
        token = credentials.credentials
-       
+
        # Verify token and get claims
        payload = verify_auth0_token(token)
-       
+
        # Extract user info from verified token
        auth0_id = payload["sub"]
        email = payload.get("email")
        name = payload.get("name", email)
-       
+
        # Get or create user (SAFE because token is verified)
        user_service = UserService(session)
        user = await user_service.get_by_auth0_id(auth0_id)
-       
+
        if not user:
            user = await user_service.create({
                "auth0_id": auth0_id,
                "email": email,
                "name": name
            })
-       
+
        return user
    ```
 
@@ -958,14 +982,14 @@ export function useAuth() {
 
    ```python
    # All protected endpoints use get_current_user dependency
-   
+
    @router.get("/users/me", response_model=UserOut)
    async def get_current_user_info(
        current_user: User = Depends(get_current_user)
    ):
        """Current user (auto-created if first login)"""
        return current_user
-   
+
    @router.post("/workspaces/{workspace_id}/programs")
    async def create_program(
        workspace_id: UUID,
@@ -975,7 +999,7 @@ export function useAuth() {
        # Token verified, user authenticated, auto-created if needed
        # Override author_id with authenticated user
        body.author_id = current_user.id
-       
+
        svc = ProgramService(session)
        return await svc.create_under_workspace(workspace_id, body)
    ```
@@ -989,7 +1013,7 @@ export function useAuth() {
      return fetchAndCheck<User>(url, {
        method: "GET",
        headers: {
-         "Authorization": `Bearer ${accessToken}`, // ← Token sent here
+         Authorization: `Bearer ${accessToken}`, // ← Token sent here
        },
        credentials: "include", // Send cookies too
      });
@@ -1013,20 +1037,24 @@ export function useAuth() {
 #### In Auth0 Dashboard:
 
 1. **Create Application**
+
    - Type: Single Page Application (SPA)
    - Copy Client ID and Domain
 
 2. **Configure Application URLs**
+
    - Allowed Callback URLs: `http://localhost:3000, https://slodi.is`
    - Allowed Logout URLs: `http://localhost:3000, https://slodi.is`
    - Allowed Web Origins: `http://localhost:3000, https://slodi.is`
 
 3. **Create API**
+
    - Name: "Slóði API"
    - Identifier: `https://api.slodi.is` (your audience)
    - Signing Algorithm: RS256
 
 4. **Configure API Scopes** (optional for future)
+
    - `read:programs`
    - `write:programs`
    - `read:profile`
@@ -1056,20 +1084,24 @@ AUTH0_ALGORITHMS=["RS256"]
 ### Phase 1: Backend Auth Setup (Do First!)
 
 1. **Add dependencies to pyproject.toml**
+
    - Already added: `python-jose[cryptography]>=3.3.0` and `httpx>=0.27.0`
    - Install with:
+
    ```bash
    cd backend
    uv sync
    ```
 
 2. **Create auth configuration**
+
    - [x] Create `backend/app/core/config.py` with Auth0 settings
    - [x] Add environment variables to `backend/.env`
    - Auth0 settings added to `app/settings.py`: `auth0_domain`, `auth0_audience`, `auth0_algorithms`
    - Config module created at `app/core/config.py` that re-exports settings
 
 3. **Create auth module**
+
    - [x] Create `backend/app/core/auth.py` with:
      - `get_auth0_jwks()` - Fetch Auth0 public keys ✓
      - `verify_auth0_token()` - Complete JWT verification ✓
@@ -1082,17 +1114,20 @@ AUTH0_ALGORITHMS=["RS256"]
      - Comprehensive error handling with detailed messages
 
 4. **Add user lookup method**
+
    - [x] Add `UserService.get_by_auth0_id()` method ✓
    - Added to `app/services/users.py`
    - Returns `User | None` (model instance, not UserOut schema)
    - Used by `get_current_user()` dependency for authentication
 
 5. **Add /users/me endpoint**
+
    - [x] Created `GET /users/me` endpoint ✓
    - Location: `app/routers/users.py`
    - Uses `Depends(get_current_user)` for authentication
    - Returns current authenticated user (auto-creates on first login)
    - Positioned before parametric routes to ensure proper matching
+
    ```python
    @router.get("/me", response_model=UserOut)
    async def get_current_user_endpoint(
@@ -1111,11 +1146,14 @@ AUTH0_ALGORITHMS=["RS256"]
 **Current Status: Partially Complete** ✅🟡
 
 #### ✅ Already Implemented:
+
 1. **Auth0 SDK Installed**
+
    - ✅ `@auth0/nextjs-auth0` v4.10.0 installed in package.json
    - Using Next.js App Router SDK (not React SPA SDK)
 
 2. **Environment Configuration Exists**
+
    - ✅ `.env.example` has Auth0 variables template
    - ✅ `.env` file exists (needs verification of values)
    - Variables needed:
@@ -1135,6 +1173,7 @@ AUTH0_ALGORITHMS=["RS256"]
 #### 🟡 Needs Implementation:
 
 4. **Create AuthContext** ✅ COMPLETE
+
    - [x] Created `contexts/AuthContext.tsx` that wraps Auth0's `useUser()`
    - [x] Fetches backend user data via `GET /users/me` after Auth0 authentication
    - [x] Provides `getToken()` function for API calls
@@ -1144,6 +1183,7 @@ AUTH0_ALGORITHMS=["RS256"]
    - Tokens obtained via server-side API route for security
 
 5. **Create user service** ✅ COMPLETE
+
    - [x] Created `services/users.service.ts` with:
      - `getCurrentUser(token: string): Promise<User>` - calls `GET /users/me`
      - `updateCurrentUser(token, updates)` - updates user profile
@@ -1151,12 +1191,14 @@ AUTH0_ALGORITHMS=["RS256"]
    - Used by AuthContext to fetch backend user data
 
 6. **Add auth helper to api.ts** ✅ COMPLETE
+
    - [x] Updated `lib/api.ts` with `fetchWithAuth()` function
    - Adds Authorization header with Bearer token
    - Handles 401 errors by redirecting to login
    - Ready for use in services
 
 7. **Update program service** 🔴 REQUIRED FOR PROGRAM CREATION
+
    - [ ] Update `createProgram()` to accept `getToken` parameter
    - [ ] Remove `authorId` from `ProgramCreateInput` (backend uses authenticated user)
    - [ ] Use `fetchWithAuth()` helper instead of direct fetch
@@ -1174,6 +1216,7 @@ AUTH0_ALGORITHMS=["RS256"]
 The docs suggest `@auth0/auth0-react` (SPA SDK), but the project uses `@auth0/nextjs-auth0` (Next.js SDK).
 
 Key differences:
+
 - ✅ Use `useUser()` instead of `useAuth0()`
 - ✅ Use `getAccessToken()` from `@auth0/nextjs-auth0` server utils
 - ✅ Auth routes handled by `/api/auth/[auth0]` dynamic route
@@ -1181,6 +1224,7 @@ Key differences:
 - ❌ No `loginWithRedirect()` - use `<a href="/auth/login">`
 
 **Next Steps Priority:**
+
 1. Create `contexts/AuthContext.tsx` (wraps useUser + fetches backend user)
 2. Create `services/users.service.ts` (getCurrentUser function)
 3. Update `lib/api.ts` (add fetchWithAuth helper)
@@ -1190,15 +1234,18 @@ Key differences:
 ### Phase 3: Connect Everything
 
 1. **Add login/logout UI**
+
    - [ ] Add login button to header/landing page
    - [ ] Add logout button to user menu
 
 2. **Protect program creation**
+
    - [ ] Update `NewProgramForm` to use `getToken` from `useAuth()`
    - [ ] Remove `authorId` prop
    - [ ] Show loading state while submitting
 
 3. **Add protected routes**
+
    - [ ] Wrap protected pages with auth check
    - [ ] Redirect to login if not authenticated
    - [ ] Show loading state during auth check
@@ -1217,16 +1264,17 @@ Key differences:
 2. **Then**: Implement AuthContext and basic login/logout
 3. **Then**: Implement backend user creation flow
 4. **Finally**: Connect user ID to program creation
-✅ **Never store tokens in localStorage/state** - Use httpOnly cookies
-6. ✅ **Validate JWT signature with Auth0 public key** - Check expiration, audience, issuer
-7. ✅ **Backend overrides author_id** - Never trust author_id from client request
-8. ✅ **Use Authorization header** - Send `Bearer {token}` with every API call
-9. ⚠️ **Implement token refresh** - Handle expired tokens gracefully
-10. ⚠️ **Protected routes** - Require authentication for sensitive operations
+   ✅ **Never store tokens in localStorage/state** - Use httpOnly cookies
+5. ✅ **Validate JWT signature with Auth0 public key** - Check expiration, audience, issuer
+6. ✅ **Backend overrides author_id** - Never trust author_id from client request
+7. ✅ **Use Authorization header** - Send `Bearer {token}` with every API call
+8. ⚠️ **Implement token refresh** - Handle expired tokens gracefully
+9. ⚠️ **Protected routes** - Require authentication for sensitive operations
 
 ## Common Security Anti-Patterns to AVOID
 
 ### ❌ 1. Client-Side User Creation
+
 ```tsx
 // NEVER do this - anyone can call this endpoint
 if (!user) {
@@ -1235,13 +1283,15 @@ if (!user) {
 ```
 
 ### ❌ 2. Storing Tokens in State/localStorage
+
 ```tsx
 // NEVER do this - exposed to XSS
 setUser({ accessToken });
-localStorage.setItem('token', token);
+localStorage.setItem("token", token);
 ```
 
 ### ❌ 3. Trusting author_id from Client
+
 ```python
 # NEVER do this - client can send any author_id
 @router.post("/programs")
@@ -1251,6 +1301,7 @@ async def create_program(body: ProgramCreate):
 ```
 
 ### ❌ 4. Skipping Token Validation
+
 ```python
 # NEVER do this - tokens can be forged/expired
 async def get_user(token: str):
@@ -1258,6 +1309,7 @@ async def get_user(token: str):
 ```
 
 ### ❌ 5. Frontend Querying User Existence (User Enumeration)
+
 ```tsx
 // ❌ BAD: Exposes which users exist in system
 let backendUser = await getUserByAuth0Id(auth0User.sub);
@@ -1271,6 +1323,7 @@ if (!backendUser) {
 **✅ Better:** Backend handles everything in `/auth/callback` endpoint
 
 ### ❌ 6. Hardcoded Workspace IDs
+
 ```tsx
 // ❌ BAD: Hardcoded workspace
 const workspaceId = "36606c77-5e0d-4fc9-891f-4e0126c6e9a6";
@@ -1279,6 +1332,7 @@ const workspaceId = "36606c77-5e0d-4fc9-891f-4e0126c6e9a6";
 **Problem:** Not flexible, doesn't scale with multiple workspaces.
 
 **✅ Better:** Get workspace from:
+
 - URL parameter: `/workspaces/{id}/programs`
 - User's workspace memberships
 - Default workspace from user preferences
@@ -1353,6 +1407,7 @@ const workspaceId = "36606c77-5e0d-4fc9-891f-4e0126c6e9a6";
 ### Required Backend Endpoints
 
 #### 1. **POST /auth/callback**
+
 ```python
 @router.post("/auth/callback")
 async def auth_callback(
@@ -1371,27 +1426,27 @@ async def auth_callback(
     # Exchange code for tokens with Auth0
     token_response = await exchange_code_for_token(code)
     access_token = token_response["access_token"]
-    
+
     # Verify token and get user info
     payload = verify_auth0_token(access_token)
     auth0_id = payload["sub"]
     email = payload.get("email")
     name = payload.get("name", email)
-    
+
     # Get or create user (SAFE because token is verified)
     user_service = UserService(session)
     user = await user_service.get_by_auth0_id(auth0_id)
-    
+
     if not user:
         user = await user_service.create({
             "auth0_id": auth0_id,
             "email": email,
             "name": name
         })
-    
+
     # Create secure session cookie
     session_token = create_session_token(user.id)
-    
+
     response.set_cookie(
         key="session",
         value=session_token,
@@ -1400,11 +1455,12 @@ async def auth_callback(
         samesite="strict",
         max_age=7200,  # 2 hours
     )
-    
+
     return user
 ```
 
 #### 2. **GET /auth/me**
+
 ```python
 @router.get("/auth/me", response_model=UserOut)
 async def get_current_session(
@@ -1416,24 +1472,25 @@ async def get_current_session(
     Used to restore session on page load.
     """
     session_token = request.cookies.get("session")
-    
+
     if not session_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    
+
     # Verify session token and get user ID
     user_id = verify_session_token(session_token)
-    
+
     # Get user from database
     user_service = UserService(session)
     user = await user_service.get(user_id)
-    
+
     if not user:
         raise HTTPException(status_code=401, detail="Invalid session")
-    
+
     return user
 ```
 
 #### 3. **POST /auth/logout**
+
 ```python
 @router.post("/auth/logout")
 async def logout(response: Response):
@@ -1460,45 +1517,49 @@ export function AuthProvider({ children }) {
   // Handle Auth0 callback
   useEffect(() => {
     const handleCallback = async () => {
-      if (window.location.search.includes('code=')) {
+      if (window.location.search.includes("code=")) {
         try {
           // Get authorization code from URL
           const urlParams = new URLSearchParams(window.location.search);
-          const code = urlParams.get('code');
-          
+          const code = urlParams.get("code");
+
           if (code) {
             // Send code to backend
-            const user = await fetch('/api/auth/callback', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            const user = await fetch("/api/auth/callback", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ code }),
-              credentials: 'include', // Send/receive cookies
-            }).then(r => r.json());
-            
+              credentials: "include", // Send/receive cookies
+            }).then((r) => r.json());
+
             setUser(user);
-            
+
             // Clean up URL
-            window.history.replaceState({}, document.title, window.location.pathname);
+            window.history.replaceState(
+              {},
+              document.title,
+              window.location.pathname
+            );
           }
         } catch (err) {
-          console.error('Auth callback error:', err);
+          console.error("Auth callback error:", err);
         }
       }
     };
-    
+
     handleCallback();
   }, []);
 
   async function checkSession() {
     try {
       // Backend reads httpOnly cookie
-      const user = await fetch('/api/auth/me', {
-        credentials: 'include', // Send cookies
-      }).then(r => {
-        if (!r.ok) throw new Error('No session');
+      const user = await fetch("/api/auth/me", {
+        credentials: "include", // Send cookies
+      }).then((r) => {
+        if (!r.ok) throw new Error("No session");
         return r.json();
       });
-      
+
       setUser(user);
     } catch {
       setUser(null);
@@ -1510,14 +1571,14 @@ export function AuthProvider({ children }) {
   async function login() {
     // Redirect to Auth0
     await loginWithRedirect({
-      redirectUri: window.location.origin + '/callback',
+      redirectUri: window.location.origin + "/callback",
     });
   }
 
   async function logout() {
-    await fetch('/api/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
     });
     setUser(null);
   }
@@ -1525,9 +1586,15 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider 
-      value={{ user, isAuthenticated, isLoading, login, logout, refetch: checkSession }}
-    >
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoading,
+        login,
+        logout,
+        refetch: checkSession,
+      }}>
       {children}
     </AuthContext.Provider>
   );
@@ -1542,17 +1609,17 @@ export function AuthProvider({ children }) {
 export default function ProgramsPage() {
   const params = useParams();
   const workspaceId = params.workspaceId as string;
-  
+
   // Or get from user's workspaces
   const { user } = useAuth();
   const { workspaces } = useWorkspaces(user?.id);
   const defaultWorkspace = workspaces?.[0]?.id;
-  
+
   // Use URL param or fallback to default
   const activeWorkspaceId = workspaceId || defaultWorkspace;
-  
+
   const { programs, loading, error, refetch } = usePrograms(activeWorkspaceId);
-  
+
   // Rest of component...
 }
 ```
@@ -1562,6 +1629,7 @@ export default function ProgramsPage() {
 ## ✅ Final Security Checklist
 
 ### Backend Security
+
 - [ ] Verify JWT signature with Auth0 JWKS (public keys)
 - [ ] Check token expiration, audience, and issuer claims
 - [ ] Extract `auth0_id` from verified token only
@@ -1574,6 +1642,7 @@ export default function ProgramsPage() {
 - [ ] Log authentication attempts and failures
 
 ### Frontend Security
+
 - [ ] Never store tokens in localStorage/sessionStorage
 - [ ] Never store tokens in React state
 - [ ] Let Auth0 SDK manage token storage and refresh
@@ -1586,6 +1655,7 @@ export default function ProgramsPage() {
 - [ ] Handle 401 errors by redirecting to login
 
 ### Testing & Monitoring
+
 - [ ] Test signup flow: Auth0 → auto-create → use app
 - [ ] Test login flow: Auth0 → fetch user → use app
 - [ ] Test token refresh: automatic via Auth0 SDK
@@ -1598,9 +1668,11 @@ export default function ProgramsPage() {
 ## ❓ Questions to Clarify
 
 ### Tags Implementation
+
 You need to clarify with the backend team:
 
 **Option A: Backend creates tags automatically**
+
 ```python
 # Frontend sends tag strings
 { "tags": ["útivera", "leikir"] }
@@ -1609,26 +1681,21 @@ You need to clarify with the backend team:
 ```
 
 **Option B: Frontend must create tags first**
+
 ```typescript
 // 1. Create tags first
 const tagIds = await Promise.all(
-  selectedTags.map(name => createTag({ name }))
+  selectedTags.map((name) => createTag({ name }))
 );
 
 // 2. Associate with program
 await createProgram({
   ...data,
-  tag_ids: tagIds.map(t => t.id)
+  tag_ids: tagIds.map((t) => t.id),
 });
 ```
 
-**Recommendation:** Option A is simpler - backend should handle tag creation/association automatically.creates on first auth
-2. How should we handle the access token for backend API authentication? (Authorization header with Bearer token)
-3. Should we use httpOnly cookies or local storage for session management?
-4. ✅ ~~Do we need to verify the Auth0 token on the backend?~~ **Yes** - Verify on EVERY API call
-5. How should we handle user profile updates (name, email changes)?
-6. What Auth0 scopes/permissions do we need for the API?
-7. How do we handle token refresh when it expires?
+**Recommendation:** Option A is simpler - backend should handle tag creation/association automatically.creates on first auth 2. How should we handle the access token for backend API authentication? (Authorization header with Bearer token) 3. Should we use httpOnly cookies or local storage for session management? 4. ✅ ~~Do we need to verify the Auth0 token on the backend?~~ **Yes** - Verify on EVERY API call 5. How should we handle user profile updates (name, email changes)? 6. What Auth0 scopes/permissions do we need for the API? 7. How do we handle token refresh when it expires?
 
 ## Security Best Practices Summary
 
@@ -1639,6 +1706,6 @@ await createProgram({
 5. ⚠️ **Use Authorization header** - Send `Bearer {token}` with every API call
 6. ⚠️ **Implement token refresh** - Handle expired tokens gracefully
 7. ⚠️ **Protected routes** - Require authentication for sensitive operationstion?
-3. Should we use httpOnly cookies or local storage for session management?
-4. Do we need to verify the Auth0 token on the backend for every API call?
-5. How should we handle user profile updates (name, email changes)?
+8. Should we use httpOnly cookies or local storage for session management?
+9. Do we need to verify the Auth0 token on the backend for every API call?
+10. How should we handle user profile updates (name, email changes)?
