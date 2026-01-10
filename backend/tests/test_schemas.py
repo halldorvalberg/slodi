@@ -36,10 +36,8 @@ def test_workspace_defaults_in_schema():
 def test_content_like_count_non_negative():
     with pytest.raises(ValidationError):
         s.ContentCreate(
-            content_type=m.ContentType.program,
             name="N",
             description=None,
-            public=False,
             like_count=-1,
             created_at=get_current_datetime(),
             author_id=uuid4(),
@@ -52,12 +50,9 @@ def test_event_time_is_tz_aware():
         s.EventCreate(
             name="Camp",
             description=None,
-            public=False,
             like_count=0,
             created_at=get_current_datetime(),
             author_id=uuid4(),
-            workspace_id=uuid4(),
-            program_id=uuid4(),
             content_type=m.ContentType.event,
             start_dt=dt.datetime(2025, 1, 1, 10, 0),  # naive
         )
@@ -70,11 +65,9 @@ def test_task_participants_rules():
             content_type=m.ContentType.task,
             name="Knot tying",
             description=None,
-            public=False,
             like_count=0,
             created_at=get_current_datetime(),
             author_id=uuid4(),
-            event_id=uuid4(),
             participant_min=5,
             participant_max=4,
         )
@@ -85,11 +78,9 @@ def test_task_participants_rules():
             content_type=m.ContentType.task,
             name="Game",
             description=None,
-            public=False,
             like_count=0,
             created_at=get_current_datetime(),
             author_id=uuid4(),
-            event_id=uuid4(),
             participant_min=0,
             participant_max=0,
         )

@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
 from app.core.pagination import Limit, Offset, add_pagination_headers
+from app.models.content import ContentType
 from app.schemas.event import EventCreate, EventOut, EventUpdate
 from app.services.events import EventService
 
@@ -33,9 +34,7 @@ async def list_workspace_events(
     offset: Offset = 0,
 ):
     svc = EventService(session)
-    total = await svc.count_events_for_workspace(
-        workspace_id, date_from=date_from, date_to=date_to
-    )
+    total = await svc.count_events_for_workspace(workspace_id, date_from=date_from, date_to=date_to)
     items = await svc.list_for_workspace(
         workspace_id, date_from=date_from, date_to=date_to, limit=limit, offset=offset
     )
@@ -97,6 +96,7 @@ async def create_workspace_event(
     workspace_id: UUID,
     body: EventCreate,
 ):
+    assert body.content_type == ContentType.event, "Content type must be 'event'"
     svc = EventService(session)
     event = await svc.create_under_workspace(workspace_id, body)
     response.headers["Location"] = f"/events/{event.id}"
@@ -114,6 +114,7 @@ async def create_program_event(
     program_id: UUID,
     body: EventCreate,
 ):
+    assert body.content_type == ContentType.event, "Content type must be 'event'"
     svc = EventService(session)
     event = await svc.create_under_program(program_id, body)
     response.headers["Location"] = f"/events/{event.id}"

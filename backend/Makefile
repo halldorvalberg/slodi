@@ -1,3 +1,8 @@
+# Defaults — can be overridden on the `make` command line, e.g.
+# `make run HOST=0.0.0.0` or `make run ARGS="--host 0.0.0.0 --port 8000"`
+HOST ?= 127.0.0.1
+PORT ?= 8000
+ARGS ?=
 .PHONY: test lint fmt migrate makemigration downgrade run docker-build docker-run docker-stop docker-clean docker-logs docker-shell docker-db-shell
 
 test:
