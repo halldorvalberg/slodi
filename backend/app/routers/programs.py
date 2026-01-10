@@ -58,6 +58,28 @@ async def create_program_under_workspace(
     return program
 
 
+async def copy_program_to_workspace(
+    session: SessionDep,
+    workspace_id: UUID,
+    program_id: UUID,
+    user_id: UUID,
+    response: Response,
+) -> ProgramOut:
+    svc = ProgramService(session)
+    original_program = await svc.get(program_id)
+    copied_program = ProgramCreate(
+        name=original_program.name,
+        description=original_program.description,
+        like_count=0,
+        author_id=user_id,
+        content_type=ContentType.program,
+        image=original_program.image,
+    )
+    program = await svc.create_under_workspace(workspace_id, copied_program)
+    response.headers["Location"] = f"/programs/{program.id}"
+    return program
+
+
 # ----- item endpoints -----
 
 
