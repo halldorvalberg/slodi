@@ -5,9 +5,11 @@ import Modal from "@/components/Modal/Modal";
 import NewProgramForm from "@/app/programs/components/NewProgramForm";
 import ProgramCard from "@/components/ProgramCard/ProgramCard";
 import ProgramGrid from "./components/ProgramGrid";
+import ProgramSearch from "./components/ProgramSearch";
+import ProgramFilters from "./components/ProgramFilters";
+import ProgramSort from "./components/ProgramSort";
 import Pagination from "./components/Pagination";
 import { ProgramsHeader } from "./components/ProgramsHeader";
-import { ProgramsToolbar } from "./components/ProgramsToolbar";
 import styles from "./program.module.css";
 import { useTags } from "@/hooks/useTags";
 import usePrograms from "@/hooks/usePrograms";
@@ -62,8 +64,10 @@ export default function ProgramsPage() {
 
     return (
         <section className="builder-page">
+            {/* Header with FAB button */}
             <ProgramsHeader onNewProgram={() => setShowNewProgram(true)} />
 
+            {/* New Program Modal */}
             <Modal
                 open={showNewProgram}
                 onClose={() => setShowNewProgram(false)}
@@ -75,52 +79,78 @@ export default function ProgramsPage() {
                 />
             </Modal>
 
-            <ProgramsToolbar
-                query={query}
-                onQueryChange={setQuery}
-                selectedTags={selectedTags}
-                onTagsChange={setSelectedTags}
-                availableTags={availableTags || []}
-                isLoadingTags={tagsLoading}
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-                resultCount={filteredAndSorted.length}
-                onClearFilters={clearFilters}
-            />
-
-            <main className={styles.main}>
-                <ProgramGrid
-                    isEmpty={filteredAndSorted.length === 0}
-                    isLoading={programsLoading}
-                    emptyMessage={
-                        programsError
-                            ? "Villa kom upp við að sækja dagskrár"
-                            : query.trim() || selectedTags.length > 0
-                                ? "Engar dagskrár fundust með þessari leit"
-                                : "Engar dagskrár í boði"
-                    }
-                >
-                    {paginatedItems.map((p) => (
-                        <ProgramCard
-                            key={p.id}
-                            id={p.id}
-                            name={p.name}
-                            description={p.description}
-                            tags={p.tags}
+            {/* Main two-column layout */}
+            <div className={styles.pageContainer}>
+                {/* Left Sidebar - Filters */}
+                <aside className={styles.sidebar}>
+                    <div className={styles.searchSection}>
+                        <ProgramSearch
+                            value={query}
+                            onChange={setQuery}
+                            onSearch={() => { }}
+                            resultCount={query.trim() || selectedTags.length > 0 ? filteredAndSorted.length : undefined}
+                            placeholder="Leita að dagskrá"
                         />
-                    ))}
-                </ProgramGrid>
+                    </div>
 
-                {filteredAndSorted.length > 0 && (
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                        totalItems={totalItems}
-                        itemsPerPage={itemsPerPage}
+                    <ProgramFilters
+                        availableTags={availableTags || []}
+                        selectedTags={selectedTags}
+                        onTagsChange={setSelectedTags}
+                        onClearAll={clearFilters}
+                        isLoadingTags={tagsLoading}
                     />
-                )}
-            </main>
+                </aside>
+
+                {/* Right Side - Main Content */}
+                <main className={styles.mainContent}>
+                    {/* Content Header - Result count and sort */}
+                    <div className={styles.contentHeader}>
+                        <div className={styles.resultCount}>
+                            <span>
+                                {filteredAndSorted.length === 1
+                                    ? '1 dagskrá'
+                                    : `${filteredAndSorted.length} dagskrár`}
+                            </span>
+                        </div>
+                        <ProgramSort value={sortBy} onChange={setSortBy} />
+                    </div>
+
+                    {/* Program Grid */}
+                    <ProgramGrid
+                        isEmpty={filteredAndSorted.length === 0}
+                        isLoading={programsLoading}
+                        emptyMessage={
+                            programsError
+                                ? "Villa kom upp við að sækja dagskrár"
+                                : query.trim() || selectedTags.length > 0
+                                    ? "Engar dagskrár fundust með þessari leit"
+                                    : "Engar dagskrár í boði"
+                        }
+                    >
+                        {paginatedItems.map((p) => (
+                            <ProgramCard
+                                key={p.id}
+                                id={p.id}
+                                name={p.name}
+                                description={p.description}
+                                tags={p.tags}
+                            />
+                        ))}
+                    </ProgramGrid>
+
+                    {/* Pagination */}
+                    {filteredAndSorted.length > 0 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                            totalItems={totalItems}
+                            itemsPerPage={itemsPerPage}
+                        />
+                    )}
+                </main>
+            </div>
         </section>
     );
 }
