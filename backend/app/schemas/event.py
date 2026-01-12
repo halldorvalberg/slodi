@@ -12,9 +12,7 @@ from app.utils import get_current_datetime
 
 from .content import ContentCreate, ContentOut, ContentUpdate
 
-LocationStr = Annotated[
-    str, StringConstraints(max_length=LOCATION_MAX, strip_whitespace=True)
-]
+LocationStr = Annotated[str, StringConstraints(max_length=LOCATION_MAX, strip_whitespace=True)]
 
 
 def _ensure_tzaware(value: dt.datetime, field: str) -> dt.datetime:

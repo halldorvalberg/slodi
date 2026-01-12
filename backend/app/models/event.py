@@ -42,12 +42,8 @@ class Event(Content):
         nullable=False,
     )
 
-    start_dt: Mapped[dt.datetime] = mapped_column(
-        SADateTime(timezone=True), nullable=False
-    )
-    end_dt: Mapped[dt.datetime | None] = mapped_column(
-        SADateTime(timezone=True), nullable=True
-    )
+    start_dt: Mapped[dt.datetime] = mapped_column(SADateTime(timezone=True), nullable=False)
+    end_dt: Mapped[dt.datetime | None] = mapped_column(SADateTime(timezone=True), nullable=True)
 
     location: Mapped[str | None] = mapped_column(String(LOCATION_MAX), nullable=True)
 

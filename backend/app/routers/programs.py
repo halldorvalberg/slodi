@@ -57,7 +57,7 @@ async def create_program_under_workspace(
 ):
     # Toggle this to enable/disable debug logging for program creation
     DEBUG_PROGRAM_CREATE = True
-    
+
     if DEBUG_PROGRAM_CREATE:
         print(f"=== CREATE PROGRAM DEBUG ===")
         print(f"Workspace ID: {workspace_id}")
@@ -65,11 +65,11 @@ async def create_program_under_workspace(
         print(f"Request body type: {type(body)}")
         print(f"Request body: {body.model_dump()}")
         print(f"Body validation errors: {body.model_validate(body.model_dump())}")
-    
+
     try:
         # Override author_id with authenticated user (never trust client input)
         body.author_id = current_user.id
-        
+
         svc = ProgramService(session)
         program = await svc.create_under_workspace(workspace_id, body)
         response.headers["Location"] = f"/programs/{program.id}"

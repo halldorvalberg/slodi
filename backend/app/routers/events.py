@@ -33,9 +33,7 @@ async def list_workspace_events(
     offset: Offset = 0,
 ):
     svc = EventService(session)
-    total = await svc.count_events_for_workspace(
-        workspace_id, date_from=date_from, date_to=date_to
-    )
+    total = await svc.count_events_for_workspace(workspace_id, date_from=date_from, date_to=date_to)
     items = await svc.list_for_workspace(
         workspace_id, date_from=date_from, date_to=date_to, limit=limit, offset=offset
     )

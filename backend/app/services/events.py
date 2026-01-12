@@ -82,23 +82,17 @@ class EventService:
 
     # ----- creation under workspace/program -----
 
-    async def create_under_workspace(
-        self, workspace_id: UUID, data: EventCreate
-    ) -> EventOut:
+    async def create_under_workspace(self, workspace_id: UUID, data: EventCreate) -> EventOut:
         event = Event(workspace_id=workspace_id, program_id=None, **data.model_dump())
         await self.repo.create(event)
         await self.session.commit()
         await self.session.refresh(event)
         return EventOut.model_validate(event)
 
-    async def create_under_program(
-        self, program_id: UUID, data: EventCreate
-    ) -> EventOut:
+    async def create_under_program(self, program_id: UUID, data: EventCreate) -> EventOut:
         program = await self.program_repo.get(program_id)
         if not program:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Program not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Program not found")
         event = Event(
             workspace_id=program.workspace_id,
             program_id=program.id,
@@ -114,9 +108,7 @@ class EventService:
     async def get(self, event_id: UUID) -> EventOut:
         row = await self.repo.get(event_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
         return EventOut.model_validate(row)
 
     async def get_in_program(
@@ -124,17 +116,13 @@ class EventService:
     ) -> EventOut:
         row = await self.repo.get_in_program(event_id, program_id, workspace_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
         return EventOut.model_validate(row)
 
     async def update(self, event_id: UUID, data: EventUpdate) -> EventOut:
         row = await self.repo.get(event_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
         if data.program_id is not None:
             program = await self.program_repo.get(data.program_id)
             if not program:
@@ -159,8 +147,6 @@ class EventService:
     async def delete(self, event_id: UUID) -> None:
         row = await self.repo.get(event_id)
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Event not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
         await self.repo.delete(event_id)
         await self.session.commit()

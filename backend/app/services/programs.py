@@ -33,10 +33,27 @@ class ProgramService:
 
     # create under a workspace
     async def create_under_workspace(self, workspace_id: UUID, data: ProgramCreate) -> ProgramOut:
+        # Create a new Program instance with the provided workspace_id and data
         program = Program(workspace_id=workspace_id, **data.model_dump())
+
+        # Save the new program to the database using the repository
         await self.repo.create(program)
+
+        # Commit the transaction to persist the changes
         await self.session.commit()
-        await self.session.refresh(program)
+
+        # Retrieve the newly created program using the repository's get() method
+        # This ensures proper eager loading of related data
+        program = await self.repo.get(program.id)
+
+        # If the program cannot be retrieved, raise an internal server error
+        if not program:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to retrieve created program",
+            )
+
+        # Return the created program as a ProgramOut schema
         return ProgramOut.model_validate(program)
 
     # item-level operations (not scoped)
