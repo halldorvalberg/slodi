@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
 from app.core.pagination import Limit, Offset, add_pagination_headers
+from app.models.content import ContentType
 from app.schemas.task import TaskCreate, TaskOut, TaskUpdate
 from app.services.tasks import TaskService
 
@@ -51,6 +52,7 @@ async def create_event_task(
     body: TaskCreate,
     response: Response,
 ):
+    assert body.content_type == ContentType.task, "Content type must be 'task'"
     svc = TaskService(session)
     task = await svc.create_under_event(event_id, body)
     response.headers["Location"] = f"/tasks/{task.id}"

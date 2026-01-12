@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.program import Program
-from app.models.tag import ContentTag
 from app.repositories.base import Repository
 
 

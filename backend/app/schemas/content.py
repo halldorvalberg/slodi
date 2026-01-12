@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
@@ -27,7 +27,6 @@ class ContentBase(BaseModel):
 
     name: NameStr
     description: DescStr | None = None
-    public: bool = False
     like_count: int = 0
     created_at: dt.datetime = Field(default_factory=get_current_datetime)
     author_id: UUID
@@ -41,11 +40,7 @@ class ContentBase(BaseModel):
 
 
 class ContentCreate(ContentBase):
-    # Override author_id to make it optional - backend sets this from authenticated user
-    author_id: UUID | None = None
-    # Override like_count and created_at with defaults
-    like_count: int = 0
-    created_at: dt.datetime = Field(default_factory=get_current_datetime)
+    pass
 
 
 class ContentUpdate(BaseModel):
@@ -53,7 +48,6 @@ class ContentUpdate(BaseModel):
 
     name: NameStr | None = None
     description: DescStr | None = None
-    public: bool | None = None
     like_count: int | None = None
 
     @field_validator("like_count")
