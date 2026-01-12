@@ -2,9 +2,15 @@
 
 import React from "react";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { fetchProgramById, updateProgram, type Program } from "@/services/programs.service";
+import { useAuth } from "@/contexts/AuthContext";
+import { canEditProgram } from "@/lib/permissions";
+import type { ProgramUpdateFormData } from "@/lib/validation";
 import ProgramDetailHero from "../components/ProgramDetailHero";
 import ProgramDetailTabs from "../components/ProgramDetailTabs";
 import ProgramQuickInfo from "../components/ProgramQuickInfo";
+import ProgramDetailEdit from "./components/ProgramDetailEdit";
 import styles from "./program-detail.module.css";
 import { useProgram } from "@/hooks/useProgram";
 import { useProgramLikes } from "@/hooks/useProgramLikes";
@@ -28,31 +34,94 @@ interface ProgramDetailPageProps {
  */
 export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
     const { id } = React.use(params);
+    const { user, isAuthenticated, getToken } = useAuth();
 
-    const { program, isLoading, error } = useProgram(id);
-    const { likeCount, isLiked, toggleLike } = useProgramLikes(program?.like_count || 0);
-    const { handleShare, handleAddToWorkspace, handleBack } = useProgramActions(program);
+    const [program, setProgram] = useState<Program | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [likeCount, setLikeCount] = useState(0);
+    const [isLiked, setIsLiked] = useState(false);
 
-    // All hooks are called first, then we do conditional rendering
-    if (error) return <ProgramDetailError error={error} />;
-    if (isLoading) return <ProgramDetailSkeleton />;
-    if (!program) notFound();
+    useEffect(() => {
+        async function fetchProgram() {
+            try {
+                setIsLoading(true);
+                const data = await fetchProgramById(id);
+                setProgram(data);
+                setLikeCount(data.like_count || 0);
+            } catch (error) {
+                console.error("Failed to fetch program:", error);
+                setProgram(null);
+            } finally {
+                setIsLoading(false);
+            }
+        }
 
-    const breadcrumbItems = [
-        { label: 'Heim', href: ROUTES.HOME },
-        { label: 'Dagskrár', href: ROUTES.PROGRAMS },
-        { label: program.name }
-    ];
+        fetchProgram();
+    }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className={styles.container}>
+                <div style={{ padding: "2rem", textAlign: "center" }}>
+                    Hleð dagskrá...
+                </div>
+            </div>
+        );
+    }
+
+    if (!program) {
+        notFound();
+    }
+
+    const handleLike = () => {
+        setIsLiked(!isLiked);
+        setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+        // TODO: API call to backend
+    };
+
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: program.name,
+                text: program.description || "",
+                url: window.location.href,
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Hlekkur afritaður!");
+        }
+    };
+
+    const handleAddToWorkspace = () => {
+        // TODO: Implement add to workspace
+        alert("Bæta við vinnusvæði - kemur síðar");
+    };
+
+    const handleBack = () => {
+        router.push("/programs");
+    };
 
     return (
         <div className={styles.container}>
-            <Breadcrumb items={breadcrumbItems} />
+            {/* Breadcrumb */}
+            <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+                <ol>
+                    <li>
+                        <Link href="/">Heim</Link>
+                    </li>
+                    <li>
+                        <Link href="/programs">Dagskrár</Link>
+                    </li>
+                    <li aria-current="page">{program.name}</li>
+                </ol>
+            </nav>
 
+            {/* Hero Section */}
             <ProgramDetailHero
                 program={program}
                 likeCount={likeCount}
                 isLiked={isLiked}
-                onLike={toggleLike}  // Changed from handleLike
+                onLike={handleLike}
                 onShare={handleShare}
                 onAddToWorkspace={handleAddToWorkspace}
             />

@@ -20,8 +20,10 @@ class ProgramRepository(Repository):
         stmt = (
             select(Program)
             .options(
+                selectinload(Program.author),
                 selectinload(Program.workspace),
                 selectinload(Program.events),
+                selectinload(Program.comments),
                 selectinload(Program.content_tags).selectinload(ContentTag.tag),
             )
             .where(Program.id == program_id)
@@ -46,6 +48,9 @@ class ProgramRepository(Repository):
         stmt = (
             select(Program)
             .options(
+                selectinload(Program.author),
+                selectinload(Program.workspace),
+                selectinload(Program.comments),
                 selectinload(Program.content_tags).selectinload(ContentTag.tag),
             )
             .where(Program.workspace_id == workspace_id)

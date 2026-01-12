@@ -1,0 +1,376 @@
+.editForm {
+  background: hsl(var(--background));
+  border: 2px solid hsl(var(--border));
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Form Header */
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.formTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin: 0;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Form Groups */
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  margin-bottom: 0.5rem;
+}
+
+.required {
+  color: hsl(var(--error));
+}
+
+/* Input Fields */
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  transition: all 0.2s ease;
+}
+
+.input:hover,
+.textarea:hover {
+  border-color: hsl(var(--border) / 0.8);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+}
+
+.input:disabled,
+.textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: hsl(var(--muted));
+}
+
+.inputError {
+  border-color: hsl(var(--error));
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 3px hsl(var(--error) / 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+/* Field Errors */
+.fieldError {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: hsl(var(--error));
+}
+
+/* Error Message */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: hsl(var(--error) / 0.1);
+  border: 1px solid hsl(var(--error));
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  color: hsl(var(--error));
+  font-size: 0.875rem;
+}
+
+.errorIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Toggle Switch */
+.toggleContainer {
+  background: hsl(var(--muted));
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.toggleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.toggleIcon {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: hsl(var(--foreground));
+}
+
+.toggleLabels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.toggleTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.toggleStatus {
+  font-size: 0.75rem;
+  color: hsl(var(--text-muted));
+}
+
+.toggleHint {
+  font-size: 0.75rem;
+  color: hsl(var(--text-muted));
+  margin: 0;
+  line-height: 1.4;
+}
+
+.switchLabel {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.switchInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  background: hsl(var(--border));
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.switchInput:checked + .switch {
+  background: hsl(var(--primary));
+}
+
+.switchInput:disabled + .switch {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switchThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.switchInput:checked + .switch .switchThumb {
+  transform: translateX(20px);
+}
+
+.switchInput:focus-visible + .switch {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Radio Toggles */
+.toggleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 2px solid hsl(var(--border));
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.radioLabel:hover {
+  border-color: hsl(var(--primary));
+  background: hsl(var(--muted));
+}
+
+.radioLabel:has(input:checked) {
+  border-color: hsl(var(--primary));
+  background: hsl(var(--primary) / 0.1);
+}
+
+.radioLabel:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.radio {
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: hsl(var(--primary));
+}
+
+.radio:disabled {
+  cursor: not-allowed;
+}
+
+.radioText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.radioTitle {
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.radioDescription {
+  font-size: 0.875rem;
+  color: hsl(var(--text-muted));
+}
+
+/* Buttons */
+.cancelButton,
+.saveButton,
+.cancelButtonMobile,
+.saveButtonMobile {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.cancelButton,
+.cancelButtonMobile {
+  background: transparent;
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.cancelButton:hover:not(:disabled),
+.cancelButtonMobile:hover:not(:disabled) {
+  background: hsl(var(--muted));
+  border-color: hsl(var(--border) / 0.8);
+}
+
+.cancelButton:disabled,
+.cancelButtonMobile:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveButton,
+.saveButtonMobile {
+  background: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.saveButton:hover:not(:disabled),
+.saveButtonMobile:hover:not(:disabled) {
+  background: hsl(var(--primary) / 0.9);
+  border-color: hsl(var(--primary) / 0.9);
+}
+
+.saveButton:disabled,
+.saveButtonMobile:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form Footer (Mobile) */
+.formFooter {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .editForm {
+    padding: 1rem;
+  }
+
+  .formHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .formActions {
+    display: none;
+  }
+
+  .formFooter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid hsl(var(--border));
+  }
+
+  .formTitle {
+    font-size: 1.25rem;
+  }
+
+  .toggleGroup {
+    gap: 0.5rem;
+  }
+
+  .radioLabel {
+    padding: 0.75rem;
+  }
+}

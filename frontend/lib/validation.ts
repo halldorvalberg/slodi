@@ -13,6 +13,25 @@ export const programSchema = z.object({
 
 export type ProgramFormData = z.infer<typeof programSchema>;
 
+// Program update validation schema (for editing existing programs)
+export const programUpdateSchema = z.object({
+  name: z
+    .string()
+    .min(3, 'Nafn verður að vera að minnsta kosti 3 stafir')
+    .max(100, 'Nafn má ekki vera lengra en 100 stafir')
+    .trim(),
+  description: z
+    .string()
+    .max(5000, 'Lýsing má ekki vera lengri en 5000 stafir')
+    .optional()
+    .nullable(),
+  public: z.boolean().refine(value => value !== undefined, {
+    message: 'Velja þarf sýnileika',
+  }),
+});
+
+export type ProgramUpdateFormData = z.infer<typeof programUpdateSchema>;
+
 // Filter state validation
 export const filterStateSchema = z.object({
   query: z.string().optional(),

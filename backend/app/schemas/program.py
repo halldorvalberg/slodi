@@ -10,6 +10,8 @@ from app.models.content import ContentType
 
 from .content import ContentCreate, ContentOut, ContentUpdate
 from .tag import TagOut  # Import to resolve forward reference
+from .user import UserNested  # Import for nested author
+from .workspace import WorkspaceNested  # Import for nested workspace
 
 # Rebuild model to resolve forward references
 ContentOut.model_rebuild()
@@ -34,3 +36,4 @@ class ProgramOut(ContentOut):
 
     image: ImageStr | None = None
     workspace_id: UUID
+    workspace: WorkspaceNested
