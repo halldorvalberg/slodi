@@ -1,7 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import styles from "./not-found.module.css";
-
+/**
+ * Not Found page for missing programs
+ * Displays a 404 message with navigation options
+ */
 export default function NotFound() {
     return (
         <div className={styles.container}>

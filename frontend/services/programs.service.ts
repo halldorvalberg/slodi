@@ -6,6 +6,7 @@
 import { buildApiUrl, fetchAndCheck } from "@/lib/api-utils";
 import { fetchWithAuth } from "@/lib/api";
 import { findTagIdByName, addTagToContent } from "@/services/tags.service";
+import { API_BASE_URL } from "@/constants/config";
 
 export type Program = {
   id: string;
@@ -49,7 +50,22 @@ export type ProgramUpdateInput = {
   tags?: string[];
 };
 
+export interface ProgramUpdateFormData {
+  name: string;
+  description: string | null;
+  public: boolean;
+}
+
 export type ProgramsResponse = Program[] | { programs: Program[] };
+
+/**
+ * Check if a user can edit a program
+ * User can edit if they are the author of the program
+ */
+export function canEditProgram(user: any, program: Program): boolean {
+  if (!user || !program) return false;
+  return user.id === program.author_id;
+}
 
 /**
  * Fetch all programs for a workspace
@@ -230,11 +246,18 @@ export async function deleteProgram(
   getToken: () => Promise<string | null>
 ): Promise<void> {
   const url = buildApiUrl(`/programs/${id}`);
-  await fetchWithAuth(url, {
-    method: "DELETE",
-  }, getToken);
-}
 
+  try {
+    await fetchWithAuth(url, {
+      method: "DELETE",
+    }, getToken);
+
+    console.log("Program deleted successfully");
+  } catch (error) {
+    console.error("Delete program error:", error);
+    throw error;
+  }
+}
 /**
  * Like or unlike a program
  */
@@ -269,7 +292,7 @@ export function filterProgramsByQuery(
   query: string
 ): Program[] {
   if (!query.trim()) return programs;
-  
+
   const q = query.trim().toLowerCase();
   return programs.filter(
     (p) =>
@@ -286,7 +309,7 @@ export function filterProgramsByTags(
   selectedTags: string[]
 ): Program[] {
   if (selectedTags.length === 0) return programs;
-  
+
   return programs.filter((p) => {
     const programTagNames = (p.tags || []).map(t => t.name);
     return selectedTags.some((selectedTag) => programTagNames.includes(selectedTag));
@@ -301,7 +324,7 @@ export function sortPrograms(
   sortBy: "newest" | "oldest" | "most-liked" | "alphabetical"
 ): Program[] {
   const sorted = [...programs];
-  
+
   switch (sortBy) {
     case "newest":
       return sorted.sort(

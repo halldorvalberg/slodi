@@ -1,376 +1,218 @@
-.editForm {
-  background: hsl(var(--background));
-  border: 2px solid hsl(var(--border));
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+.editContainer {
+  background: hsl(var(--color-background-secondary));
+  border: 1px solid hsl(var(--color-border));
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
 }
 
-/* Form Header */
-.formHeader {
+.form {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid hsl(var(--border));
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
-.formTitle {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: hsl(var(--foreground));
-  margin: 0;
-}
-
-.formActions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-/* Form Groups */
 .formGroup {
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: hsl(var(--foreground));
-  margin-bottom: 0.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: hsl(var(--color-text-primary));
 }
 
-.required {
-  color: hsl(var(--error));
-}
-
-/* Input Fields */
 .input,
 .textarea {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid hsl(var(--border));
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
   font-family: inherit;
-  color: hsl(var(--foreground));
-  background: hsl(var(--background));
-  transition: all 0.2s ease;
-}
-
-.input:hover,
-.textarea:hover {
-  border-color: hsl(var(--border) / 0.8);
+  color: hsl(var(--color-text-primary));
+  background: hsl(var(--color-background-primary));
+  border: 2px solid hsl(var(--color-border));
+  border-radius: var(--radius-lg);
+  outline: none;
+  transition: 
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .input:focus,
 .textarea:focus {
-  outline: none;
-  border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  border-color: hsl(var(--color-primary));
+  box-shadow: 0 0 0 4px hsl(var(--color-primary) / 0.1);
 }
 
 .input:disabled,
 .textarea:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: hsl(var(--muted));
-}
-
-.inputError {
-  border-color: hsl(var(--error));
-}
-
-.inputError:focus {
-  box-shadow: 0 0 0 3px hsl(var(--error) / 0.1);
+  background: hsl(var(--color-background-tertiary));
 }
 
 .textarea {
   resize: vertical;
   min-height: 120px;
-  line-height: 1.6;
 }
 
-/* Field Errors */
-.fieldError {
+.checkboxLabel {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: hsl(var(--error));
+  gap: var(--space-2);
+  font-size: var(--font-size-base);
+  color: hsl(var(--color-text-primary));
+  cursor: pointer;
 }
 
-/* Error Message */
-.errorMessage {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: hsl(var(--error) / 0.1);
-  border: 1px solid hsl(var(--error));
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  color: hsl(var(--error));
-  font-size: 0.875rem;
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
-.errorIcon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-/* Toggle Switch */
-.toggleContainer {
-  background: hsl(var(--muted));
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.toggleHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.toggleIcon {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: hsl(var(--foreground));
-}
-
-.toggleLabels {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.toggleTitle {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: hsl(var(--foreground));
-}
-
-.toggleStatus {
-  font-size: 0.75rem;
-  color: hsl(var(--text-muted));
-}
-
-.toggleHint {
-  font-size: 0.75rem;
-  color: hsl(var(--text-muted));
+.helpText {
+  font-size: var(--font-size-sm);
+  color: hsl(var(--color-text-secondary));
   margin: 0;
-  line-height: 1.4;
 }
 
-.switchLabel {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
+.error {
+  padding: var(--space-3) var(--space-4);
+  background: hsl(0 100% 97%);
+  border: 1px solid hsl(0 100% 85%);
+  border-radius: var(--radius-lg);
+  color: hsl(0 70% 40%);
+  font-size: var(--font-size-sm);
 }
 
-.switchInput {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  background: hsl(var(--border));
-  border-radius: 12px;
-  transition: background-color 0.2s ease;
-}
-
-.switchInput:checked + .switch {
-  background: hsl(var(--primary));
-}
-
-.switchInput:disabled + .switch {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.switchThumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.switchInput:checked + .switch .switchThumb {
-  transform: translateX(20px);
-}
-
-.switchInput:focus-visible + .switch {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-}
-
-/* Radio Toggles */
-.toggleGroup {
+.actions {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid hsl(var(--color-border));
 }
 
-.radioLabel {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem;
-  border: 2px solid hsl(var(--border));
-  border-radius: 8px;
+.saveButton,
+.cancelButton {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-fast);
 }
 
-.radioLabel:hover {
-  border-color: hsl(var(--primary));
-  background: hsl(var(--muted));
+.saveButton {
+  background: hsl(var(--color-primary));
+  color: white;
+  border: 2px solid hsl(var(--color-primary));
 }
 
-.radioLabel:has(input:checked) {
-  border-color: hsl(var(--primary));
-  background: hsl(var(--primary) / 0.1);
+.saveButton:hover:not(:disabled) {
+  background: hsl(var(--color-primary-dark));
+  border-color: hsl(var(--color-primary-dark));
 }
 
-.radioLabel:has(input:disabled) {
+.saveButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.radio {
-  margin-top: 2px;
-  cursor: pointer;
-  accent-color: hsl(var(--primary));
-}
-
-.radio:disabled {
-  cursor: not-allowed;
-}
-
-.radioText {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
-}
-
-.radioTitle {
-  font-weight: 500;
-  color: hsl(var(--foreground));
-}
-
-.radioDescription {
-  font-size: 0.875rem;
-  color: hsl(var(--text-muted));
-}
-
-/* Buttons */
-.cancelButton,
-.saveButton,
-.cancelButtonMobile,
-.saveButtonMobile {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.cancelButton,
-.cancelButtonMobile {
+.cancelButton {
   background: transparent;
-  border: 1px solid hsl(var(--border));
-  color: hsl(var(--foreground));
+  color: hsl(var(--color-text-secondary));
+  border: 2px solid hsl(var(--color-border));
 }
 
-.cancelButton:hover:not(:disabled),
-.cancelButtonMobile:hover:not(:disabled) {
-  background: hsl(var(--muted));
-  border-color: hsl(var(--border) / 0.8);
+.cancelButton:hover:not(:disabled) {
+  background: hsl(var(--color-background-secondary));
+  border-color: hsl(var(--color-border-strong));
+  color: hsl(var(--color-text-primary));
 }
 
-.cancelButton:disabled,
-.cancelButtonMobile:disabled {
-  opacity: 0.5;
+.cancelButton:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.saveButton,
-.saveButtonMobile {
-  background: hsl(var(--primary));
-  border: 1px solid hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+@media (max-width: 640px) {
+  .editContainer {
+    padding: var(--space-4);
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .saveButton,
+  .cancelButton {
+    width: 100%;
+  }
 }
 
-.saveButton:hover:not(:disabled),
-.saveButtonMobile:hover:not(:disabled) {
-  background: hsl(var(--primary) / 0.9);
-  border-color: hsl(var(--primary) / 0.9);
+/* ... existing styles ... */
+
+.dangerZone {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 2px solid hsl(var(--color-border));
 }
 
-.saveButton:disabled,
-.saveButtonMobile:disabled {
-  opacity: 0.5;
+.dangerTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: hsl(0 70% 40%);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.dangerDescription {
+  font-size: var(--font-size-sm);
+  color: hsl(var(--color-text-secondary));
+  margin: 0 0 var(--space-4) 0;
+}
+
+.deleteButton {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  background: transparent;
+  color: hsl(0 70% 50%);
+  border: 2px solid hsl(0 70% 50%);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: 
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: hsl(0 70% 50%);
+  color: white;
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Form Footer (Mobile) */
-.formFooter {
-  display: none;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .editForm {
-    padding: 1rem;
+@media (max-width: 640px) {
+  .editContainer {
+    padding: var(--space-4);
   }
 
-  .formHeader {
+  .actions {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
   }
 
-  .formActions {
-    display: none;
-  }
-
-  .formFooter {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid hsl(var(--border));
-  }
-
-  .formTitle {
-    font-size: 1.25rem;
-  }
-
-  .toggleGroup {
-    gap: 0.5rem;
-  }
-
-  .radioLabel {
-    padding: 0.75rem;
+  .saveButton,
+  .cancelButton,
+  .deleteButton {
+    width: 100%;
   }
 }

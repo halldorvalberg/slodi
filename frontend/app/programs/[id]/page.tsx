@@ -1,16 +1,10 @@
 "use client";
 
-import React from "react";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { fetchProgramById, updateProgram, type Program } from "@/services/programs.service";
-import { useAuth } from "@/contexts/AuthContext";
-import { canEditProgram } from "@/lib/permissions";
-import type { ProgramUpdateFormData } from "@/lib/validation";
+import React, { useState } from "react";
+import { notFound, useRouter } from "next/navigation";
 import ProgramDetailHero from "../components/ProgramDetailHero";
 import ProgramDetailTabs from "../components/ProgramDetailTabs";
 import ProgramQuickInfo from "../components/ProgramQuickInfo";
-import ProgramDetailEdit from "./components/ProgramDetailEdit";
 import styles from "./program-detail.module.css";
 import { useProgram } from "@/hooks/useProgram";
 import { useProgramLikes } from "@/hooks/useProgramLikes";
@@ -19,6 +13,9 @@ import { ROUTES } from "@/constants/routes";
 import { useProgramActions } from "@/hooks/useProgramActions";
 import { ProgramDetailError } from "@/app/programs/components/ProgramDetailError";
 import { ProgramDetailSkeleton } from "@/app/programs/components/ProgramDetailSkeleton";
+import { useAuth } from "@/hooks/useAuth";
+import { updateProgram, canEditProgram, ProgramUpdateFormData, deleteProgram } from "@/services/programs.service";
+import ProgramDetailEdit from "./components/ProgramDetailEdit";
 
 interface ProgramDetailPageProps {
     params: Promise<{
@@ -33,102 +30,123 @@ interface ProgramDetailPageProps {
  * @returns Program detail view with hero section, tabs, and sidebar information
  */
 export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
+    const router = useRouter();
     const { id } = React.use(params);
     const { user, isAuthenticated, getToken } = useAuth();
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-    const [program, setProgram] = useState<Program | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [likeCount, setLikeCount] = useState(0);
-    const [isLiked, setIsLiked] = useState(false);
+    const { program, isLoading, error, setProgram } = useProgram(id);
+    const { likeCount, isLiked, toggleLike } = useProgramLikes(program?.like_count || 0);
+    const { handleShare, handleAddToWorkspace, handleBack } = useProgramActions(program);
 
-    useEffect(() => {
-        async function fetchProgram() {
-            try {
-                setIsLoading(true);
-                const data = await fetchProgramById(id);
-                setProgram(data);
-                setLikeCount(data.like_count || 0);
-            } catch (error) {
-                console.error("Failed to fetch program:", error);
-                setProgram(null);
-            } finally {
-                setIsLoading(false);
+    // All hooks are called first, then we do conditional rendering
+    if (error) return <ProgramDetailError error={error} />;
+    if (isLoading) return <ProgramDetailSkeleton />;
+    if (!program) notFound();
+
+    // Check if current user can edit this program
+    const canEdit = canEditProgram(user, program);
+
+    const breadcrumbItems = [
+        { label: 'Heim', href: ROUTES.HOME },
+        { label: 'Dagskrár', href: ROUTES.PROGRAMS },
+        { label: program.name }
+    ];
+
+    const handleEdit = () => {
+        setIsEditMode(true);
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditMode(false);
+    };
+
+    const handleSaveEdit = async (data: ProgramUpdateFormData) => {
+        if (!program) return;
+
+        try {
+            // Transform data: convert null to undefined for API compatibility
+            const updateData: {
+                name: string;
+                description?: string;
+                public: boolean;
+            } = {
+                name: data.name,
+                public: data.public,
+            };
+
+            // Only include description if it's not null
+            if (data.description !== null && data.description !== undefined) {
+                updateData.description = data.description;
             }
+
+            // Update program via API - pass getToken function, not token string
+            const updatedProgram = await updateProgram(program.id, updateData, getToken);
+
+            // Update local state
+            setProgram(updatedProgram);
+            setIsEditMode(false);
+        } catch (error) {
+            console.error("Failed to update program:", error);
+            throw error; // Re-throw to let the form component handle the error
         }
+    };
 
-        fetchProgram();
-    }, [id]);
+    const handleDelete = async () => {
+        if (!program) return;
 
-    if (isLoading) {
-        return (
-            <div className={styles.container}>
-                <div style={{ padding: "2rem", textAlign: "center" }}>
-                    Hleð dagskrá...
-                </div>
-            </div>
+        // Confirm deletion
+        const confirmed = window.confirm(
+            `Ertu viss um að þú viljir eyða dagskránni "${program.name}"? Þetta er ekki hægt að afturkalla.`
         );
-    }
 
-    if (!program) {
-        notFound();
-    }
+        if (!confirmed) return;
 
-    const handleLike = () => {
-        setIsLiked(!isLiked);
-        setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
-        // TODO: API call to backend
-    };
+        try {
+            setIsDeleting(true);
+            await deleteProgram(program.id, getToken);
 
-    const handleShare = () => {
-        if (navigator.share) {
-            navigator.share({
-                title: program.name,
-                text: program.description || "",
-                url: window.location.href,
-            });
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-            alert("Hlekkur afritaður!");
+            // Redirect to programs list after successful deletion
+            router.push(ROUTES.PROGRAMS);
+            // Don't reset isDeleting here - we're navigating away
+        } catch (error) {
+            console.error("Failed to delete program:", error);
+            alert("Ekki tókst að eyða dagskránni. Vinsamlegast reyndu aftur síðar.");
+            setIsDeleting(false);
         }
-    };
-
-    const handleAddToWorkspace = () => {
-        // TODO: Implement add to workspace
-        alert("Bæta við vinnusvæði - kemur síðar");
-    };
-
-    const handleBack = () => {
-        router.push("/programs");
     };
 
     return (
         <div className={styles.container}>
-            {/* Breadcrumb */}
-            <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-                <ol>
-                    <li>
-                        <Link href="/">Heim</Link>
-                    </li>
-                    <li>
-                        <Link href="/programs">Dagskrár</Link>
-                    </li>
-                    <li aria-current="page">{program.name}</li>
-                </ol>
-            </nav>
+            <Breadcrumb items={breadcrumbItems} />
 
-            {/* Hero Section */}
             <ProgramDetailHero
                 program={program}
                 likeCount={likeCount}
                 isLiked={isLiked}
-                onLike={handleLike}
+                onLike={toggleLike}
                 onShare={handleShare}
                 onAddToWorkspace={handleAddToWorkspace}
+                isAuthenticated={isAuthenticated}
+                canEdit={canEdit}
+                isEditMode={isEditMode}
+                onEdit={handleEdit}
             />
 
             <div className={styles.contentGrid}>
                 <div className={styles.mainContent}>
-                    <ProgramDetailTabs program={program} />
+                    {isEditMode ? (
+                        <ProgramDetailEdit
+                            program={program}
+                            onSave={handleSaveEdit}
+                            onCancel={handleCancelEdit}
+                            onDelete={handleDelete}
+                            isDeleting={isDeleting}
+                        />
+                    ) : (
+                            <ProgramDetailTabs program={program} />
+                    )}
                 </div>
                 <aside className={styles.sidebar}>
                     <ProgramQuickInfo program={program} />
@@ -142,4 +160,4 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
             </div>
         </div>
     );
-}
+    }
