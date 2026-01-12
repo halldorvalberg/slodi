@@ -1,0 +1,55 @@
+.indicator {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.indicator[data-status="healthy"] .dot {
+  background: #22c55e;
+}
+
+.indicator[data-status="unhealthy"] .dot {
+  background: #ef4444;
+}
+
+.indicator[data-status="checking"] .dot {
+  background: #f59e0b;
+}
+
+.indicator[data-status="healthy"] .text {
+  color: #22c55e;
+}
+
+.indicator[data-status="unhealthy"] .text {
+  color: #ef4444;
+}
+
+.indicator[data-status="checking"] .text {
+  color: #f59e0b;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

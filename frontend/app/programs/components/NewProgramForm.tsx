@@ -44,21 +44,25 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
 
   // Get available tags
   const { tagNames: availableTags } = useTags();
-  
+
   // Placeholder tags for development
   const PLACEHOLDER_TAGS = ["útivist", "innileikur", "list", "sköpun", "matreiðsla", "leikur", "fræðsla", "náttúrufræði"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // CRITICAL: Prevent duplicate submissions
+    if (loading) return;
+
     setError(null);
-    
+
     if (!name.trim()) {
       setError("Heiti hugmyndar er nauðsynlegt");
       return;
     }
 
     setLoading(true);
-    
+
     try {
       // Determine which workspace to use based on public/private
       // If public: use the default workspace (dagskrábankinn)
@@ -76,10 +80,10 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
         tags: selectedTags.length > 0 ? selectedTags : undefined,
         workspaceId: targetWorkspaceId,
       }, getToken); // Pass token getter for authentication
-      
+
       // Reset form
       handleReset();
-      
+
       onCreated?.(program);
     } catch (err) {
       setError(handleApiErrorIs(err));
@@ -125,8 +129,8 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
   };
 
   const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     );
@@ -202,13 +206,13 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
         <label className={styles.label}>
           Mynd
         </label>
-        
+
         {imagePreview ? (
           <div className={styles.imagePreview}>
-            <Image 
-              src={imagePreview} 
-              alt="Preview" 
-              width={400} 
+            <Image
+              src={imagePreview}
+              alt="Preview"
+              width={400}
               height={250}
               className={styles.previewImage}
             />
@@ -239,7 +243,7 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
             </label>
           </div>
         )}
-        
+
         {/* Image URL fallback */}
         <div className={styles.orDivider}>
           <span>eða</span>

@@ -89,3 +89,8 @@ class Content(Base):
     def tags(self):
         """Return list of Tag objects from content_tags relationship"""
         return [ct.tag for ct in self.content_tags]
+
+    @property
+    def comment_count(self) -> int:
+        """Return count of comments for this content"""
+        return len(self.comments) if self.comments else 0

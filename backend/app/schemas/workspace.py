@@ -64,6 +64,15 @@ class WorkspaceOut(WorkspaceBase):
     id: UUID
 
 
+class WorkspaceNested(BaseModel):
+    """Minimal workspace info for embedding in other schemas."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    name: NameStr
+
+
 # ---- WorkspaceMembership ----
 
 

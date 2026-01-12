@@ -1,6 +1,6 @@
 // API client utilities
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_RUL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean>;
@@ -11,11 +11,11 @@ interface AuthFetchOptions extends Omit<RequestInit, 'headers'> {
 }
 
 export async function apiClient<T>(
-  endpoint: string, 
+  endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
   const { params, ...fetchOptions } = options;
-  
+
   // Build URL with query params
   let url = `${API_BASE_URL}${endpoint}`;
   if (params) {
@@ -25,22 +25,22 @@ export async function apiClient<T>(
     });
     url += `?${searchParams.toString()}`;
   }
-  
+
   // Default headers
   const headers = {
     'Content-Type': 'application/json',
     ...fetchOptions.headers,
   };
-  
+
   const response = await fetch(url, {
     ...fetchOptions,
     headers,
   });
-  
+
   if (!response.ok) {
     throw new Error(`API Error: ${response.status} ${response.statusText}`);
   }
-  
+
   return response.json();
 }
 
@@ -48,13 +48,13 @@ export async function apiClient<T>(
 export const api = {
   get: <T>(endpoint: string, params?: Record<string, string | number | boolean>) =>
     apiClient<T>(endpoint, { method: 'GET', params }),
-    
+
   post: <T>(endpoint: string, body: unknown) =>
     apiClient<T>(endpoint, { method: 'POST', body: JSON.stringify(body) }),
-    
+
   patch: <T>(endpoint: string, body: unknown) =>
     apiClient<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body) }),
-    
+
   delete: <T>(endpoint: string) =>
     apiClient<T>(endpoint, { method: 'DELETE' }),
 };
@@ -89,15 +89,33 @@ export async function fetchWithAuth<T>(
       window.location.href = "/auth/login";
       throw new Error("Authentication required");
     }
+
+    // Try to get error details from response
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || errorData.message || `API error: ${response.statusText}`);
+    }
+
     throw new Error(`API error: ${response.statusText}`);
   }
 
-  // For DELETE and other methods that may not return JSON
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    return response.json();
+  // Handle 204 No Content (common for DELETE requests)
+  if (response.status === 204) {
+    return undefined as T;
   }
 
-  // Return empty object for responses without JSON
-  return {} as T;
+  // Check if response has content
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    // Check if there's actually content to parse
+    const text = await response.text();
+    if (!text || text.trim() === '') {
+      return undefined as T;
+    }
+    return JSON.parse(text) as T;
+  }
+
+  // Return undefined for non-JSON responses
+  return undefined as T;
 }

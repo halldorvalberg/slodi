@@ -1,0 +1,40 @@
+.button {
+  position: fixed;
+  top: var(--sl-spacing-element);
+  left: var(--sl-spacing-element);
+  width: 40px;
+  height: 40px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--sl-color-primary));
+  color: hsl(var(--sl-color-text-inverse));
+  border: none;
+  border-radius: var(--sl-radius-button);
+  cursor: pointer;
+  z-index: calc(var(--sl-z-fixed) + 1);
+  box-shadow: var(--sl-shadow-card);
+  transition: var(--sl-transition-fast);
+}
+
+.button:hover {
+  background: hsl(var(--sl-color-primary-hover));
+  box-shadow: var(--sl-shadow-card-hover);
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--sl-shadow-focus);
+}
+
+@media (max-width: 767px) {
+  .button {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

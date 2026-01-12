@@ -36,6 +36,11 @@
   width: 64px;
 }
 
+/* Collapsed state on desktop using data attribute */
+.sidebar[data-collapsed="true"] {
+  width: 64px;
+}
+
 /* ===== COLLAPSE BUTTON (INTEGRATED) ===== */
 .collapseButtonWrapper {
   padding: 0 var(--sl-spacing-inline);
@@ -386,48 +391,52 @@
 /* Mobile: Hide sidebar by default (use drawer/hamburger) */
 @media (max-width: 767px) {
   .sidebar {
-    transform: translateX(-100%);
+    width: 280px; /* Fixed width on mobile */
+    transform: translateX(-280px); /* Hide off-screen to the left */
     transition: transform var(--sl-transition-base);
+    box-shadow: none; /* No shadow when closed */
   }
 
+  /* Show sidebar when open */
   .sidebar[data-open="true"] {
     transform: translateX(0);
     box-shadow: var(--sl-shadow-modal);
   }
-
-  /* Full width on mobile when open */
-  .sidebar[data-open="true"] {
-    width: 280px;
+  
+  /* Ensure labels are visible on mobile */
+  .sidebar .navLabel,
+  .sidebar .userName,
+  .sidebar .navBadge,
+  .sidebar .collapseLabel {
+    display: block;
+  }
+  
+  /* Reset collapsed styles on mobile - always show full menu */
+  .sidebar .navItem,
+  .sidebar .userLink {
+    justify-content: flex-start;
+    padding: var(--sl-spacing-inset-md);
+    margin: 0 var(--sl-spacing-inline);
+  }
+  
+  .sidebar .navItemActive {
+    border-left: 3px solid hsl(var(--sl-color-primary));
+    border-bottom: none;
+    padding-left: calc(var(--sl-spacing-inset-md) - 3px);
+  }
+  
+  .sidebar .userSection {
+    margin: var(--sl-spacing-element) var(--sl-spacing-inline);
+  }
+  
+  .sidebar .collapseButtonWrapper {
+    padding: 0 var(--sl-spacing-inline);
+  }
+  
+  .sidebar .collapseButton {
+    justify-content: flex-start;
   }
 }
-
-/* ===== DARK MODE ADJUSTMENTS ===== */
-:global(.dark) .sidebar {
-  box-shadow: inset -1px 0 0 0 hsl(var(--sl-color-border-subtle));
-}
-
-:global(.dark) .collapseButton {
-  background: hsl(var(--sl-color-surface));
-}
-
-/* ===== SCROLLBAR STYLING ===== */
-.sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: hsl(var(--sl-color-border));
-  border-radius: var(--sl-primitive-radius-sm);
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--sl-color-border-strong));
-}
-
 /* ===== PRINT STYLES ===== */
 @media print {
   .sidebar {

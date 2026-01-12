@@ -9,6 +9,10 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_vali
 from app.domain.content_constraints import DESC_MAX, NAME_MAX, NAME_MIN
 from app.utils import get_current_datetime
 
+if TYPE_CHECKING:
+    from app.schemas.tag import TagOut
+    from app.schemas.user import UserNested
+
 NameStr = Annotated[
     str,
     StringConstraints(min_length=NAME_MIN, max_length=NAME_MAX, strip_whitespace=True),
@@ -58,3 +62,6 @@ class ContentOut(ContentBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    author: "UserNested"
+    tags: list["TagOut"] = []
+    comment_count: int = 0

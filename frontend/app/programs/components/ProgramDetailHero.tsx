@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { Heart, Share2, Plus, Edit2, FileText } from "lucide-react";
 import styles from "./ProgramDetailHero.module.css";
 
 type Program = {
@@ -18,18 +19,26 @@ interface ProgramDetailHeroProps {
     program: Program;
     likeCount: number;
     isLiked: boolean;
+    isAuthenticated: boolean;
+    canEdit: boolean;
+    isEditMode: boolean;
     onLike: () => void;
     onShare: () => void;
     onAddToWorkspace: () => void;
+    onEdit: () => void;
 }
 
 export default function ProgramDetailHero({
     program,
     likeCount,
     isLiked,
+    isAuthenticated,
+    canEdit,
+    isEditMode,
     onLike,
     onShare,
     onAddToWorkspace,
+    onEdit,
 }: ProgramDetailHeroProps) {
     return (
         <div className={styles.hero}>
@@ -47,7 +56,7 @@ export default function ProgramDetailHero({
                 </div>
             ) : (
                 <div className={styles.imagePlaceholder}>
-                    <span className={styles.placeholderIcon}>📋</span>
+                        <FileText className={styles.placeholderIcon} size={80} strokeWidth={1.5} />
                 </div>
             )}
 
@@ -63,14 +72,29 @@ export default function ProgramDetailHero({
                 </div>
 
                 <div className={styles.actions}>
+                    {canEdit && !isEditMode && (
+                        <button
+                            onClick={onEdit}
+                            className={styles.editButton}
+                            aria-label="Breyta dagskrá"
+                        >
+                            <Edit2 className={styles.icon} size={18} />
+                            <span>Breyta</span>
+                        </button>
+                    )}
+
                     <button
                         onClick={onLike}
                         className={`${styles.actionButton} ${isLiked ? styles.liked : ""}`}
                         aria-label={isLiked ? "Fjarlægja líkar" : "Líkar við"}
+                        disabled={!isAuthenticated}
+                        title={!isAuthenticated ? "Skráðu þig inn til að líka við" : undefined}
                     >
-                        <span className={styles.icon}>
-                            {isLiked ? "❤️" : "🤍"}
-                        </span>
+                        <Heart
+                            className={styles.icon}
+                            size={18}
+                            fill={isLiked ? "currentColor" : "none"}
+                        />
                         <span>{likeCount}</span>
                     </button>
 
@@ -79,7 +103,7 @@ export default function ProgramDetailHero({
                         className={styles.actionButton}
                         aria-label="Deila dagskrá"
                     >
-                        <span className={styles.icon}>↗️</span>
+                        <Share2 className={styles.icon} size={18} />
                         <span>Deila</span>
                     </button>
 
@@ -87,8 +111,10 @@ export default function ProgramDetailHero({
                         onClick={onAddToWorkspace}
                         className={styles.primaryButton}
                         aria-label="Bæta við vinnusvæði"
+                        disabled={!isAuthenticated}
+                        title={!isAuthenticated ? "Skráðu þig inn til að bæta við vinnusvæði" : undefined}
                     >
-                        <span className={styles.icon}>+</span>
+                        <Plus className={styles.icon} size={18} />
                         <span>Bæta við vinnusvæði</span>
                     </button>
                 </div>

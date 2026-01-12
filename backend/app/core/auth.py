@@ -53,7 +53,7 @@ def get_auth0_jwks() -> dict:
     except httpx.HTTPError as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Unable to fetch Auth0 public keys: {str(e)}"
+            detail=f"Unable to fetch Auth0 public keys: {str(e)}",
         ) from e
 
 
@@ -80,16 +80,16 @@ def verify_auth0_token(token: str) -> dict:
     """
     # Toggle this to enable/disable debug logging for token verification
     DEBUG_AUTH = False
-    
+
     try:
         if DEBUG_AUTH:
             logger.info(f"=== Token Verification Debug ===")
             logger.info(f"Token length: {len(token)}")
             logger.info(f"Token starts with: {token[:30]}...")
-        
+
         # Get unverified header to find which key to use
         unverified_header = jwt.get_unverified_header(token)
-        
+
         if DEBUG_AUTH:
             logger.info(f"Unverified header: {unverified_header}")
             # Decode token without verification to see claims
@@ -111,7 +111,7 @@ def verify_auth0_token(token: str) -> dict:
                     "kid": key["kid"],
                     "use": key["use"],
                     "n": key["n"],
-                    "e": key["e"]
+                    "e": key["e"],
                 }
                 break
 
@@ -119,7 +119,7 @@ def verify_auth0_token(token: str) -> dict:
             logger.error("Unable to find appropriate signing key")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Unable to find appropriate signing key"
+                detail="Unable to find appropriate signing key",
             )
 
         if DEBUG_AUTH:
@@ -139,7 +139,7 @@ def verify_auth0_token(token: str) -> dict:
                 "verify_exp": True,
                 "verify_iat": True,
                 "verify_iss": True,
-            }
+            },
         )
 
         if DEBUG_AUTH:
@@ -149,33 +149,29 @@ def verify_auth0_token(token: str) -> dict:
     except ExpiredSignatureError as e:
         logger.error(f"Token expired: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
         ) from e
     except JWTClaimsError as e:
         logger.error(f"JWT claims error: {str(e)}")
         logger.error(f"This usually means audience or issuer mismatch")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token claims: {str(e)}"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token claims: {str(e)}"
         ) from e
     except JWTError as e:
         logger.error(f"JWT error: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token: {str(e)}"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid token: {str(e)}"
         ) from e
     except Exception as e:
         logger.error(f"Unexpected error during token verification: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Token verification failed: {str(e)}"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Token verification failed: {str(e)}"
         ) from e
 
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ) -> User:
     """
     FastAPI dependency that authenticates requests and returns the current user.
@@ -218,8 +214,7 @@ async def get_current_user(
 
     if not auth0_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token missing required claim (sub)"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token missing required claim (sub)"
         )
 
     # If email is missing from token, fetch it from Auth0 userinfo endpoint
@@ -227,9 +222,7 @@ async def get_current_user(
         try:
             userinfo_url = f"https://{settings.auth0_domain}/userinfo"
             response = httpx.get(
-                userinfo_url,
-                headers={"Authorization": f"Bearer {token}"},
-                timeout=10.0
+                userinfo_url, headers={"Authorization": f"Bearer {token}"}, timeout=10.0
             )
             response.raise_for_status()
             userinfo = response.json()
@@ -239,13 +232,12 @@ async def get_current_user(
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Failed to fetch user info from Auth0: {str(e)}"
+                detail=f"Failed to fetch user info from Auth0: {str(e)}",
             ) from e
 
     if not email:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unable to retrieve user email"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unable to retrieve user email"
         )
 
     # Use email as fallback for name if still not set
@@ -258,19 +250,14 @@ async def get_current_user(
 
     if not user:
         # Auto-create user on first login (SAFE because token is verified)
-        user_data = UserCreate(
-            auth0_id=auth0_id,
-            email=email,
-            name=name
-        )
+        user_data = UserCreate(auth0_id=auth0_id, email=email, name=name)
         user_out = await user_service.create(user_data)
         # Get the actual User model instance
         user = await user_service.get_by_auth0_id(auth0_id)
 
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create user"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create user"
             )
 
     return user

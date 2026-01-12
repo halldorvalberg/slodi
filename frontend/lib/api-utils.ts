@@ -11,9 +11,39 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
  * @param response The fetch Response object
  * @throws Error if response is not ok
  */
-export function checkResponse(response: Response): void {
+export async function checkResponse(response: Response): Promise<void> {
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    // Try to get error details from response body
+    let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+
+    try {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        // FastAPI typically returns errors in a "detail" field
+        if (errorData.detail) {
+          errorMessage = typeof errorData.detail === 'string'
+            ? errorData.detail
+            : JSON.stringify(errorData.detail);
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else {
+          errorMessage = JSON.stringify(errorData);
+        }
+      }
+    } catch (parseError) {
+      // If we can't parse the error, use the default message
+      console.error("Failed to parse error response:", parseError);
+    }
+
+    console.error("API Error Details:", {
+      status: response.status,
+      statusText: response.statusText,
+      url: response.url,
+      message: errorMessage
+    });
+
+    throw new Error(errorMessage);
   }
 }
 
@@ -22,9 +52,36 @@ export function checkResponse(response: Response): void {
  * @param response The fetch Response object
  * @throws Error if response is not ok (with Icelandic message)
  */
-export function checkResponseIs(response: Response): void {
+export async function checkResponseIs(response: Response): Promise<void> {
   if (!response.ok) {
-    throw new Error(`Villa kom upp: ${response.status} ${response.statusText}`);
+    // Try to get error details from response body
+    let errorMessage = `Villa kom upp: ${response.status} ${response.statusText}`;
+
+    try {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        // FastAPI typically returns errors in a "detail" field
+        if (errorData.detail) {
+          errorMessage = typeof errorData.detail === 'string'
+            ? `Villa: ${errorData.detail}`
+            : `Villa: ${JSON.stringify(errorData.detail)}`;
+        } else if (errorData.message) {
+          errorMessage = `Villa: ${errorData.message}`;
+        }
+      }
+    } catch (parseError) {
+      console.error("Gat ekki lesið villuskilaboð:", parseError);
+    }
+
+    console.error("API Villa:", {
+      status: response.status,
+      statusText: response.statusText,
+      url: response.url,
+      message: errorMessage
+    });
+
+    throw new Error(errorMessage);
   }
 }
 
@@ -40,8 +97,21 @@ export async function fetchAndCheck<T>(
   options?: RequestInit
 ): Promise<T> {
   const response = await fetch(url, options);
-  checkResponse(response);
-  return response.json();
+  await checkResponse(response);
+
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  // Check if response has JSON content
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  // Return empty object for non-JSON responses
+  return {} as T;
 }
 
 /**
@@ -56,8 +126,21 @@ export async function fetchAndCheckIs<T>(
   options?: RequestInit
 ): Promise<T> {
   const response = await fetch(url, options);
-  checkResponseIs(response);
-  return response.json();
+  await checkResponseIs(response);
+
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  // Check if response has JSON content
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  // Return empty object for non-JSON responses
+  return {} as T;
 }
 
 /**
@@ -109,7 +192,7 @@ export function handleApiErrorIs(
  */
 export function createFormData(data: Record<string, string | number | boolean | File | object | null | undefined>): FormData {
   const formData = new FormData();
-  
+
   Object.entries(data).forEach(([key, value]) => {
     if (value !== null && value !== undefined && value !== "") {
       if (value instanceof File) {
@@ -121,7 +204,7 @@ export function createFormData(data: Record<string, string | number | boolean | 
       }
     }
   });
-  
+
   return formData;
 }
 
