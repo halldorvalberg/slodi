@@ -162,7 +162,8 @@ export default function DashboardSidebar({
     collapsed = false,
     onCollapsedChange,
     showUserSection = false, // Default to hidden
-}: DashboardSidebarProps) {
+    ...props // Accept additional props like data-open
+}: DashboardSidebarProps & { 'data-open'?: string }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
@@ -263,6 +264,8 @@ export default function DashboardSidebar({
         <aside
             className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ""}`}
             aria-label="Aðalvalmynd"
+            data-collapsed={isCollapsed}
+            data-open={props['data-open']}
         >
             <nav className={styles.nav}>
                 {/* Home navigation: Slóði */}

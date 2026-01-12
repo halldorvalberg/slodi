@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import Sidebar from "@/components/DashboardSidebar";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import Sidebar from "@/components/DashboardSidebar/DashboardSidebar";
+import { MobileMenuButton } from "@/components/MobileMenuButton/MobileMenuButton";
+import { useSidebarState } from "@/hooks/useSidebarState";
 import styles from "./DashboardLayout.module.css";
-import { Menu, X } from "lucide-react";
-import { useUser } from "@auth0/nextjs-auth0";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -19,15 +19,11 @@ interface DashboardLayoutProps {
  * 
  * Full-page layout for authenticated dashboard routes
  * Features:
- * - Left sidebar navigation (collapsible)
- * - Mobile hamburger menu
+ * - Left sidebar navigation (collapsible on desktop)
+ * - Mobile hamburger menu with drawer
  * - No header or footer (those are for public pages only)
- * - Responsive: sidebar drawer on mobile, icon-only on tablet, full on desktop
- * 
- * This layout wraps all dashboard routes:
- * /dashboard, /programs, /builder, /social, /analytics, /admin, /profile, /settings, /badges
+ * - Responsive: drawer on mobile, icon-only on tablet, full on desktop
  */
-
 export default function DashboardLayout({
     children,
     userRole = "admin",
@@ -35,29 +31,28 @@ export default function DashboardLayout({
     userAvatar,
     badgeCount = 0,
 }: DashboardLayoutProps) {
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
     const { user } = useUser();
+    const {
+        sidebarCollapsed,
+        mobileMenuOpen,
+        isMobile,
+        toggleSidebar,
+        toggleMobileMenu,
+        closeMobileMenu,
+    } = useSidebarState();
 
+    // Resolve user data with Auth0 fallbacks
     const resolvedUserName = user?.name || userName;
-    const resolvedUserAvatar = user?.picture || userAvatar || undefined;
-    const resolvedBadgeCount = badgeCount || 0;     // Resolve badge count later
-    const resolvedUserRole = userRole || "leader";  // Resolve user role later
+    const resolvedUserAvatar = user?.picture || userAvatar;
+    const resolvedUserRole = userRole;
+    const resolvedBadgeCount = badgeCount;
 
     return (
         <div className={styles.layout}>
             {/* Mobile menu button - only visible on mobile */}
-            <button
-                className={styles.mobileMenuButton}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label={mobileMenuOpen ? "Loka valmynd" : "Opna valmynd"}
-                aria-expanded={mobileMenuOpen}
-            >
-                {mobileMenuOpen ? <X /> : <Menu />}
-            </button>
+            <MobileMenuButton isOpen={mobileMenuOpen} onClick={toggleMobileMenu} />
 
-            {/* Sidebar - wrapped for mobile drawer control */}
+            {/* Sidebar wrapper - handles mobile drawer positioning */}
             <div
                 className={styles.sidebarWrapper}
                 data-open={mobileMenuOpen}
@@ -69,21 +64,22 @@ export default function DashboardLayout({
                     userAvatar={resolvedUserAvatar}
                     badgeCount={resolvedBadgeCount}
                     collapsed={sidebarCollapsed}
-                    onCollapsedChange={setSidebarCollapsed}
-                    showUserSection={false} // User section handled by personal nav items
+                    onCollapsedChange={toggleSidebar}
+                    showUserSection={false}
+                    data-open={mobileMenuOpen.toString()} // Add this prop
                 />
             </div>
 
-            {/* Mobile overlay - darkens background when drawer is open */}
+            {/* Mobile overlay - darkens background and closes menu on click */}
             {mobileMenuOpen && (
                 <div
                     className={styles.overlay}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                     aria-hidden="true"
                 />
             )}
 
-            {/* Main content area - adjusts margin based on sidebar state */}
+            {/* Main content area */}
             <main
                 id="main-content"
                 className={`${styles.main} ${sidebarCollapsed ? styles.mainCollapsed : ""

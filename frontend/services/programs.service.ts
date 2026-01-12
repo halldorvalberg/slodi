@@ -6,7 +6,7 @@
 import { buildApiUrl, fetchAndCheck } from "@/lib/api-utils";
 import { fetchWithAuth } from "@/lib/api";
 import { findTagIdByName, addTagToContent } from "@/services/tags.service";
-import { API_BASE_URL } from "@/constants/config";
+import { User } from "@/services/users.service";
 
 export type Program = {
   id: string;
@@ -62,7 +62,7 @@ export type ProgramsResponse = Program[] | { programs: Program[] };
  * Check if a user can edit a program
  * User can edit if they are the author of the program
  */
-export function canEditProgram(user: any, program: Program): boolean {
+export function canEditProgram(user: User | null, program: Program): boolean {
   if (!user || !program) return false;
   return user.id === program.author_id;
 }

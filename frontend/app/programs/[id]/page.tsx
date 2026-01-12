@@ -97,9 +97,7 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
         if (!program) return;
 
         // Confirm deletion
-        const confirmed = window.confirm(
-            `Ertu viss um að þú viljir eyða dagskránni "${program.name}"? Þetta er ekki hægt að afturkalla.`
-        );
+        const confirmed = window.confirm("Ertu viss um að þú viljir eyða þessari dagskrá? Þetta er óafturkræft.");
 
         if (!confirmed) return;
 
@@ -107,14 +105,14 @@ export default function ProgramDetailPage({ params }: ProgramDetailPageProps) {
             setIsDeleting(true);
             await deleteProgram(program.id, getToken);
 
-            // Redirect to programs list after successful deletion
             router.push(ROUTES.PROGRAMS);
-            // Don't reset isDeleting here - we're navigating away
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Failed to delete program:", error);
             alert("Ekki tókst að eyða dagskránni. Vinsamlegast reyndu aftur síðar.");
             setIsDeleting(false);
         }
+
     };
 
     return (

@@ -21,31 +21,18 @@
 }
 
 .subtitle {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 600;
     color: hsl(var(--sl-color-text-primary));
-    margin: 1.5rem 0 1rem 0;
-    line-height: 1.2;
+    margin: 1rem 0;
 }
 
 .message {
-    font-size: 1.125rem;
+    font-size: 1rem;
     color: hsl(var(--sl-color-text-secondary));
-    line-height: 1.6;
-    margin: 0 0 2.5rem 0;
-    font-weight: 400;
-}
-
-.errorDetail {
-    font-size: 0.875rem;
-    color: hsl(var(--sl-color-text-tertiary));
-    line-height: 1.5;
-    margin: 0.5rem 0 2rem 0;
-    padding: 0.75rem 1rem;
-    background: hsl(var(--sl-color-background-secondary));
-    border-radius: 0.5rem;
-    font-family: var(--sl-primitive-font-family-mono);
-    word-break: break-word;
+    line-height: 1.625;
+    margin: 0 0 2rem 0;
+    word-wrap: break-word;
 }
 
 .actions {
@@ -60,13 +47,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.875rem 1.75rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: none;
-    transition: all 200ms ease-out;
-    min-width: 240px;
+    transition: all 150ms ease-out;
+    min-width: 200px;
 }
 
 .primaryButton {
@@ -78,8 +65,8 @@
 .primaryButton:hover {
     background: hsl(var(--sl-color-primary-hover));
     border-color: hsl(var(--sl-color-primary-hover));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px hsl(var(--sl-color-primary) / 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .secondaryButton {
@@ -91,18 +78,12 @@
 .secondaryButton:hover {
     background: hsl(var(--sl-color-background-tertiary));
     border-color: hsl(var(--sl-color-border-strong));
-    transform: translateY(-2px);
-}
-
-.primaryButton:active,
-.secondaryButton:active {
-    transform: translateY(0);
 }
 
 .primaryButton:focus-visible,
 .secondaryButton:focus-visible {
-    outline: 3px solid hsl(var(--sl-color-primary));
-    outline-offset: 3px;
+    outline: 2px solid hsl(var(--sl-color-primary));
+    outline-offset: 2px;
 }
 
 @media (max-width: 768px) {
@@ -115,12 +96,15 @@
     }
 
     .subtitle {
-        font-size: 1.5rem;
-    }
-
-    .message {
-        font-size: 1rem;
+        font-size: 1.25rem;
     }
 
     .actions {
-        width:
+        width: 100%;
+    }
+
+    .primaryButton,
+    .secondaryButton {
+        width: 100%;
+    }
+}

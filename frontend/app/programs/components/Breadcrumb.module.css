@@ -1,9 +1,9 @@
 .breadcrumb {
   display: flex;
   align-items: center;
-  font-size: 0.95rem;
-  color: var(--color-text-secondary, #666);
-  margin-bottom: 1rem;
+  font-size: var(--sl-primitive-font-size-sm);
+  color: hsl(var(--sl-color-text-secondary));
+  margin-bottom: var(--sl-primitive-space-4);
 }
 
 .breadcrumb ol {
@@ -20,21 +20,22 @@
 
 .breadcrumb li:not(:last-child)::after {
   content: "/";
-  margin: 0 0.5em;
-  color: var(--color-text-tertiary, #aaa);
+  margin: 0 var(--sl-primitive-space-2);
+  color: hsl(var(--sl-color-text-tertiary));
 }
 
 .breadcrumb a {
-  color: var(--color-link, #0070f3);
+  color: hsl(var(--sl-color-text-link));
   text-decoration: none;
-  transition: text-decoration 0.2s;
+  transition: text-decoration var(--sl-transition-fast);
 }
 
 .breadcrumb a:hover {
+  color: hsl(var(--sl-color-text-link-hover));
   text-decoration: underline;
 }
 
 .breadcrumb li[aria-current="page"] {
-  font-weight: bold;
-  color: var(--color-text-primary, #222);
+  font-weight: var(--sl-primitive-font-weight-semibold);
+  color: hsl(var(--sl-color-text-primary));
 }

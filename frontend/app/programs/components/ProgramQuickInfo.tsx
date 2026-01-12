@@ -1,39 +1,14 @@
 import React from "react";
 import { BarChart3, Clock, Users, MapPin, User, Tag, Target, Calendar, Heart, MessageCircle, Printer, Download, Flag } from "lucide-react";
 import styles from "./ProgramQuickInfo.module.css";
-
-type Program = {
-    id: string;
-    name: string;
-    created_at: string;
-    like_count: number;
-    author: {
-        id: string;
-        name: string;
-        email: string;
-    };
-    workspace: {
-        id: string;
-        name: string;
-    };
-    tags?: Array<{ id: string; name: string }>;
-    comment_count?: number;
-};
+import type { Program } from "@/services/programs.service";
+import { formatIcelandicDate } from "@/utils/date";
 
 interface ProgramQuickInfoProps {
     program: Program;
 }
 
 export default function ProgramQuickInfo({ program }: ProgramQuickInfoProps) {
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return new Intl.DateTimeFormat("is-IS", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        }).format(date);
-    };
-
     return (
         <div className={styles.container}>
             {/* Quick Stats */}
@@ -142,7 +117,7 @@ export default function ProgramQuickInfo({ program }: ProgramQuickInfoProps) {
                     <div className={styles.metaRow}>
                         <span className={styles.metaLabel}>Búið til</span>
                         <span className={styles.metaValue}>
-                            {formatDate(program.created_at)}
+                            {formatIcelandicDate(program.created_at)}
                         </span>
                     </div>
                     <div className={styles.metaRow}>
