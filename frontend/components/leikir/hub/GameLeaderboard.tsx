@@ -1,7 +1,7 @@
 "use client";
 
 import type { ScoreEntry } from "@/lib/leikir-games";
-import styles from "./HorpuhoppLeaderboard.module.css";
+import styles from "./GameLeaderboard.module.css";
 
 export type { ScoreEntry };
 
@@ -16,7 +16,12 @@ interface Props {
   errorMessage?: string | null;
 }
 
-export default function HorpuhoppLeaderboard({
+/**
+ * In-game score panel shared by every scored leikur — a sidebar on desktop, a
+ * bottom sheet on mobile. Purely presentational: `useGameScores` owns fetching
+ * and submission, so a new game only has to render this with its own state.
+ */
+export default function GameLeaderboard({
   entries,
   visible,
   onClose,
@@ -25,8 +30,13 @@ export default function HorpuhoppLeaderboard({
 }: Props) {
   return (
     <aside className={`${styles.leaderboard} ${visible ? styles.active : ""}`}>
-      {/* drag handle — mobile only */}
-      <div className={styles.handle} onClick={onClose} role="button" aria-label="Loka stigatöflu" />
+      {/* Dismiss handle — mobile only. A real button rather than a div with
+          role="button": on a touch device this is the only way to close the
+          sheet, so a keyboard or switch-control user would otherwise be stuck
+          with it covering the game until they restarted the run. */}
+      <button type="button" className={styles.handle} onClick={onClose}>
+        <span className={styles.srOnly}>Loka stigatöflu</span>
+      </button>
 
       <h2 className={styles.title}>Stigatafla</h2>
 

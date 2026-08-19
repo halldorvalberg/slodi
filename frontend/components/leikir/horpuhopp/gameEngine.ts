@@ -457,7 +457,21 @@ export function createGameEngine(canvas: HTMLCanvasElement, callbacks: GameCallb
   }
 
   // ── Input ─────────────────────────────────────────────────────────────────
+
+  /**
+   * The listener is on `document` so the game is playable without first
+   * clicking the canvas — but that means it also sees keys aimed at real
+   * controls. A button is activated by Space on *keyup*, so swallowing Space
+   * here would stop the leaderboard's dismiss button from working and restart
+   * the run instead. Anything focusable that is not the canvas keeps its keys.
+   */
+  function handlesItsOwnKeys(target: EventTarget | null): boolean {
+    if (!(target instanceof Element) || target === canvas) return false;
+    return target.closest("a[href], button, input, select, textarea, [tabindex]") !== null;
+  }
+
   function onKeyDown(e: KeyboardEvent): void {
+    if (handlesItsOwnKeys(e.target)) return;
     keys[e.key] = true;
     if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
       e.preventDefault();
