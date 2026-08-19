@@ -181,6 +181,13 @@ function makeCanvas(): HTMLCanvasElement {
 /** Let the queued image onload microtasks run. */
 const settleSprites = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
+/**
+ * Wait past the short load deadline the tests configure. Real timers rather
+ * than vi.useFakeTimers(): faking them behaved differently on CI than locally,
+ * which made these two tests pass here and fail there.
+ */
+const afterDeadline = () => new Promise<void>((resolve) => setTimeout(resolve, 40));
+
 /** One simulation step, matching STEP_MS in the engine. */
 const STEP = 1000 / 60;
 
@@ -585,56 +592,54 @@ describe("createGameEngine", () => {
     // A stalled request fires neither onload nor onerror, so settling "either
     // way" does not cover it — without a deadline the player sits on a blank
     // blue rectangle forever with no message and no response to input.
-    vi.useFakeTimers();
-    try {
-      imagesLoad = false; // never fires onload or onerror
-      const canvas = makeCanvas();
-      const onGameOver = vi.fn();
-      createGameEngine(canvas, { onGameOver, onRestart: vi.fn(), onRunStart: vi.fn() });
+    imagesLoad = false; // never fires onload or onerror
+    const canvas = makeCanvas();
+    const onGameOver = vi.fn();
+    createGameEngine(
+      canvas,
+      { onGameOver, onRestart: vi.fn(), onRunStart: vi.fn() },
+      { loadDeadlineMs: 10 }
+    );
 
-      canvas.dispatchEvent(new MouseEvent("click"));
-      runFrames(300, STEP);
-      expect(onGameOver).not.toHaveBeenCalled(); // still waiting
+    canvas.dispatchEvent(new MouseEvent("click"));
+    runFrames(300, STEP);
+    expect(onGameOver).not.toHaveBeenCalled(); // still waiting
 
-      vi.advanceTimersByTime(5000); // load deadline passes
+    await afterDeadline();
 
-      canvas.dispatchEvent(new MouseEvent("click"));
-      runFrames(300, STEP);
-      expect(onGameOver).toHaveBeenCalledTimes(1);
-    } finally {
-      vi.useRealTimers();
-    }
+    canvas.dispatchEvent(new MouseEvent("click"));
+    runFrames(300, STEP);
+    expect(onGameOver).toHaveBeenCalledTimes(1);
   });
 
   it("draws a sprite that arrives after the load deadline", async () => {
     // The deadline marks everything still in flight as broken so the game can
     // start. An image that then arrives must be un-marked, or the skyline and
     // ground stay invisible all session despite being fully decoded.
-    vi.useFakeTimers();
-    try {
-      imagesLoad = false; // nothing settles yet
-      const canvas = makeCanvas();
-      const ctx = stubCtx(canvas);
-      createGameEngine(canvas, { onGameOver: vi.fn(), onRestart: vi.fn(), onRunStart: vi.fn() });
+    imagesLoad = false; // nothing settles yet
+    const canvas = makeCanvas();
+    const ctx = stubCtx(canvas);
+    createGameEngine(
+      canvas,
+      { onGameOver: vi.fn(), onRestart: vi.fn(), onRunStart: vi.fn() },
+      { loadDeadlineMs: 10 }
+    );
 
-      vi.advanceTimersByTime(5000); // deadline passes, all marked broken
-      runFrames(2, STEP);
-      ctx.drawImage.mockClear();
+    await afterDeadline(); // deadline passes, everything unsettled marked broken
+    runFrames(2, STEP);
+    ctx.drawImage.mockClear();
 
-      // The slow ground sprite finally lands.
-      const ground = lastImages.find((i) => i.src.includes("ground.png"))!;
-      ground.width = 552;
-      ground.height = 112;
-      ground.onload?.();
+    // The slow ground sprite finally lands.
+    const ground = lastImages.find((i) => i.src.includes("ground.png"))!;
+    ground.width = 552;
+    ground.height = 112;
+    ground.onload?.();
 
-      runFrames(2, STEP);
-      const drewGround = ctx.drawImage.mock.calls.some((c) =>
-        String((c[0] as { src?: string })?.src ?? "").includes("ground.png")
-      );
-      expect(drewGround).toBe(true);
-    } finally {
-      vi.useRealTimers();
-    }
+    runFrames(2, STEP);
+    const drewGround = ctx.drawImage.mock.calls.some((c) =>
+      String((c[0] as { src?: string })?.src ?? "").includes("ground.png")
+    );
+    expect(drewGround).toBe(true);
   });
 
   it("does not eagerly download the sound effects", async () => {

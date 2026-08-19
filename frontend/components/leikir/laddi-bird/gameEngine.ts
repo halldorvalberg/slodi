@@ -142,7 +142,23 @@ function play(sound: HTMLAudioElement): void {
 
 // ── Factory ──────────────────────────────────────────────────────────────────
 
-export function createGameEngine(canvas: HTMLCanvasElement, callbacks: GameCallbacks): () => void {
+export interface GameOptions {
+  /**
+   * Override the sprite-load deadline, in ms.
+   *
+   * A seam for tests: the deadline is the one behaviour here that only happens
+   * after several seconds, and driving it with fake timers proved to behave
+   * differently between local runs and CI. A short real deadline is
+   * deterministic everywhere.
+   */
+  loadDeadlineMs?: number;
+}
+
+export function createGameEngine(
+  canvas: HTMLCanvasElement,
+  callbacks: GameCallbacks,
+  options: GameOptions = {}
+): () => void {
   const ctx = canvas.getContext("2d")!;
   canvas.width = GAME_W;
   canvas.height = GAME_H;
@@ -194,7 +210,7 @@ export function createGameEngine(canvas: HTMLCanvasElement, callbacks: GameCallb
   const loadTimer = setTimeout(() => {
     loadDeadlinePassed = true;
     for (const img of requested) if (!settled.has(img)) broken.add(img);
-  }, LOAD_DEADLINE_MS);
+  }, options.loadDeadlineMs ?? LOAD_DEADLINE_MS);
 
   const ready = () => loadDeadlinePassed || settled.size >= requested.length;
 
