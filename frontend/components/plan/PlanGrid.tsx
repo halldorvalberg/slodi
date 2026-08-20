@@ -135,14 +135,32 @@ export default function PlanGrid({ data, onSelectEvent }: Props) {
             // A troop-wide event takes the whole row: that is what stops
             // parallel flokksfundir being drawn during a útilega.
             if (band) {
+              // A per-flokkur cell may still be spanning down into this week
+              // from above. Those columns are already occupied, so the band has
+              // to give them up — claiming the full width would put one more
+              // column in this row than the table has and shear it sideways.
+              const takenHere = patrols.filter((patrol) =>
+                occupied.has(cellKey(week.index, patrol.id))
+              ).length;
+              const bandWidth = patrols.length - takenHere;
+
               return (
                 <tr key={week.index} className={styles.bandRow}>
                   <th scope="row" className={styles.weekHead}>
                     {week.label}
                   </th>
-                  <td colSpan={patrols.length} className={styles.bandCell}>
-                    <EntryButton entry={band} onSelect={onSelectEvent} />
-                  </td>
+                  {bandWidth > 0 && (
+                    <td
+                      colSpan={bandWidth}
+                      // Without this a multi-week band draws its title in the
+                      // first week and leaves the rest as rows with no body
+                      // cells — a ragged hole rather than a band.
+                      rowSpan={Math.max(1, band.span_weeks)}
+                      className={styles.bandCell}
+                    >
+                      <EntryButton entry={band} onSelect={onSelectEvent} />
+                    </td>
+                  )}
                 </tr>
               );
             }

@@ -30,17 +30,32 @@ type ViewId = (typeof VIEWS)[number]["id"];
 
 export default function PlanShell() {
   const workspaceId = useDefaultWorkspaceId();
-  const { seasons, isLoading, isUnavailable, error } = useSeasons(workspaceId);
+  const { seasons, isLoading: seasonsLoading, isUnavailable, error } = useSeasons(workspaceId);
+  // The workspace id itself resolves in an effect, so on the first render the
+  // seasons query is disabled and reports "not loading". Without counting that
+  // as loading, the page tells every visitor they have no starfsár before it
+  // has even asked.
+  const isLoading = seasonsLoading || workspaceId === null;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [view, setView] = useState<ViewId>("window");
   // One query per season, shared by every view — ADR-002 §2 requires the views
   // to be projections of one dataset, which only holds if they share a fetch.
-  const { grid, isLoading: gridLoading } = usePlanGrid(selectedId);
+  const {
+    grid,
+    isLoading: gridLoading,
+    isUnavailable: gridUnavailable,
+    error: gridError,
+  } = usePlanGrid(selectedId);
 
   // Land on the newest starfsár once seasons arrive, so the route is never a
   // blank chooser when there is an obvious thing to be looking at.
   useEffect(() => {
-    if (!selectedId && seasons.length > 0) setSelectedId(seasons[0].id);
+    if (seasons.length === 0) return;
+    // Re-select whenever the current choice is gone, not only when it was never
+    // made: refetchOnWindowFocus is on precisely because co-leaders edit in
+    // other tabs, so the selected season can vanish under us.
+    const stillThere = seasons.some((season) => season.id === selectedId);
+    if (!stillThere) setSelectedId(seasons[0].id);
   }, [seasons, selectedId]);
 
   const selected = seasons.find((s) => s.id === selectedId) ?? null;
@@ -57,13 +72,12 @@ export default function PlanShell() {
       <SeasonSwitcher seasons={seasons} selectedId={selectedId} onSelect={setSelectedId} />
 
       {seasons.length > 0 && (
-        <div className={styles.viewBar} role="tablist" aria-label="Sýn">
+        <div className={styles.viewBar} role="group" aria-label="Sýn">
           {VIEWS.map((v) => (
             <button
               key={v.id}
               type="button"
-              role="tab"
-              aria-selected={view === v.id}
+              aria-pressed={view === v.id}
               className={`${styles.viewTab} ${view === v.id ? styles.viewSelected : ""}`}
               onClick={() => setView(v.id)}
             >
@@ -73,7 +87,7 @@ export default function PlanShell() {
         </div>
       )}
 
-      <main className={styles.content}>
+      <div className={styles.content}>
         {isLoading && <p className={styles.muted}>Sæki starfsár…</p>}
 
         {isUnavailable && (
@@ -99,22 +113,25 @@ export default function PlanShell() {
           </div>
         )}
 
-        {selected && view === "window" && (
+        {selected && (view === "window" || view === "grid") && (
           <section aria-live="polite">
-            {gridLoading && <p className={styles.muted}>Sæki fundina…</p>}
-            {grid && <PlanWindow data={grid} />}
-            {!gridLoading && !grid && (
-              <p className={styles.muted}>Engir fundir skráðir á {selected.name} enn.</p>
-            )}
-          </section>
-        )}
+            {gridLoading && <p className={styles.muted}>Sæki dagskrána…</p>}
 
-        {selected && view === "grid" && (
-          <section aria-live="polite">
-            {gridLoading && <p className={styles.muted}>Sæki töfluna…</p>}
-            {grid && <PlanGrid data={grid} />}
-            {!gridLoading && !grid && (
-              <p className={styles.muted}>Engin tafla til fyrir {selected.name} enn.</p>
+            {gridUnavailable && !gridLoading && (
+              <p className={styles.muted}>Dagskrárgrunnurinn er ekki tilbúinn enn.</p>
+            )}
+
+            {gridError && !gridLoading && (
+              <div className={styles.error} role="alert">
+                Ekki tókst að sækja dagskrána fyrir {selected.name}.
+              </div>
+            )}
+
+            {grid && view === "window" && <PlanWindow key={grid.season_id} data={grid} />}
+            {grid && view === "grid" && <PlanGrid data={grid} />}
+
+            {!gridLoading && !grid && !gridUnavailable && !gridError && (
+              <p className={styles.muted}>Ekkert skráð á {selected.name} enn.</p>
             )}
           </section>
         )}
@@ -129,7 +146,7 @@ export default function PlanShell() {
             </p>
           </section>
         )}
-      </main>
+      </div>
     </div>
   );
 }

@@ -56,6 +56,24 @@ export const api = {
 };
 
 /**
+ * An API failure that still knows its HTTP status.
+ *
+ * Callers used to have to pattern-match the message text to tell, say, an
+ * undeployed route from a missing record — both arrive as "not found". Carrying
+ * the status makes that a check rather than a guess. It extends Error, so any
+ * existing `catch` that only reads `.message` is unaffected.
+ */
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+/**
  * Fetch with authentication
  * Automatically adds Authorization header with Bearer token
  */
@@ -98,14 +116,14 @@ export async function fetchWithAuth<T>(
           )
           .join("; ");
         console.error(`[API ${response.status}]`, errorData.detail);
-        throw new Error(messages || `API error: ${response.status}`);
+        throw new ApiError(messages || `API error: ${response.status}`, response.status);
       }
       const msg = errorData.detail || errorData.message || `API error: ${response.statusText}`;
       console.error(`[API ${response.status}]`, msg);
-      throw new Error(msg);
+      throw new ApiError(msg, response.status);
     }
 
-    throw new Error(`API error: ${response.statusText}`);
+    throw new ApiError(`API error: ${response.statusText}`, response.status);
   }
 
   // Handle 204 No Content (common for DELETE requests)

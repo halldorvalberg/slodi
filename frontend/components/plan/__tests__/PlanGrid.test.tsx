@@ -107,12 +107,32 @@ describe("PlanGrid", () => {
     expect(bodyCells("Vika 2")).toHaveLength(1);
   });
 
-  it("keeps every week visible under a spanning band", () => {
+  it("continues a multi-week band down instead of leaving a hole", () => {
     render(<PlanGrid data={grid({ bands: [band({ week_index: 1, span_weeks: 2 })] })} />);
 
-    // The covered week still gets its row and header, so the axis stays honest.
+    // Without a rowSpan the band draws its title in week 1 and leaves week 2 a
+    // row with no body cells at all — ragged, not a band. The covered row
+    // legitimately owns no cell of its own; the span is what fills it.
+    const [bandCell] = bodyCells("Vika 1");
+    expect(bandCell).toHaveAttribute("rowspan", "2");
     expect(screen.getByRole("rowheader", { name: "Vika 2" })).toBeInTheDocument();
     expect(bodyCells("Vika 2")).toHaveLength(0);
+  });
+
+  it("gives up the columns a cell is already spanning into", () => {
+    // A cell spanning from week 1 into week 2 plus a full-width band in week 2
+    // would put one more column in that row than the table has.
+    render(
+      <PlanGrid
+        data={grid({
+          cells: [cell({ week_index: 1, patrol_id: "p1", span_weeks: 2 })],
+          bands: [band({ week_index: 2 })],
+        })}
+      />
+    );
+
+    const [bandCell] = bodyCells("Vika 2");
+    expect(bandCell).toHaveAttribute("colspan", "1"); // one patrol column left
   });
 
   it("marks an undecided element with the '?' rather than leaving it blank", () => {

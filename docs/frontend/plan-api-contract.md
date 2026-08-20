@@ -95,6 +95,8 @@ type PlanGrid = {
 
 **`span_weeks` counts the first week.** `1` means a single week; `2` means this week and the next. The frontend skips the positions a span covers, so an off-by-one here shears the grid sideways.
 
+**One entry per position.** The grid renders at most one band per week and one cell per week-and-patrol; a second for the same position replaces the first on screen rather than stacking. If two troop-wide events can genuinely share a week — a skipulagsfundur alongside a mót — say so and the grid needs an overflow affordance before that ships, because today it would silently drop one.
+
 `patrols` and `weeks` are the axes — send them even when there are no events, so the grid can render an empty term rather than nothing.
 
 ## Not in this contract yet

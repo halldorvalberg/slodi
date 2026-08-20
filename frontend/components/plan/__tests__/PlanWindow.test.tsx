@@ -54,13 +54,40 @@ describe("PlanWindow", () => {
     render(<PlanWindow data={grid()} today={TODAY} ahead={4} />);
 
     const shown = titles();
-    // Weeks 1–2 are past, so week 2 is the single done one kept for context,
-    // then the next four ahead.
+    // Week 1 (7–14 Sept) is over. Week 2 contains TODAY, so it is still ahead.
     expect(shown).toHaveLength(5);
-    expect(shown[0]).toContain("Vika 2");
+    expect(shown[0]).toContain("Vika 1");
     expect(shown[0]).toContain("Búið");
-    expect(shown[1]).toContain("Vika 3");
-    expect(shown[4]).toContain("Vika 6");
+    expect(shown[1]).toContain("Vika 2");
+    expect(shown[4]).toContain("Vika 5");
+  });
+
+  it("does not mark the current week done before it is over", () => {
+    // starts_on is the Monday but the fundur is usually midweek. Comparing
+    // against the start would grey out on Monday morning the very meeting the
+    // leader opened the planner to prepare for.
+    const monday = new Date("2026-09-14T09:00:00Z"); // week 2 starts 14 Sept
+    render(<PlanWindow data={grid({ cells: [cell(2)] })} today={monday} />);
+
+    const [entry] = titles();
+    expect(entry).toContain("Vika 2");
+    expect(entry).not.toContain("Búið");
+  });
+
+  it("keeps the chosen flokkur only while it exists in the season", () => {
+    // The shell swaps `data` when the season changes without remounting, so a
+    // patrol id from the previous season would match nothing and blank the view.
+    const { rerender } = render(<PlanWindow data={grid()} today={TODAY} />);
+    expect(screen.getByRole("combobox")).toHaveValue("p1");
+
+    const otherSeason = grid({
+      patrols: [{ id: "p9", name: "Úlfar" }],
+      cells: [cell(3, { patrol_id: "p9", title: "Úlfafundur" })],
+    });
+    rerender(<PlanWindow data={otherSeason} today={TODAY} />);
+
+    expect(screen.getByRole("combobox")).toHaveValue("p9");
+    expect(titles().join(" ")).toContain("Úlfafundur");
   });
 
   it("does not run past the end of the season", () => {

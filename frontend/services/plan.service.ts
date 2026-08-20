@@ -1,5 +1,5 @@
 import { buildApiUrl } from "@/lib/api-utils";
-import { fetchWithAuth } from "@/lib/api";
+import { ApiError, fetchWithAuth } from "@/lib/api";
 
 /**
  * The plan API — seasons and the scratchpad (A1, sc-34).
@@ -72,8 +72,16 @@ export class SeasonsUnavailable extends Error {
 
 type GetToken = () => Promise<string | null>;
 
+/**
+ * Is this a 404 for the *route* rather than for a resource?
+ *
+ * Both arrive as 404, and they mean opposite things to a leader: "the planner
+ * is still being built" versus "the thing you asked for is gone". The backend
+ * sends a `detail` for a resource it looked for and did not find; an unrouted
+ * path has nothing to say about one.
+ */
 function isMissingEndpoint(error: unknown): boolean {
-  return error instanceof Error && /\b404\b|not found/i.test(error.message);
+  return error instanceof ApiError && error.status === 404 && !/not found/i.test(error.message);
 }
 
 /** Every season in a workspace, dated and undated alike. */

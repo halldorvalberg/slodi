@@ -51,13 +51,23 @@ describe("getSeasons", () => {
     expect((init.headers as Record<string, string>).Authorization).toBe(`Bearer ${TOKEN}`);
   });
 
-  it("reports a missing endpoint distinctly from a real failure", async () => {
+  it("reports an undeployed endpoint distinctly from a real failure", async () => {
     // The backend half of A1 is a separate track, so "not deployed yet" and
     // "something broke" are different things to tell a leader — only one of
-    // them is worth reporting as a bug.
-    fetchMock.mockResolvedValueOnce(response({ detail: "Not Found" }, 404));
+    // them is worth reporting as a bug. An unrouted path has no `detail`.
+    fetchMock.mockResolvedValueOnce(response({}, 404));
 
     await expect(getSeasons(WORKSPACE, getToken)).rejects.toBeInstanceOf(SeasonsUnavailable);
+  });
+
+  it("does not mistake a missing workspace for an unbuilt backend", async () => {
+    // A stale cached workspace id, or a season deleted in another tab, 404s
+    // with a detail. Showing "the backend is on its way" would hide it.
+    fetchMock.mockResolvedValueOnce(response({ detail: "Workspace not found" }, 404));
+
+    const error = await getSeasons(WORKSPACE, getToken).catch((e) => e);
+    expect(error).toBeInstanceOf(Error);
+    expect(error).not.toBeInstanceOf(SeasonsUnavailable);
   });
 
   it("lets a genuine server error through as an error", async () => {

@@ -56,8 +56,15 @@ export function useCreateSeason(workspaceId: string | null) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: Omit<SeasonCreate, "workspace_id">) =>
-      createSeason({ ...payload, workspace_id: workspaceId as string }, getToken),
+    mutationFn: (payload: Omit<SeasonCreate, "workspace_id">) => {
+      // The workspace id resolves asynchronously, and it is interpolated
+      // straight into the URL — without this a call made too early POSTs to
+      // /workspaces/null/seasons and 404s for a reason nobody can read.
+      if (!workspaceId) {
+        return Promise.reject(new Error("Workspace is not resolved yet"));
+      }
+      return createSeason({ ...payload, workspace_id: workspaceId }, getToken);
+    },
     onSuccess: (created: Season) => {
       queryClient.setQueryData<Season[]>(planKeys.seasons(created.workspace_id), (previous) =>
         previous ? [...previous, created] : [created]

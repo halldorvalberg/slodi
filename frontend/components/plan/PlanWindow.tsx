@@ -33,18 +33,38 @@ type WindowEntry = {
   isDone: boolean;
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 /**
- * A week counts as done once it has started. An undated week — a scratchpad —
- * is never done: there is no date to be past, and marking it done would make
- * the scratchpad look like a finished term.
+ * A week counts as done once it is over, not once it has begun.
+ *
+ * `starts_on` is the Monday, but the fundur is usually midweek — comparing
+ * against the start would grey out on Monday morning the very meeting the
+ * leader opened the planner to prepare for.
+ *
+ * An undated week — a scratchpad — is never done: there is no date to be past,
+ * and marking it done would make a scratchpad look like a finished term.
  */
 function isWeekDone(week: PlanWeek, today: Date): boolean {
   if (!week.starts_on) return false;
-  return new Date(week.starts_on).getTime() < today.getTime();
+  return new Date(week.starts_on).getTime() + 7 * DAY_MS <= today.getTime();
 }
 
-export default function PlanWindow({ data, today = new Date(), ahead = DEFAULT_AHEAD }: Props) {
+export default function PlanWindow({ data, today, ahead = DEFAULT_AHEAD }: Props) {
+  // A default of `new Date()` in the parameter list is a new object on every
+  // render, which invalidates every memo below it. Day granularity is all the
+  // done/ahead split needs, and it is stable across a day's renders.
+  const now = useMemo(() => today ?? new Date(), [today]);
+
   const [patrolId, setPatrolId] = useState<string | null>(data.patrols[0]?.id ?? null);
+
+  // Finding from review: the shell swaps `data` when the season changes without
+  // remounting, so a patrol id from the previous season would survive and match
+  // nothing — an empty window and a select with no option chosen.
+  const activePatrolId =
+    patrolId && data.patrols.some((patrol) => patrol.id === patrolId)
+      ? patrolId
+      : (data.patrols[0]?.id ?? null);
 
   const weekByIndex = useMemo(() => {
     const byIndex = new Map<number, PlanWeek>();
@@ -53,16 +73,16 @@ export default function PlanWindow({ data, today = new Date(), ahead = DEFAULT_A
   }, [data.weeks]);
 
   const entries = useMemo<WindowEntry[]>(() => {
-    if (!patrolId) return [];
+    if (!activePatrolId) return [];
     return data.cells
-      .filter((cell) => cell.patrol_id === patrolId)
+      .filter((cell) => cell.patrol_id === activePatrolId)
       .map((cell) => {
         const week = weekByIndex.get(cell.week_index);
-        return week ? { cell, week, isDone: isWeekDone(week, today) } : null;
+        return week ? { cell, week, isDone: isWeekDone(week, now) } : null;
       })
       .filter((entry): entry is WindowEntry => entry !== null)
       .sort((a, b) => a.week.index - b.week.index);
-  }, [data.cells, patrolId, weekByIndex, today]);
+  }, [data.cells, activePatrolId, weekByIndex, now]);
 
   /**
    * Keep a little history and the next few ahead. Slicing around the first
@@ -89,7 +109,7 @@ export default function PlanWindow({ data, today = new Date(), ahead = DEFAULT_A
         <select
           id="plan-window-patrol"
           className={styles.select}
-          value={patrolId ?? ""}
+          value={activePatrolId ?? ""}
           onChange={(event) => setPatrolId(event.target.value)}
         >
           {data.patrols.map((patrol) => (
