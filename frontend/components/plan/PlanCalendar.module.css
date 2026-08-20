@@ -1,0 +1,125 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-spacing-md, 16px);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-spacing-md, 16px);
+}
+
+.monthTitle {
+  margin: 0;
+  font-size: 1rem;
+  color: hsl(var(--sl-color-text-primary));
+  text-transform: capitalize;
+}
+
+.nav {
+  padding: 6px 12px;
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: 999px;
+  background: hsl(var(--sl-color-surface));
+  color: hsl(var(--sl-color-text-primary));
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.nav:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.nav:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-primary));
+  outline-offset: 2px;
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.caption {
+  caption-side: bottom;
+  padding-top: var(--sl-spacing-sm, 8px);
+  color: hsl(var(--sl-color-text-secondary));
+  font-size: 0.76rem;
+  text-align: left;
+}
+
+.dayHead {
+  padding: 6px;
+  border-bottom: 1px solid hsl(var(--sl-color-border));
+  color: hsl(var(--sl-color-text-secondary));
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.day {
+  border: 1px solid hsl(var(--sl-color-border));
+  padding: 6px;
+  height: 42px;
+  vertical-align: top;
+}
+
+.dayNumber {
+  font-size: 0.76rem;
+  color: hsl(var(--sl-color-text-secondary));
+  font-variant-numeric: tabular-nums;
+}
+
+.today .dayNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: hsl(var(--sl-color-primary));
+  color: hsl(var(--sl-color-primary-foreground, 0 0% 100%));
+  font-weight: 600;
+}
+
+/* Entries belong to the week, not to a day — see the component docstring. */
+.entriesRow {
+  border: 1px solid hsl(var(--sl-color-border));
+  border-top: 0;
+  padding: 6px;
+  background: hsl(var(--sl-color-surface));
+}
+
+.entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.entry,
+.troopWide {
+  font-size: 0.78rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border-left: 3px solid hsl(var(--sl-color-primary));
+  background: hsl(var(--sl-color-background));
+  color: hsl(var(--sl-color-text-primary));
+}
+
+.troopWide {
+  border-left-color: hsl(var(--sl-color-warning, 35 100% 64%));
+  font-weight: 600;
+}
+
+.empty {
+  margin: 0;
+  color: hsl(var(--sl-color-text-secondary));
+}

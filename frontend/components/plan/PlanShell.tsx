@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useDefaultWorkspaceId } from "@/hooks/useDefaultWorkspaceId";
 import { useSeasons, usePlanGrid } from "@/hooks/usePlan";
+import PlanCalendar from "./PlanCalendar";
 import PlanGrid from "./PlanGrid";
+import PlanTimeline from "./PlanTimeline";
 import PlanWindow from "./PlanWindow";
 import SeasonSwitcher from "./SeasonSwitcher";
 import styles from "./PlanShell.module.css";
@@ -116,7 +118,7 @@ export default function PlanShell() {
           </div>
         )}
 
-        {selected && (view === "window" || view === "grid") && (
+        {selected && (
           <section aria-live="polite">
             {gridLoading && <p className={styles.muted}>Sæki dagskrána…</p>}
 
@@ -128,21 +130,12 @@ export default function PlanShell() {
 
             {grid && view === "window" && <PlanWindow key={grid.season_id} data={grid} />}
             {grid && view === "grid" && <PlanGrid data={grid} />}
+            {grid && view === "timeline" && <PlanTimeline key={grid.season_id} data={grid} />}
+            {grid && view === "calendar" && <PlanCalendar key={grid.season_id} data={grid} />}
 
             {!gridLoading && !grid && !gridError && (
               <p className={styles.muted}>Ekkert skráð á {selected.name} enn.</p>
             )}
-          </section>
-        )}
-
-        {selected && (view === "timeline" || view === "calendar") && (
-          <section className={styles.viewHost} aria-live="polite">
-            {/* Timeline and calendar are A4. They mount here and read the same
-                query the grid does, so the three never diverge. */}
-            <p className={styles.muted}>
-              {VIEWS.find((v) => v.id === view)?.label} fyrir <strong>{selected.name}</strong> kemur
-              með {VIEWS.find((v) => v.id === view)?.ticket}.
-            </p>
           </section>
         )}
       </div>

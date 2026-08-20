@@ -101,6 +101,12 @@ type PlanGrid = {
 
 `patrols` and `weeks` are the axes — send them even when there are no events, so the grid can render an empty term rather than nothing.
 
+## Wanted next: a date per event
+
+The month view (A4) can only place an entry against its *week*, because `week_index` is the finest granularity the grid carries. A fundur is usually midweek and a útilega usually a weekend, so dropping either onto its week's Monday would tell a leader a day the planner does not actually know — and this is the artifact the team is meant to set dates around (A5).
+
+An optional `starts_on` / `ends_on` on `PlanCell` and `PlanBand` would let the calendar place events on real days and the timeline show real dates. Until then the calendar labels itself as week-granular, which is honest but weaker than A5 wants.
+
 ## Not in this contract yet
 
 Writing to the grid — creating, moving and renaming events in a cell — is A3 (sc-38), which is where inline edit and autosave live. The `Task` planning dimensions below the event (venue, timing, endurmat) come with their own tickets. What is here covers reading a season and reading its grid, which is what A1 and A2 need.

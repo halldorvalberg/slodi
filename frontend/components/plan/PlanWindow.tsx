@@ -1,12 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type {
-  PlanBand,
-  PlanCell,
-  PlanGrid as PlanGridData,
-  PlanWeek,
-} from "@/services/plan.service";
+import type { PlanGrid as PlanGridData } from "@/services/plan.service";
+import { entriesForPatrol, resolvePatrolId, type PlanEntry } from "./planEntries";
 import styles from "./PlanWindow.module.css";
 
 /**
@@ -16,9 +12,8 @@ import styles from "./PlanWindow.module.css";
  * which is what the paper "Fundarhugmyndir" sheet is for. This is that horizon:
  * a little done behind for context, the skeleton ahead to fill in.
  *
- * It reads the same `PlanGrid` the grid view does and filters it — no second
- * fetch and no second shape. That is ADR-002 §2's "projections of one dataset"
- * being literally true rather than merely intended.
+ * It is the timeline (A4) sliced short — both read `entriesForPatrol`, so they
+ * cannot disagree about what counts as a meeting or as done.
  */
 
 /** Meetings kept behind the current one, for context. */
@@ -32,89 +27,19 @@ interface Props {
   ahead?: number;
 }
 
-type WindowEntry = {
-  id: string;
-  title: string;
-  status: PlanCell["status"];
-  week: PlanWeek;
-  isDone: boolean;
-  /** Troop-wide: every flokkur is on it, so it shows in every flokkur's window. */
-  isTroopWide: boolean;
-};
-
-/**
- * A week counts as done once it is over, not once it has begun.
- *
- * `starts_on` is the Monday, but the fundur is usually midweek — comparing
- * against the start would grey out on Monday morning the very meeting the
- * leader opened the planner to prepare for.
- *
- * An undated week — a scratchpad — is never done: there is no date to be past,
- * and marking it done would make a scratchpad look like a finished term.
- */
-function isWeekDone(week: PlanWeek, today: Date): boolean {
-  if (!week.starts_on) return false;
-  // A date-only ISO string parses as UTC midnight while `today` is a local
-  // instant, so comparing them directly shifts the boundary by the offset —
-  // invisible in Iceland, up to a day wrong further west. Compare the calendar
-  // day the week ends on against today's calendar day instead.
-  const [year, month, day] = week.starts_on.slice(0, 10).split("-").map(Number);
-  if (![year, month, day].every(Number.isFinite)) return false;
-  const weekEnd = new Date(year, month - 1, day + 7);
-  return weekEnd.getTime() <= today.getTime();
-}
-
 export default function PlanWindow({ data, today, ahead = DEFAULT_AHEAD }: Props) {
   // A default of `new Date()` in the parameter list is a new object on every
   // render, which invalidates every memo below it. Day granularity is all the
   // done/ahead split needs, and it is stable across a day's renders.
   const now = useMemo(() => today ?? new Date(), [today]);
 
-  const [patrolId, setPatrolId] = useState<string | null>(data.patrols[0]?.id ?? null);
+  const [patrolId, setPatrolId] = useState<string | null>(null);
+  const activePatrolId = resolvePatrolId(data, patrolId);
 
-  // Finding from review: the shell swaps `data` when the season changes without
-  // remounting, so a patrol id from the previous season would survive and match
-  // nothing — an empty window and a select with no option chosen.
-  const activePatrolId =
-    patrolId && data.patrols.some((patrol) => patrol.id === patrolId)
-      ? patrolId
-      : (data.patrols[0]?.id ?? null);
-
-  const weekByIndex = useMemo(() => {
-    const byIndex = new Map<number, PlanWeek>();
-    for (const week of data.weeks) byIndex.set(week.index, week);
-    return byIndex;
-  }, [data.weeks]);
-
-  const entries = useMemo<WindowEntry[]>(() => {
-    if (!activePatrolId) return [];
-
-    const toEntry = (entry: PlanCell | PlanBand, isTroopWide: boolean): WindowEntry | null => {
-      const week = weekByIndex.get(entry.week_index);
-      if (!week) return null;
-      return {
-        id: entry.event_id,
-        title: entry.title,
-        status: entry.status,
-        week,
-        isDone: isWeekDone(week, now),
-        isTroopWide,
-      };
-    };
-
-    const mine = data.cells
-      .filter((cell) => cell.patrol_id === activePatrolId)
-      .map((cell) => toEntry(cell, false));
-
-    // A troop-wide fundur — sveitarfundur, útilega, mót — is a meeting this
-    // flokkur attends by definition. Leaving them out made the one view a
-    // flokksforingi opens to see what is coming omit half of what is coming.
-    const shared = data.bands.map((band) => toEntry(band, true));
-
-    return [...mine, ...shared]
-      .filter((entry): entry is WindowEntry => entry !== null)
-      .sort((a, b) => a.week.index - b.week.index);
-  }, [data.cells, data.bands, activePatrolId, weekByIndex, now]);
+  const entries = useMemo<PlanEntry[]>(
+    () => entriesForPatrol(data, activePatrolId, now),
+    [data, activePatrolId, now]
+  );
 
   /**
    * Keep a little history and the next few ahead. Slicing around the first
