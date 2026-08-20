@@ -3,8 +3,6 @@
 import { useMemo } from "react";
 import {
   cellKey,
-  coveredWeeks,
-  indexCells,
   type PlanBand,
   type PlanCell,
   type PlanGrid as PlanGridData,
@@ -76,31 +74,60 @@ function EntryButton({
 export default function PlanGrid({ data, onSelectEvent }: Props) {
   const { patrols, weeks, bands, cells } = data;
 
-  const cellIndex = useMemo(() => indexCells(cells), [cells]);
-  const bandByWeek = useMemo(() => {
-    const byWeek = new Map<number, PlanBand>();
-    for (const band of bands) byWeek.set(band.week_index, band);
-    return byWeek;
-  }, [bands]);
-
   /**
-   * Positions already occupied by something spanning into them from above.
-   * Without this a rowSpan and the cell beneath it would both render and the
-   * row would grow an extra column.
+   * A band takes the whole week: a troop-wide event means every flokkur is on
+   * it, so per-flokkur cells cannot coexist with one. That is what makes the
+   * layout tractable — the alternative is placing a band into whatever columns
+   * a spanning cell has left free, which the HTML table model cannot express as
+   * one cell unless those columns happen to be contiguous and at an edge.
+   *
+   * So spans are *clipped* at the next band instead, and any cell that lands
+   * inside a band's weeks is reported on the band rather than silently dropped.
    */
-  const occupied = useMemo(() => {
-    const taken = new Set<string>();
-    for (const cell of cells) {
-      for (const week of coveredWeeks(cell)) taken.add(cellKey(week, cell.patrol_id));
-    }
-    return taken;
-  }, [cells]);
+  const layout = useMemo(() => {
+    const bandStart = new Map<number, PlanBand>();
+    for (const band of bands) bandStart.set(band.week_index, band);
 
-  const bandCoveredWeeks = useMemo(() => {
-    const taken = new Set<number>();
-    for (const band of bands) for (const week of coveredWeeks(band)) taken.add(week);
-    return taken;
-  }, [bands]);
+    const bandWeeks = new Set<number>();
+    for (const band of bands) {
+      for (let offset = 0; offset < Math.max(1, band.span_weeks); offset++) {
+        bandWeeks.add(band.week_index + offset);
+      }
+    }
+
+    /** How far a cell may span before it would run into a band. */
+    const clippedSpan = (cell: PlanCell): number => {
+      const wanted = Math.max(1, cell.span_weeks);
+      for (let offset = 1; offset < wanted; offset++) {
+        if (bandWeeks.has(cell.week_index + offset)) return offset;
+      }
+      return wanted;
+    };
+
+    const placed = new Map<string, { cell: PlanCell; span: number }>();
+    const covered = new Set<string>();
+    const swallowed = new Map<number, PlanCell[]>();
+
+    for (const cell of cells) {
+      if (bandWeeks.has(cell.week_index)) {
+        // Inside a band's weeks. Surfaced on the band so it is visible.
+        const bandWeek = [...bandStart.keys()]
+          .filter((week) => week <= cell.week_index)
+          .sort((a, b) => b - a)[0];
+        const list = swallowed.get(bandWeek) ?? [];
+        list.push(cell);
+        swallowed.set(bandWeek, list);
+        continue;
+      }
+      const span = clippedSpan(cell);
+      placed.set(cellKey(cell.week_index, cell.patrol_id), { cell, span });
+      for (let offset = 1; offset < span; offset++) {
+        covered.add(cellKey(cell.week_index + offset, cell.patrol_id));
+      }
+    }
+
+    return { bandStart, bandWeeks, placed, covered, swallowed };
+  }, [bands, cells]);
 
   if (patrols.length === 0 || weeks.length === 0) {
     return (
@@ -130,43 +157,33 @@ export default function PlanGrid({ data, onSelectEvent }: Props) {
         </thead>
         <tbody>
           {weeks.map((week) => {
-            const band = bandByWeek.get(week.index);
+            const band = layout.bandStart.get(week.index);
 
-            // A troop-wide event takes the whole row: that is what stops
-            // parallel flokksfundir being drawn during a útilega.
             if (band) {
-              // A per-flokkur cell may still be spanning down into this week
-              // from above. Those columns are already occupied, so the band has
-              // to give them up — claiming the full width would put one more
-              // column in this row than the table has and shear it sideways.
-              const takenHere = patrols.filter((patrol) =>
-                occupied.has(cellKey(week.index, patrol.id))
-              ).length;
-              const bandWidth = patrols.length - takenHere;
-
+              const hidden = layout.swallowed.get(week.index) ?? [];
               return (
                 <tr key={week.index} className={styles.bandRow}>
                   <th scope="row" className={styles.weekHead}>
                     {week.label}
                   </th>
-                  {bandWidth > 0 && (
-                    <td
-                      colSpan={bandWidth}
-                      // Without this a multi-week band draws its title in the
-                      // first week and leaves the rest as rows with no body
-                      // cells — a ragged hole rather than a band.
-                      rowSpan={Math.max(1, band.span_weeks)}
-                      className={styles.bandCell}
-                    >
-                      <EntryButton entry={band} onSelect={onSelectEvent} />
-                    </td>
-                  )}
+                  <td
+                    colSpan={patrols.length}
+                    rowSpan={Math.max(1, band.span_weeks)}
+                    className={styles.bandCell}
+                  >
+                    <EntryButton entry={band} onSelect={onSelectEvent} />
+                    {hidden.length > 0 && (
+                      <p className={styles.swallowed}>
+                        {hidden.length} flokkafundur á sama tíma — opnaðu vikuna til að sjá
+                      </p>
+                    )}
+                  </td>
                 </tr>
               );
             }
 
-            // Covered by a band spanning down from an earlier week.
-            if (bandCoveredWeeks.has(week.index)) {
+            // A week under a band the previous row is spanning into.
+            if (layout.bandWeeks.has(week.index)) {
               return (
                 <tr key={week.index} className={styles.bandRow}>
                   <th scope="row" className={styles.weekHead}>
@@ -183,19 +200,17 @@ export default function PlanGrid({ data, onSelectEvent }: Props) {
                 </th>
                 {patrols.map((patrol) => {
                   const key = cellKey(week.index, patrol.id);
-                  if (occupied.has(key)) return null;
+                  if (layout.covered.has(key)) return null;
 
-                  const cell = cellIndex.get(key);
-                  const span = cell ? Math.max(1, cell.span_weeks) : 1;
-
+                  const entry = layout.placed.get(key);
                   return (
                     <td
                       key={patrol.id}
                       className={styles.cell}
-                      rowSpan={span > 1 ? span : undefined}
+                      rowSpan={entry && entry.span > 1 ? entry.span : undefined}
                     >
-                      {cell ? (
-                        <EntryButton entry={cell} onSelect={onSelectEvent} />
+                      {entry ? (
+                        <EntryButton entry={entry.cell} onSelect={onSelectEvent} />
                       ) : (
                         <span className={styles.blank} aria-hidden="true" />
                       )}

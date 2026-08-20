@@ -1,5 +1,5 @@
 import { buildApiUrl } from "@/lib/api-utils";
-import { ApiError, fetchWithAuth } from "@/lib/api";
+import { fetchWithAuth } from "@/lib/api";
 
 /**
  * The plan API — seasons and the scratchpad (A1, sc-34).
@@ -21,10 +21,15 @@ import { ApiError, fetchWithAuth } from "@/lib/api";
  *
  * The backend half of A1 is a separate track. These types are the contract that
  * half implements, so they are written against the confirmed data model rather
- * than against whatever ships first. Until the endpoints exist, `getSeasons`
- * returns an empty list on 404 (see `SeasonsUnavailable`) so the shell renders
- * its empty state instead of erroring — the plan route is reachable and
- * reviewable now, and starts showing real data the moment the API lands.
+ * than against whatever ships first. Until the endpoints exist the calls fail
+ * and the UI says it could not load the plan, without claiming to know why.
+ *
+ * An earlier version tried to tell "not deployed yet" apart from "broken" by
+ * inspecting the error message. That cannot work: FastAPI answers an unrouted
+ * path with exactly `{"detail": "Not Found"}`, which is indistinguishable from
+ * a missing record, so the guess was wrong in one direction or the other
+ * whichever way it matched. A confidently wrong reassurance is worse than an
+ * honest vague message.
  */
 
 /**
@@ -56,46 +61,11 @@ export type SeasonCreate = {
   ends_on?: string | null;
 };
 
-/**
- * Thrown when the plan endpoints are not deployed yet.
- *
- * Distinct from a real failure on purpose: the shell shows "not available yet"
- * rather than "something went wrong", which are different things to tell a
- * leader, and only one of them is worth reporting as a bug.
- */
-export class SeasonsUnavailable extends Error {
-  constructor() {
-    super("The plan API is not available yet");
-    this.name = "SeasonsUnavailable";
-  }
-}
-
 type GetToken = () => Promise<string | null>;
-
-/**
- * Is this a 404 for the *route* rather than for a resource?
- *
- * Both arrive as 404, and they mean opposite things to a leader: "the planner
- * is still being built" versus "the thing you asked for is gone". The backend
- * sends a `detail` for a resource it looked for and did not find; an unrouted
- * path has nothing to say about one.
- */
-function isMissingEndpoint(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 404 && !/not found/i.test(error.message);
-}
 
 /** Every season in a workspace, dated and undated alike. */
 export async function getSeasons(workspaceId: string, getToken: GetToken): Promise<Season[]> {
-  try {
-    return await fetchWithAuth<Season[]>(
-      buildApiUrl(`/workspaces/${workspaceId}/seasons`),
-      {},
-      getToken
-    );
-  } catch (error) {
-    if (isMissingEndpoint(error)) throw new SeasonsUnavailable();
-    throw error;
-  }
+  return fetchWithAuth<Season[]>(buildApiUrl(`/workspaces/${workspaceId}/seasons`), {}, getToken);
 }
 
 export async function createSeason(payload: SeasonCreate, getToken: GetToken): Promise<Season> {
@@ -187,12 +157,7 @@ export type PlanGrid = {
 
 /** The week×flokkur matrix for one season. */
 export async function getSeasonGrid(seasonId: string, getToken: GetToken): Promise<PlanGrid> {
-  try {
-    return await fetchWithAuth<PlanGrid>(buildApiUrl(`/seasons/${seasonId}/grid`), {}, getToken);
-  } catch (error) {
-    if (isMissingEndpoint(error)) throw new SeasonsUnavailable();
-    throw error;
-  }
+  return fetchWithAuth<PlanGrid>(buildApiUrl(`/seasons/${seasonId}/grid`), {}, getToken);
 }
 
 /**

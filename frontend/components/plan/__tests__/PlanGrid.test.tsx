@@ -119,9 +119,11 @@ describe("PlanGrid", () => {
     expect(bodyCells("Vika 2")).toHaveLength(0);
   });
 
-  it("gives up the columns a cell is already spanning into", () => {
-    // A cell spanning from week 1 into week 2 plus a full-width band in week 2
-    // would put one more column in that row than the table has.
+  it("clips a cell's span where a band begins", () => {
+    // A troop-wide event means every flokkur is on it, so a per-flokkur cell
+    // cannot run into one. Clipping keeps the band full width; the alternative
+    // — squeezing the band into whatever columns are left — cannot be expressed
+    // as one table cell unless those columns happen to be contiguous.
     render(
       <PlanGrid
         data={grid({
@@ -131,8 +133,26 @@ describe("PlanGrid", () => {
       />
     );
 
+    const [clipped] = bodyCells("Vika 1");
+    expect(clipped).not.toHaveAttribute("rowspan");
+
     const [bandCell] = bodyCells("Vika 2");
-    expect(bandCell).toHaveAttribute("colspan", "1"); // one patrol column left
+    expect(bandCell).toHaveAttribute("colspan", String(PATROLS.length));
+  });
+
+  it("reports cells that fall inside a band's weeks instead of dropping them", () => {
+    // Silently omitting an event from the one view a leader uses to check a
+    // week is worse than showing it awkwardly.
+    render(
+      <PlanGrid
+        data={grid({
+          bands: [band({ week_index: 2, span_weeks: 2 })],
+          cells: [cell({ week_index: 3, title: "Falinn fundur" })],
+        })}
+      />
+    );
+
+    expect(screen.getByText(/1 flokkafundur á sama tíma/)).toBeInTheDocument();
   });
 
   it("marks an undecided element with the '?' rather than leaving it blank", () => {

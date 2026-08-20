@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { compareSeasons, getSeasons, SeasonsUnavailable, type Season } from "../plan.service";
+import { compareSeasons, getSeasons, type Season } from "../plan.service";
 
 const TOKEN = "test-token";
 const getToken = async () => TOKEN;
@@ -51,31 +51,19 @@ describe("getSeasons", () => {
     expect((init.headers as Record<string, string>).Authorization).toBe(`Bearer ${TOKEN}`);
   });
 
-  it("reports an undeployed endpoint distinctly from a real failure", async () => {
-    // The backend half of A1 is a separate track, so "not deployed yet" and
-    // "something broke" are different things to tell a leader — only one of
-    // them is worth reporting as a bug. An unrouted path has no `detail`.
-    fetchMock.mockResolvedValueOnce(response({}, 404));
+  it("surfaces a 404 as an error rather than as an empty plan", async () => {
+    // An unrouted path and a missing record both arrive as
+    // `{"detail": "Not Found"}`, so the UI cannot claim to know which. What it
+    // must not do is treat either as "this season is simply empty".
+    fetchMock.mockResolvedValueOnce(response({ detail: "Not Found" }, 404));
 
-    await expect(getSeasons(WORKSPACE, getToken)).rejects.toBeInstanceOf(SeasonsUnavailable);
-  });
-
-  it("does not mistake a missing workspace for an unbuilt backend", async () => {
-    // A stale cached workspace id, or a season deleted in another tab, 404s
-    // with a detail. Showing "the backend is on its way" would hide it.
-    fetchMock.mockResolvedValueOnce(response({ detail: "Workspace not found" }, 404));
-
-    const error = await getSeasons(WORKSPACE, getToken).catch((e) => e);
-    expect(error).toBeInstanceOf(Error);
-    expect(error).not.toBeInstanceOf(SeasonsUnavailable);
+    await expect(getSeasons(WORKSPACE, getToken)).rejects.toBeInstanceOf(Error);
   });
 
   it("lets a genuine server error through as an error", async () => {
     fetchMock.mockResolvedValueOnce(response({ detail: "boom" }, 500));
 
-    const error = await getSeasons(WORKSPACE, getToken).catch((e) => e);
-    expect(error).toBeInstanceOf(Error);
-    expect(error).not.toBeInstanceOf(SeasonsUnavailable);
+    await expect(getSeasons(WORKSPACE, getToken)).rejects.toBeInstanceOf(Error);
   });
 });
 

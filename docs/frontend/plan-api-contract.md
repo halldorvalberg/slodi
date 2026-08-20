@@ -55,7 +55,7 @@ type SeasonCreate = {
 
 **The scratchpad is not a separate feature.** It is a `Season` with null dates. That is deliberate: A3's "play with putting a dagskrá together" and A8's draft state both fall out of the same model instead of needing their own. A backend that makes the scratchpad its own table or a boolean flag on something else would break that, and A8 would need reworking.
 
-**A 404 is treated as "not built yet", not as an error.** Until these endpoints exist the plan route shows a "backend is on its way" notice rather than an error state, and starts showing real data the moment they land — no frontend change required. Anything other than 404 surfaces as a genuine failure, so please don't return 404 for "this workspace has no seasons"; return `[]`.
+**Return `[]`, never 404, for an empty collection.** The frontend cannot tell an unrouted path from a missing record — FastAPI answers both with `{"detail": "Not Found"}` — so a 404 is always surfaced to the leader as a failure. A workspace with no seasons is not a failure.
 
 ## The grid matrix — A2 (sc-37)
 
@@ -94,6 +94,8 @@ type PlanGrid = {
 **`status: "unknown"` is the "?" marker** of ADR-002 §3, not a missing value. A leader setting the skeleton early needs to say "something goes here, undecided" and have it render as a deliberate mark rather than an empty cell. Please don't collapse it to null.
 
 **`span_weeks` counts the first week.** `1` means a single week; `2` means this week and the next. The frontend skips the positions a span covers, so an off-by-one here shears the grid sideways.
+
+**A band week holds no per-flokkur cells.** A troop-wide event means every flokkur is on it, so a cell in the same week contradicts the band. The grid clips a cell's span where a band begins, and reports any cell that still lands inside a band's weeks rather than dropping it — but that is damage control, not a supported shape. If the two can genuinely coexist, say so, because the layout would need rethinking.
 
 **One entry per position.** The grid renders at most one band per week and one cell per week-and-patrol; a second for the same position replaces the first on screen rather than stacking. If two troop-wide events can genuinely share a week — a skipulagsfundur alongside a mót — say so and the grid needs an overflow affordance before that ships, because today it would silently drop one.
 

@@ -8,7 +8,6 @@ import {
   createSeason,
   getSeasonGrid,
   getSeasons,
-  SeasonsUnavailable,
   type Season,
   type SeasonCreate,
 } from "@/services/plan.service";
@@ -36,17 +35,18 @@ export function useSeasons(workspaceId: string | null) {
     queryFn: () => getSeasons(workspaceId as string, getToken),
     // A missing endpoint is a deployment fact, not a blip — retrying just
     // delays the empty state the shell is going to show anyway.
-    retry: (failureCount, error) => !(error instanceof SeasonsUnavailable) && failureCount < 2,
+    retry: 1,
   });
 
   const seasons = useMemo(() => [...(query.data ?? [])].sort(compareSeasons), [query.data]);
 
   return {
     seasons,
-    isLoading: query.isLoading,
-    /** True while the backend half of A1 is still to land. */
-    isUnavailable: query.error instanceof SeasonsUnavailable,
-    error: query.error instanceof SeasonsUnavailable ? null : query.error,
+    // `isPending`, not `isLoading`: v5 derives isLoading as isPending &&
+    // isFetching, which is false on the single render where a query flips from
+    // disabled to enabled — long enough to flash "you have no starfsár".
+    isLoading: query.isPending,
+    error: query.error,
     refetch: query.refetch,
   };
 }
@@ -86,13 +86,12 @@ export function usePlanGrid(seasonId: string | null) {
     queryKey: planKeys.grid(seasonId ?? "none"),
     enabled: Boolean(seasonId),
     queryFn: () => getSeasonGrid(seasonId as string, getToken),
-    retry: (failureCount, error) => !(error instanceof SeasonsUnavailable) && failureCount < 2,
+    retry: 1,
   });
 
   return {
     grid: query.data ?? null,
-    isLoading: query.isLoading,
-    isUnavailable: query.error instanceof SeasonsUnavailable,
-    error: query.error instanceof SeasonsUnavailable ? null : query.error,
+    isLoading: query.isPending,
+    error: query.error,
   };
 }

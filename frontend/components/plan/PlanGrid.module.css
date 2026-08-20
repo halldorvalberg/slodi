@@ -137,3 +137,12 @@
   color: hsl(var(--sl-color-text-secondary));
   margin: 0;
 }
+
+/* Cells that fall inside a band's weeks are reported rather than dropped —
+   a leader checking a week must never be shown a view that quietly omits an
+   event that exists. */
+.swallowed {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  color: hsl(var(--sl-color-text-secondary));
+}

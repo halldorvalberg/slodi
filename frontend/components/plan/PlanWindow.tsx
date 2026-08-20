@@ -33,8 +33,6 @@ type WindowEntry = {
   isDone: boolean;
 };
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
 /**
  * A week counts as done once it is over, not once it has begun.
  *
@@ -47,7 +45,14 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  */
 function isWeekDone(week: PlanWeek, today: Date): boolean {
   if (!week.starts_on) return false;
-  return new Date(week.starts_on).getTime() + 7 * DAY_MS <= today.getTime();
+  // A date-only ISO string parses as UTC midnight while `today` is a local
+  // instant, so comparing them directly shifts the boundary by the offset —
+  // invisible in Iceland, up to a day wrong further west. Compare the calendar
+  // day the week ends on against today's calendar day instead.
+  const [year, month, day] = week.starts_on.split("-").map(Number);
+  if (!year || !month || !day) return false;
+  const weekEnd = new Date(year, month - 1, day + 7);
+  return weekEnd.getTime() <= today.getTime();
 }
 
 export default function PlanWindow({ data, today, ahead = DEFAULT_AHEAD }: Props) {

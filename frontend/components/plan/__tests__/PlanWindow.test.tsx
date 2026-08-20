@@ -11,11 +11,26 @@ import type { PlanCell, PlanGrid as PlanGridData } from "@/services/plan.service
 
 const TODAY = new Date("2026-09-20T12:00:00Z");
 
-const WEEKS = [1, 2, 3, 4, 5, 6, 7].map((index) => ({
-  index,
-  // Weeks 1 and 2 are before TODAY; 3 onwards are after.
-  starts_on: `2026-09-${String(index * 7).padStart(2, "0")}`,
-  label: `Vika ${index}`,
+/**
+ * Real Mondays. An earlier version built these by string arithmetic and
+ * produced "2026-09-35" for week 5 — an Invalid Date, whose comparisons are
+ * all false, so the later weeks counted as "ahead" by accident rather than by
+ * date and several assertions here proved nothing.
+ */
+const WEEK_STARTS = [
+  "2026-09-07",
+  "2026-09-14",
+  "2026-09-21",
+  "2026-09-28",
+  "2026-10-05",
+  "2026-10-12",
+  "2026-10-19",
+];
+
+const WEEKS = WEEK_STARTS.map((starts_on, i) => ({
+  index: i + 1,
+  starts_on,
+  label: `Vika ${i + 1}`,
 }));
 
 function cell(weekIndex: number, overrides: Partial<PlanCell> = {}): PlanCell {
