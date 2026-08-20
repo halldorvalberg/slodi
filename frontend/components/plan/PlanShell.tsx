@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useDefaultWorkspaceId } from "@/hooks/useDefaultWorkspaceId";
 import { useSeasons, usePlanGrid } from "@/hooks/usePlan";
 import PlanGrid from "./PlanGrid";
+import PlanWindow from "./PlanWindow";
 import SeasonSwitcher from "./SeasonSwitcher";
 import styles from "./PlanShell.module.css";
 
@@ -19,6 +20,7 @@ import styles from "./PlanShell.module.css";
 
 /** The three projections ADR-002 §2 requires. Timeline first, per the roadmap. */
 const VIEWS = [
+  { id: "window", label: "Næstu fundir", ticket: "A7 (sc-42)" },
   { id: "timeline", label: "Tímalína", ticket: "A4 (sc-39)" },
   { id: "grid", label: "Tafla", ticket: "A2 (sc-37)" },
   { id: "calendar", label: "Dagatal", ticket: "A4 (sc-39)" },
@@ -30,7 +32,7 @@ export default function PlanShell() {
   const workspaceId = useDefaultWorkspaceId();
   const { seasons, isLoading, isUnavailable, error } = useSeasons(workspaceId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [view, setView] = useState<ViewId>("timeline");
+  const [view, setView] = useState<ViewId>("window");
   // One query per season, shared by every view — ADR-002 §2 requires the views
   // to be projections of one dataset, which only holds if they share a fetch.
   const { grid, isLoading: gridLoading } = usePlanGrid(selectedId);
@@ -97,6 +99,16 @@ export default function PlanShell() {
           </div>
         )}
 
+        {selected && view === "window" && (
+          <section aria-live="polite">
+            {gridLoading && <p className={styles.muted}>Sæki fundina…</p>}
+            {grid && <PlanWindow data={grid} />}
+            {!gridLoading && !grid && (
+              <p className={styles.muted}>Engir fundir skráðir á {selected.name} enn.</p>
+            )}
+          </section>
+        )}
+
         {selected && view === "grid" && (
           <section aria-live="polite">
             {gridLoading && <p className={styles.muted}>Sæki töfluna…</p>}
@@ -107,7 +119,7 @@ export default function PlanShell() {
           </section>
         )}
 
-        {selected && view !== "grid" && (
+        {selected && (view === "timeline" || view === "calendar") && (
           <section className={styles.viewHost} aria-live="polite">
             {/* Timeline and calendar are A4. They mount here and read the same
                 query the grid does, so the three never diverge. */}
