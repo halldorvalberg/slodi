@@ -175,6 +175,48 @@ describe("PlanGrid", () => {
     expect(onSelectEvent).toHaveBeenCalledWith("chosen");
   });
 
+  it("clips overlapping bands instead of shearing the table", () => {
+    // Two troop-wide events overlapping is bad data, but the grid must not turn
+    // bad data into a table with more columns in one row than it has.
+    render(
+      <PlanGrid
+        data={grid({
+          bands: [band({ week_index: 1, span_weeks: 3 }), band({ event_id: "b2", week_index: 2 })],
+        })}
+      />
+    );
+
+    const [first] = bodyCells("Vika 1");
+    expect(first).toHaveAttribute("rowspan", "1"); // clipped at the next band
+    expect(bodyCells("Vika 2")).toHaveLength(1);
+  });
+
+  it("does not let a span run off the end of the season", () => {
+    // A rowSpan longer than the table has rows stretches the last row instead.
+    render(<PlanGrid data={grid({ cells: [cell({ week_index: 3, span_weeks: 5 })] })} />);
+
+    const [last] = bodyCells("Vika 3");
+    expect(last).not.toHaveAttribute("rowspan"); // only one week left
+  });
+
+  it("reports a cell hidden underneath another cell's span", () => {
+    // Same reasoning as the band case: an omitted event is worse than an
+    // awkward one, because the leader has no way to know it exists.
+    render(
+      <PlanGrid
+        data={grid({
+          cells: [
+            cell({ week_index: 1, patrol_id: "p1", span_weeks: 3 }),
+            cell({ event_id: "e2", week_index: 2, patrol_id: "p1", title: "Falinn" }),
+          ],
+        })}
+      />
+    );
+
+    // The first is clipped so the second can render in its own right.
+    expect(screen.getByRole("button", { name: /Falinn/ })).toBeInTheDocument();
+  });
+
   it("says so when there is nothing to lay out yet", () => {
     render(<PlanGrid data={grid({ patrols: [], weeks: [] })} />);
     expect(screen.getByText(/hvorki flokka né vikur/)).toBeInTheDocument();

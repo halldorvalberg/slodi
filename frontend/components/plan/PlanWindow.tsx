@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { PlanCell, PlanGrid as PlanGridData, PlanWeek } from "@/services/plan.service";
+import type {
+  PlanBand,
+  PlanCell,
+  PlanGrid as PlanGridData,
+  PlanWeek,
+} from "@/services/plan.service";
 import styles from "./PlanWindow.module.css";
 
 /**
@@ -28,9 +33,13 @@ interface Props {
 }
 
 type WindowEntry = {
-  cell: PlanCell;
+  id: string;
+  title: string;
+  status: PlanCell["status"];
   week: PlanWeek;
   isDone: boolean;
+  /** Troop-wide: every flokkur is on it, so it shows in every flokkur's window. */
+  isTroopWide: boolean;
 };
 
 /**
@@ -49,8 +58,8 @@ function isWeekDone(week: PlanWeek, today: Date): boolean {
   // instant, so comparing them directly shifts the boundary by the offset —
   // invisible in Iceland, up to a day wrong further west. Compare the calendar
   // day the week ends on against today's calendar day instead.
-  const [year, month, day] = week.starts_on.split("-").map(Number);
-  if (!year || !month || !day) return false;
+  const [year, month, day] = week.starts_on.slice(0, 10).split("-").map(Number);
+  if (![year, month, day].every(Number.isFinite)) return false;
   const weekEnd = new Date(year, month - 1, day + 7);
   return weekEnd.getTime() <= today.getTime();
 }
@@ -79,15 +88,33 @@ export default function PlanWindow({ data, today, ahead = DEFAULT_AHEAD }: Props
 
   const entries = useMemo<WindowEntry[]>(() => {
     if (!activePatrolId) return [];
-    return data.cells
+
+    const toEntry = (entry: PlanCell | PlanBand, isTroopWide: boolean): WindowEntry | null => {
+      const week = weekByIndex.get(entry.week_index);
+      if (!week) return null;
+      return {
+        id: entry.event_id,
+        title: entry.title,
+        status: entry.status,
+        week,
+        isDone: isWeekDone(week, now),
+        isTroopWide,
+      };
+    };
+
+    const mine = data.cells
       .filter((cell) => cell.patrol_id === activePatrolId)
-      .map((cell) => {
-        const week = weekByIndex.get(cell.week_index);
-        return week ? { cell, week, isDone: isWeekDone(week, now) } : null;
-      })
+      .map((cell) => toEntry(cell, false));
+
+    // A troop-wide fundur — sveitarfundur, útilega, mót — is a meeting this
+    // flokkur attends by definition. Leaving them out made the one view a
+    // flokksforingi opens to see what is coming omit half of what is coming.
+    const shared = data.bands.map((band) => toEntry(band, true));
+
+    return [...mine, ...shared]
       .filter((entry): entry is WindowEntry => entry !== null)
       .sort((a, b) => a.week.index - b.week.index);
-  }, [data.cells, activePatrolId, weekByIndex, now]);
+  }, [data.cells, data.bands, activePatrolId, weekByIndex, now]);
 
   /**
    * Keep a little history and the next few ahead. Slicing around the first
@@ -129,14 +156,12 @@ export default function PlanWindow({ data, today, ahead = DEFAULT_AHEAD }: Props
         <p className={styles.empty}>Engir fundir framundan hjá þessum flokki.</p>
       ) : (
         <ol className={styles.list}>
-          {windowed.map(({ cell, week, isDone }) => (
-            <li
-              key={cell.event_id}
-              className={`${styles.item} ${isDone ? styles.done : styles.ahead}`}
-            >
+          {windowed.map(({ id, title, status, week, isDone, isTroopWide }) => (
+            <li key={id} className={`${styles.item} ${isDone ? styles.done : styles.ahead}`}>
               <span className={styles.week}>{week.label}</span>
-              <span className={styles.title}>{cell.title}</span>
-              {cell.status === "unknown" && (
+              <span className={styles.title}>{title}</span>
+              {isTroopWide && <span className={styles.troopWide}>Öll sveitin</span>}
+              {status === "unknown" && (
                 <span className={styles.mark} aria-label="Óákveðið">
                   ?
                 </span>

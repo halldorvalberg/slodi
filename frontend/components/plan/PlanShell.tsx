@@ -94,6 +94,13 @@ export default function PlanShell() {
       <div className={styles.content}>
         {isLoading && <p className={styles.muted}>Sæki starfsár…</p>}
 
+        {workspaceMissing && (
+          <div className={styles.error} role="alert">
+            <strong>Náði ekki í vinnusvæðið.</strong> Dagskráin getur ekki hlaðist án þess — prófaðu
+            að endurhlaða síðuna.
+          </div>
+        )}
+
         {error && (
           <div className={styles.error} role="alert">
             Ekki tókst að sækja starfsárin. Grunnurinn gæti verið í smíðum.

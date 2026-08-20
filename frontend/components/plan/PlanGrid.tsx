@@ -85,49 +85,88 @@ export default function PlanGrid({ data, onSelectEvent }: Props) {
    * inside a band's weeks is reported on the band rather than silently dropped.
    */
   const layout = useMemo(() => {
+    const lastWeek = weeks.length > 0 ? weeks[weeks.length - 1].index : 0;
+
+    /**
+     * How far an entry may span before it runs into something, or off the end.
+     *
+     * `blockers` are week indices it must not reach. A span that overshoots the
+     * season emits a rowSpan longer than the table has rows; a span that reaches
+     * another entry puts two cells in one slot and shears every row below it.
+     */
+    const clipSpan = (startWeek: number, wanted: number, blockers: Set<number>): number => {
+      const capped = Math.min(Math.max(1, wanted), Math.max(1, lastWeek - startWeek + 1));
+      for (let offset = 1; offset < capped; offset++) {
+        if (blockers.has(startWeek + offset)) return offset;
+      }
+      return capped;
+    };
+
     const bandStart = new Map<number, PlanBand>();
     for (const band of bands) bandStart.set(band.week_index, band);
 
+    // Bands clip against each other too. Two overlapping troop-wide events is
+    // bad data, but the grid must not turn bad data into a broken table.
+    const bandStartWeeks = new Set(bandStart.keys());
+    const bandSpan = new Map<number, number>();
     const bandWeeks = new Set<number>();
-    for (const band of bands) {
-      for (let offset = 0; offset < Math.max(1, band.span_weeks); offset++) {
-        bandWeeks.add(band.week_index + offset);
-      }
+    for (const week of [...bandStartWeeks].sort((a, b) => a - b)) {
+      const band = bandStart.get(week) as PlanBand;
+      const others = new Set([...bandStartWeeks].filter((other) => other !== week));
+      const span = clipSpan(week, band.span_weeks, others);
+      bandSpan.set(week, span);
+      for (let offset = 0; offset < span; offset++) bandWeeks.add(week + offset);
     }
-
-    /** How far a cell may span before it would run into a band. */
-    const clippedSpan = (cell: PlanCell): number => {
-      const wanted = Math.max(1, cell.span_weeks);
-      for (let offset = 1; offset < wanted; offset++) {
-        if (bandWeeks.has(cell.week_index + offset)) return offset;
-      }
-      return wanted;
-    };
 
     const placed = new Map<string, { cell: PlanCell; span: number }>();
     const covered = new Set<string>();
     const swallowed = new Map<number, PlanCell[]>();
 
+    /** Report rather than drop: an omitted event is worse than an awkward one. */
+    const hide = (cell: PlanCell) => {
+      const owner =
+        [...bandStartWeeks].filter((week) => week <= cell.week_index).sort((a, b) => b - a)[0] ??
+        cell.week_index;
+      const list = swallowed.get(owner) ?? [];
+      list.push(cell);
+      swallowed.set(owner, list);
+    };
+
+    // Earliest first, so a later cell in the same column clips the one above it
+    // rather than being silently overdrawn by it.
+    const byColumn = new Map<string, number[]>();
     for (const cell of cells) {
+      if (bandWeeks.has(cell.week_index)) continue;
+      const starts = byColumn.get(cell.patrol_id) ?? [];
+      starts.push(cell.week_index);
+      byColumn.set(cell.patrol_id, starts);
+    }
+
+    for (const cell of [...cells].sort((a, b) => a.week_index - b.week_index)) {
       if (bandWeeks.has(cell.week_index)) {
-        // Inside a band's weeks. Surfaced on the band so it is visible.
-        const bandWeek = [...bandStart.keys()]
-          .filter((week) => week <= cell.week_index)
-          .sort((a, b) => b - a)[0];
-        const list = swallowed.get(bandWeek) ?? [];
-        list.push(cell);
-        swallowed.set(bandWeek, list);
+        hide(cell);
         continue;
       }
-      const span = clippedSpan(cell);
-      placed.set(cellKey(cell.week_index, cell.patrol_id), { cell, span });
+      const key = cellKey(cell.week_index, cell.patrol_id);
+      if (placed.has(key) || covered.has(key)) {
+        hide(cell);
+        continue;
+      }
+
+      const blockers = new Set(
+        (byColumn.get(cell.patrol_id) ?? []).filter((week) => week !== cell.week_index)
+      );
+      for (const week of bandWeeks) blockers.add(week);
+
+      const span = clipSpan(cell.week_index, cell.span_weeks, blockers);
+      placed.set(key, { cell, span });
       for (let offset = 1; offset < span; offset++) {
         covered.add(cellKey(cell.week_index + offset, cell.patrol_id));
       }
     }
 
-    return { bandStart, bandWeeks, placed, covered, swallowed };
-  }, [bands, cells]);
+    return { bandStart, bandSpan, bandWeeks, placed, covered, swallowed };
+  }, [bands, cells, weeks]);
 
   if (patrols.length === 0 || weeks.length === 0) {
     return (
@@ -168,13 +207,16 @@ export default function PlanGrid({ data, onSelectEvent }: Props) {
                   </th>
                   <td
                     colSpan={patrols.length}
-                    rowSpan={Math.max(1, band.span_weeks)}
+                    rowSpan={layout.bandSpan.get(week.index) ?? 1}
                     className={styles.bandCell}
                   >
                     <EntryButton entry={band} onSelect={onSelectEvent} />
                     {hidden.length > 0 && (
                       <p className={styles.swallowed}>
-                        {hidden.length} flokkafundur á sama tíma — opnaðu vikuna til að sjá
+                        {hidden.length === 1
+                          ? "1 flokkafundur á sama tíma"
+                          : `${hidden.length} flokkafundir á sama tíma`}{" "}
+                        — opnaðu vikuna til að sjá
                       </p>
                     )}
                   </td>

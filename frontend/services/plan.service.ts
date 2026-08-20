@@ -160,29 +160,6 @@ export async function getSeasonGrid(seasonId: string, getToken: GetToken): Promi
   return fetchWithAuth<PlanGrid>(buildApiUrl(`/seasons/${seasonId}/grid`), {}, getToken);
 }
 
-/**
- * Index the cells by week and patrol so the renderer is a lookup rather than a
- * scan per cell. A term across six patrols is ~200 cells; scanning the flat
- * list for each would be quadratic for no reason.
- */
-export function indexCells(cells: PlanCell[]): Map<string, PlanCell> {
-  const byPosition = new Map<string, PlanCell>();
-  for (const cell of cells) byPosition.set(cellKey(cell.week_index, cell.patrol_id), cell);
-  return byPosition;
-}
-
 export function cellKey(weekIndex: number, patrolId: string): string {
   return `${weekIndex}:${patrolId}`;
-}
-
-/**
- * Weeks a multi-week entry covers *after* its first, which the renderer must
- * skip so a rowSpan does not collide with a cell drawn underneath it.
- */
-export function coveredWeeks(entry: PlanEntryBase): number[] {
-  const covered: number[] = [];
-  for (let offset = 1; offset < Math.max(1, entry.span_weeks); offset++) {
-    covered.push(entry.week_index + offset);
-  }
-  return covered;
 }

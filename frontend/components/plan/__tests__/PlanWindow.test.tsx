@@ -139,6 +139,43 @@ describe("PlanWindow", () => {
     expect(screen.getByLabelText("Óákveðið")).toBeInTheDocument();
   });
 
+  it("includes troop-wide fundir, which every flokkur attends", () => {
+    // A sveitarfundur or útilega is a meeting this flokkur is on by definition.
+    // Leaving them out made the view a flokksforingi opens to see what is
+    // coming omit half of what is coming.
+    render(
+      <PlanWindow
+        data={grid({
+          cells: [],
+          bands: [
+            {
+              event_id: "b1",
+              week_index: 3,
+              title: "Útilega",
+              status: "confirmed",
+              type: "utilega",
+              span_weeks: 1,
+            },
+          ],
+        })}
+        today={TODAY}
+      />
+    );
+
+    const shown = titles().join(" ");
+    expect(shown).toContain("Útilega");
+    expect(shown).toContain("Öll sveitin");
+  });
+
+  it("survives a datetime where the contract asks for a date", () => {
+    // A NaN day made the guard return false for every week, so a whole term
+    // silently read as never-done with no visible failure.
+    const withTime = WEEKS.map((w) => ({ ...w, starts_on: `${w.starts_on}T00:00:00Z` }));
+    render(<PlanWindow data={grid({ weeks: withTime })} today={TODAY} ahead={4} />);
+
+    expect(titles()[0]).toContain("Búið");
+  });
+
   it("says so when the flokkur has nothing ahead", () => {
     render(<PlanWindow data={grid({ cells: [] })} today={TODAY} />);
 
