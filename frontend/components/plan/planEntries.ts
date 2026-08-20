@@ -1,4 +1,11 @@
-import type { PlanBand, PlanCell, PlanGrid, PlanWeek } from "@/services/plan.service";
+import type {
+  Patrol,
+  PatrolAccent,
+  PlanBand,
+  PlanCell,
+  PlanGrid,
+  PlanWeek,
+} from "@/services/plan.service";
 
 /**
  * Turning the grid into one flokkur's list of meetings.
@@ -96,4 +103,92 @@ export function entriesForPatrol(data: PlanGrid, patrolId: string | null, now: D
 export function resolvePatrolId(data: PlanGrid, chosen: string | null): string | null {
   if (chosen && data.patrols.some((patrol) => patrol.id === chosen)) return chosen;
   return data.patrols[0]?.id ?? null;
+}
+
+/**
+ * The patrol ramps, in the order an undeclared flokkur picks them up.
+ *
+ * A `Patrol` may not carry an accent — the field is optional, and the backend
+ * that will fill it does not exist yet. Falling back on column position keeps
+ * every flokkur visually distinct today, and keeps it *stable*: the same column
+ * gets the same colour on every render and in every view, which is the whole
+ * point of colouring them.
+ */
+export const PATROL_ACCENTS: PatrolAccent[] = [
+  "rekkar",
+  "drekar",
+  "falkar",
+  "drott",
+  "rover",
+  "adrir",
+];
+
+/** The CSS colour for a flokkur, declared or derived from its column. */
+export function accentVarFor(patrol: Patrol | undefined, index: number): string {
+  const accent = patrol?.accent ?? PATROL_ACCENTS[index % PATROL_ACCENTS.length];
+  return `var(--sl-color-patrol-${accent})`;
+}
+
+/**
+ * `HH:MM` from an entry's start, or null when it has none.
+ *
+ * Reads the clock out of the ISO string rather than constructing a `Date`: the
+ * planner wants the local wall-clock time the fundur was scheduled for, and
+ * parsing then re-formatting would move it by the viewer's offset — a leader
+ * abroad would see their own meetings at the wrong time.
+ */
+export function formatClock(startsAt: string | null | undefined): string | null {
+  if (!startsAt) return null;
+  const match = /T(\d{2}):(\d{2})/.exec(startsAt);
+  return match ? `${match[1]}:${match[2]}` : null;
+}
+
+/** The local calendar day of an entry, or null when it has no date. */
+export function entryDay(startsAt: string | null | undefined): Date | null {
+  if (!startsAt) return null;
+  const [year, month, day] = startsAt.slice(0, 10).split("-").map(Number);
+  if (![year, month, day].every(Number.isFinite)) return null;
+  return new Date(year, month - 1, day);
+}
+
+/** Planned and actual minutes, normalised so views do not each guess a default. */
+export function minutesOf(entry: PlanBand | PlanCell): {
+  actual: number | null;
+  planned: number | null;
+} {
+  return {
+    actual: entry.actual_minutes ?? null,
+    planned: entry.planned_minutes ?? null,
+  };
+}
+
+/** Same calendar day, ignoring the time of day. */
+export function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+/**
+ * Does this number take the singular in Icelandic?
+ *
+ * Anything ending in 1 except 11 — so 21 liður but 11 liðir. Exported as well
+ * as used by `count`, because a sentence often has to agree twice: "1 liður enn
+ * óákveðinn" needs the adjective to follow the noun.
+ */
+export function takesSingular(n: number): boolean {
+  return Math.abs(n) % 10 === 1 && Math.abs(n) % 100 !== 11;
+}
+
+/**
+ * Icelandic counts, where "1" takes the singular.
+ *
+ * Written down once because it was being re-derived at each call site and two
+ * of them had already drifted — "1 liðir enn óákveðnir" and "1 fundir í öðrum
+ * mánuðum".
+ */
+export function count(n: number, singular: string, plural: string): string {
+  return `${n} ${takesSingular(n) ? singular : plural}`;
 }

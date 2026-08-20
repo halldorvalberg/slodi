@@ -57,10 +57,21 @@ function grid(overrides: Partial<PlanGridData> = {}): PlanGridData {
   };
 }
 
-/** Cells in a row, ignoring the week header. */
+/** How many trailing columns are utilities (ATH, Innkaup) rather than flokkar. */
+const UTIL_COLUMNS = 2;
+
+/**
+ * The flokkur cells of a row — no week header, and no ATH/Innkaup columns.
+ *
+ * The utility columns are per-week and always present, so counting them would
+ * make every assertion below about the *layout* of events also depend on how
+ * many utility columns the design happens to have. Dropping them keeps each
+ * test measuring the one thing it names.
+ */
 function bodyCells(rowName: string) {
   const row = screen.getByRole("row", { name: new RegExp(rowName) });
-  return within(row).queryAllByRole("cell");
+  const cells = within(row).queryAllByRole("cell");
+  return cells.slice(0, Math.max(0, cells.length - UTIL_COLUMNS));
 }
 
 describe("PlanGrid", () => {
@@ -71,7 +82,11 @@ describe("PlanGrid", () => {
       expect(screen.getByRole("columnheader", { name: patrol.name })).toBeInTheDocument();
     }
     for (const week of WEEKS) {
-      expect(screen.getByRole("rowheader", { name: week.label })).toBeInTheDocument();
+      // The header also carries the week's date, so match the label rather than
+      // the whole accessible name.
+      expect(
+        screen.getByRole("rowheader", { name: new RegExp(`^${week.label}\\b`) })
+      ).toBeInTheDocument();
     }
   });
 
@@ -115,7 +130,7 @@ describe("PlanGrid", () => {
     // legitimately owns no cell of its own; the span is what fills it.
     const [bandCell] = bodyCells("Vika 1");
     expect(bandCell).toHaveAttribute("rowspan", "2");
-    expect(screen.getByRole("rowheader", { name: "Vika 2" })).toBeInTheDocument();
+    expect(screen.getByRole("rowheader", { name: /^Vika 2\b/ })).toBeInTheDocument();
     expect(bodyCells("Vika 2")).toHaveLength(0);
   });
 

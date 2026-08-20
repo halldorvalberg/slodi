@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Sidebar from "@/components/DashboardSidebar/DashboardSidebar";
 import { MobileMenuButton } from "@/components/MobileMenuButton/MobileMenuButton";
@@ -32,8 +33,10 @@ export default function DashboardLayout({
   badgeCount = 0,
 }: DashboardLayoutProps) {
   const { user } = useUser();
+  const pathname = usePathname();
+  // The workbench brings its own left rail; see useSidebarState.
   const { sidebarCollapsed, mobileMenuOpen, toggleSidebar, toggleMobileMenu, closeMobileMenu } =
-    useSidebarState();
+    useSidebarState({ collapseByDefault: pathname.startsWith("/builder") });
 
   // Resolve user data with Auth0 fallbacks
   const resolvedUserName = user?.name || userName;

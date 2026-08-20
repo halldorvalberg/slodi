@@ -1,77 +1,141 @@
+/* The Dagatal, per the v5 hi-fi. A real <table> for the same reason as the
+   Rist — see PlanGrid.module.css. */
+
 .root {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sl-spacing-md, 16px);
+  max-width: 1080px;
+  margin: 0 auto;
 }
 
 .bar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sl-spacing-md, 16px);
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: var(--sl-spacing-gap-md, 16px);
 }
 
 .monthTitle {
   margin: 0;
-  font-size: 1rem;
-  color: hsl(var(--sl-color-text-primary));
-  text-transform: capitalize;
+  font-size: var(--sl-text-heading-6);
+  font-weight: var(--sl-font-weight-heading);
+  text-transform: uppercase;
+  letter-spacing: var(--sl-primitive-letter-spacing-tight);
 }
 
 .nav {
-  padding: 6px 12px;
-  border: 1px solid hsl(var(--sl-color-border));
-  border-radius: 999px;
-  background: hsl(var(--sl-color-surface));
-  color: hsl(var(--sl-color-text-primary));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: var(--sl-radius-md);
+  background: none;
+  color: hsl(var(--sl-color-text-tertiary));
   font: inherit;
-  font-size: 0.82rem;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.nav:disabled {
-  opacity: 0.45;
-  cursor: default;
+.nav:hover:not(:disabled) {
+  background: hsl(var(--sl-color-background-tertiary));
+  color: hsl(var(--sl-color-text-primary));
 }
 
 .nav:focus-visible {
-  outline: 2px solid hsl(var(--sl-color-primary));
+  outline: 2px solid hsl(var(--sl-color-border-focus));
   outline-offset: 2px;
 }
 
+.nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.eyebrow {
+  font-size: var(--sl-text-overline);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: var(--sl-font-weight-emphasis);
+  color: hsl(var(--sl-color-text-tertiary));
+}
+
+.cal {
+  background: hsl(var(--sl-color-surface));
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-lg, 10px);
+  box-shadow: var(--sl-shadow-card);
+  overflow: hidden;
+}
+
 .table {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
   table-layout: fixed;
 }
 
 .caption {
-  caption-side: bottom;
-  padding-top: var(--sl-spacing-sm, 8px);
-  color: hsl(var(--sl-color-text-secondary));
-  font-size: 0.76rem;
-  text-align: left;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .dayHead {
   padding: 6px;
+  background: hsl(var(--sl-color-background-secondary));
   border-bottom: 1px solid hsl(var(--sl-color-border));
-  color: hsl(var(--sl-color-text-secondary));
-  font-size: 0.74rem;
-  font-weight: 600;
+  border-right: 1px solid hsl(var(--sl-color-border));
+  font-size: var(--sl-text-overline);
+  font-weight: var(--sl-font-weight-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: hsl(var(--sl-color-text-tertiary));
   text-align: left;
 }
 
+.dayHead:last-child {
+  border-right: 0;
+}
+
 .day {
-  border: 1px solid hsl(var(--sl-color-border));
-  padding: 6px;
-  height: 42px;
+  min-height: 104px;
+  height: 104px;
+  padding: 5px 6px;
+  border-bottom: 1px solid hsl(var(--sl-color-border));
+  border-right: 1px solid hsl(var(--sl-color-border));
   vertical-align: top;
+  min-width: 0;
+}
+
+.day:last-child {
+  border-right: 0;
+}
+
+/* Days belonging to the neighbouring month: present for orientation, recessed
+   so they never compete with the month actually being read. */
+.out {
+  background: hsl(var(--sl-color-background-secondary) / 0.5);
+}
+
+.out .dayNumber {
+  color: hsl(var(--sl-color-text-tertiary));
+}
+
+.dayHd {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 4px;
 }
 
 .dayNumber {
-  font-size: 0.76rem;
-  color: hsl(var(--sl-color-text-secondary));
+  font-size: var(--sl-text-body-sm);
+  font-weight: var(--sl-font-weight-heading);
   font-variant-numeric: tabular-nums;
 }
 
@@ -79,47 +143,67 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  border-radius: 999px;
-  background: hsl(var(--sl-color-primary));
-  color: hsl(var(--sl-color-primary-foreground, 0 0% 100%));
-  font-weight: 600;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: hsl(var(--sl-color-text-primary));
+  color: hsl(var(--sl-color-text-inverse));
 }
 
-/* Entries belong to the week, not to a day — see the component docstring. */
-.entriesRow {
-  border: 1px solid hsl(var(--sl-color-border));
-  border-top: 0;
-  padding: 6px;
-  background: hsl(var(--sl-color-surface));
+.undated {
+  margin-top: var(--sl-spacing-gap-md, 16px);
+  padding: var(--sl-spacing-inset-sm, 12px);
+  border: 1px dashed hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card, 12px);
+  background: hsl(var(--sl-color-background-secondary) / 0.6);
 }
 
-.entries {
-  list-style: none;
+.undatedTitle {
+  margin: 0 0 6px;
+  font-size: var(--sl-text-overline);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: hsl(var(--sl-color-text-tertiary));
+}
+
+.undatedList {
   margin: 0;
   padding: 0;
+  list-style: none;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 4px;
+  font-size: var(--sl-text-body-sm);
 }
 
-.entry,
-.troopWide {
-  font-size: 0.78rem;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border-left: 3px solid hsl(var(--sl-color-primary));
-  background: hsl(var(--sl-color-background));
-  color: hsl(var(--sl-color-text-primary));
+.undatedList li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.undatedWeek {
+  min-width: 5rem;
+  font-size: var(--sl-text-overline);
+  color: hsl(var(--sl-color-text-tertiary));
 }
 
 .troopWide {
-  border-left-color: hsl(var(--sl-color-warning, 35 100% 64%));
-  font-weight: 600;
+  font-size: var(--sl-text-overline);
+  color: hsl(var(--sl-color-primary));
+  font-weight: var(--sl-font-weight-emphasis);
 }
 
 .empty {
-  margin: 0;
+  max-width: 1080px;
+  margin: 0 auto;
   color: hsl(var(--sl-color-text-secondary));
+}
+
+@media (max-width: 900px) {
+  .day {
+    height: auto;
+    min-height: 72px;
+  }
 }

@@ -12,7 +12,10 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
   {
-    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"],
+    // `.next*/**`, not `.next/**`: a `next build --distDir` run (or a stale
+    // directory left behind by one) drops generated code beside it that lints
+    // with hundreds of errors nobody can act on.
+    ignores: ["node_modules/**", ".next*/**", "out/**", "build/**", "next-env.d.ts"],
   },
 ];
 
