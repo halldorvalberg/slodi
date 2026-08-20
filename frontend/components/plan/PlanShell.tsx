@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useDefaultWorkspaceId } from "@/hooks/useDefaultWorkspaceId";
-import { useSeasons } from "@/hooks/usePlan";
+import { useSeasons, usePlanGrid } from "@/hooks/usePlan";
+import PlanGrid from "./PlanGrid";
 import SeasonSwitcher from "./SeasonSwitcher";
 import styles from "./PlanShell.module.css";
 
@@ -30,6 +31,9 @@ export default function PlanShell() {
   const { seasons, isLoading, isUnavailable, error } = useSeasons(workspaceId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [view, setView] = useState<ViewId>("timeline");
+  // One query per season, shared by every view — ADR-002 §2 requires the views
+  // to be projections of one dataset, which only holds if they share a fetch.
+  const { grid, isLoading: gridLoading } = usePlanGrid(selectedId);
 
   // Land on the newest starfsár once seasons arrive, so the route is never a
   // blank chooser when there is an obvious thing to be looking at.
@@ -93,11 +97,20 @@ export default function PlanShell() {
           </div>
         )}
 
-        {selected && (
+        {selected && view === "grid" && (
+          <section aria-live="polite">
+            {gridLoading && <p className={styles.muted}>Sæki töfluna…</p>}
+            {grid && <PlanGrid data={grid} />}
+            {!gridLoading && !grid && (
+              <p className={styles.muted}>Engin tafla til fyrir {selected.name} enn.</p>
+            )}
+          </section>
+        )}
+
+        {selected && view !== "grid" && (
           <section className={styles.viewHost} aria-live="polite">
-            {/* The views themselves are A2 and A4. This shell owns the season
-                selection and the switching; the renderers mount here and read
-                the same query, so they never diverge from one another. */}
+            {/* Timeline and calendar are A4. They mount here and read the same
+                query the grid does, so the three never diverge. */}
             <p className={styles.muted}>
               {VIEWS.find((v) => v.id === view)?.label} fyrir <strong>{selected.name}</strong> kemur
               með {VIEWS.find((v) => v.id === view)?.ticket}.

@@ -57,6 +57,46 @@ type SeasonCreate = {
 
 **A 404 is treated as "not built yet", not as an error.** Until these endpoints exist the plan route shows a "backend is on its way" notice rather than an error state, and starts showing real data the moment they land — no frontend change required. Anything other than 404 surfaces as a genuine failure, so please don't return 404 for "this workspace has no seasons"; return `[]`.
 
+## The grid matrix — A2 (sc-37)
+
+### `GET /seasons/{season_id}/grid` → `PlanGrid`
+
+```ts
+type EventType = "skipulags" | "sveitar" | "flokks" | "uppskeru" | "utilega" | "dagsferd" | "mot";
+type PlanStatus = "unknown" | "tentative" | "draft" | "confirmed";
+
+type Patrol = { id: string; name: string };            // a flokkur — one column
+type PlanWeek = { index: number; starts_on: string | null; label: string };  // one row
+
+type PlanCell = {          // a per-flokkur event: one cell
+  event_id: string;
+  week_index: number;
+  patrol_id: string;
+  title: string;
+  status: PlanStatus;
+  type: EventType;
+  span_weeks: number;      // 1 unless it runs over several weeks
+};
+
+type PlanBand = Omit<PlanCell, "patrol_id">;  // a troop-wide event: the whole row
+
+type PlanGrid = {
+  season_id: string;
+  patrols: Patrol[];
+  weeks: PlanWeek[];
+  bands: PlanBand[];
+  cells: PlanCell[];
+};
+```
+
+**Bands and cells are split by `Event.scope`**, not by type. `troop-wide` becomes a band spanning every patrol column; `per-flokkur` becomes a cell in one column. That split is what lets parallel flokksfundir coexist in a period while a útilega takes the whole week.
+
+**`status: "unknown"` is the "?" marker** of ADR-002 §3, not a missing value. A leader setting the skeleton early needs to say "something goes here, undecided" and have it render as a deliberate mark rather than an empty cell. Please don't collapse it to null.
+
+**`span_weeks` counts the first week.** `1` means a single week; `2` means this week and the next. The frontend skips the positions a span covers, so an off-by-one here shears the grid sideways.
+
+`patrols` and `weeks` are the axes — send them even when there are no events, so the grid can render an empty term rather than nothing.
+
 ## Not in this contract yet
 
-The grid matrix endpoint (A2), `Event.type`/`scope`, and the `Task` planning dimensions are separate tickets. A1 is only the container and the shell.
+Writing to the grid — creating, moving and renaming events in a cell — is A3 (sc-38), which is where inline edit and autosave live. The `Task` planning dimensions below the event (venue, timing, endurmat) come with their own tickets. What is here covers reading a season and reading its grid, which is what A1 and A2 need.

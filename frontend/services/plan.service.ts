@@ -109,3 +109,107 @@ export function compareSeasons(a: Season, b: Season): number {
   const bKey = b.starts_on ?? b.created_at;
   return bKey.localeCompare(aKey);
 }
+
+// ── The grid (A2, sc-37) ─────────────────────────────────────────────────────
+
+/**
+ * ADR-002 §1. Drives default slot sets and behaviour; on the grid it drives
+ * how a cell reads at a glance.
+ */
+export type EventType =
+  | "skipulags"
+  | "sveitar"
+  | "flokks"
+  | "uppskeru"
+  | "utilega"
+  | "dagsferd"
+  | "mot";
+
+/**
+ * ADR-002 §1. This is what lets parallel flokksfundir coexist in one period:
+ * troop-wide events span every column, per-flokkur events occupy one.
+ */
+export type EventScope = "troop-wide" | "per-flokkur";
+
+/**
+ * ADR-002 §3. `unknown` is the first-class "?" marker — a leader setting the
+ * skeleton early needs to say "something goes here, not decided yet" without
+ * the plan looking broken (A8).
+ */
+export type PlanStatus = "unknown" | "tentative" | "draft" | "confirmed";
+
+/** A flokkur — one column of the grid. `Patrol` per terms-and-datamodel §3. */
+export type Patrol = {
+  id: string;
+  name: string;
+};
+
+/** One row of the grid. Undated on a scratchpad, which is why `starts_on` is nullable. */
+export type PlanWeek = {
+  index: number;
+  starts_on: string | null;
+  label: string;
+};
+
+type PlanEntryBase = {
+  event_id: string;
+  week_index: number;
+  title: string;
+  status: PlanStatus;
+  type: EventType;
+  /** ADR-002 §3 — an element may run over several weeks (badge part 1/2). */
+  span_weeks: number;
+};
+
+/** A per-flokkur event: one cell, in one patrol's column. */
+export type PlanCell = PlanEntryBase & {
+  patrol_id: string;
+};
+
+/** A troop-wide event: a band across every patrol column. */
+export type PlanBand = PlanEntryBase;
+
+export type PlanGrid = {
+  season_id: string;
+  patrols: Patrol[];
+  weeks: PlanWeek[];
+  bands: PlanBand[];
+  cells: PlanCell[];
+};
+
+/** The week×flokkur matrix for one season. */
+export async function getSeasonGrid(seasonId: string, getToken: GetToken): Promise<PlanGrid> {
+  try {
+    return await fetchWithAuth<PlanGrid>(buildApiUrl(`/seasons/${seasonId}/grid`), {}, getToken);
+  } catch (error) {
+    if (isMissingEndpoint(error)) throw new SeasonsUnavailable();
+    throw error;
+  }
+}
+
+/**
+ * Index the cells by week and patrol so the renderer is a lookup rather than a
+ * scan per cell. A term across six patrols is ~200 cells; scanning the flat
+ * list for each would be quadratic for no reason.
+ */
+export function indexCells(cells: PlanCell[]): Map<string, PlanCell> {
+  const byPosition = new Map<string, PlanCell>();
+  for (const cell of cells) byPosition.set(cellKey(cell.week_index, cell.patrol_id), cell);
+  return byPosition;
+}
+
+export function cellKey(weekIndex: number, patrolId: string): string {
+  return `${weekIndex}:${patrolId}`;
+}
+
+/**
+ * Weeks a multi-week entry covers *after* its first, which the renderer must
+ * skip so a rowSpan does not collide with a cell drawn underneath it.
+ */
+export function coveredWeeks(entry: PlanEntryBase): number[] {
+  const covered: number[] = [];
+  for (let offset = 1; offset < Math.max(1, entry.span_weeks); offset++) {
+    covered.push(entry.week_index + offset);
+  }
+  return covered;
+}

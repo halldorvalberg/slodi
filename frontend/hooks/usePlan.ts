@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   compareSeasons,
   createSeason,
+  getSeasonGrid,
   getSeasons,
   SeasonsUnavailable,
   type Season,
@@ -23,6 +24,7 @@ import {
 
 export const planKeys = {
   seasons: (workspaceId: string) => ["plan", "seasons", workspaceId] as const,
+  grid: (seasonId: string) => ["plan", "grid", seasonId] as const,
 };
 
 export function useSeasons(workspaceId: string | null) {
@@ -62,4 +64,28 @@ export function useCreateSeason(workspaceId: string | null) {
       );
     },
   });
+}
+
+/**
+ * The week×flokkur matrix for a season (A2, sc-37).
+ *
+ * Keyed by season, so switching seasons in the shell swaps the whole grid
+ * without the views needing to know that happened.
+ */
+export function usePlanGrid(seasonId: string | null) {
+  const { getToken } = useAuth();
+
+  const query = useQuery({
+    queryKey: planKeys.grid(seasonId ?? "none"),
+    enabled: Boolean(seasonId),
+    queryFn: () => getSeasonGrid(seasonId as string, getToken),
+    retry: (failureCount, error) => !(error instanceof SeasonsUnavailable) && failureCount < 2,
+  });
+
+  return {
+    grid: query.data ?? null,
+    isLoading: query.isLoading,
+    isUnavailable: query.error instanceof SeasonsUnavailable,
+    error: query.error instanceof SeasonsUnavailable ? null : query.error,
+  };
 }

@@ -1,0 +1,139 @@
+/* Grid tokens (A2). Kept local to the planner rather than promoted to
+   slodi-tokens.css until the timeline and calendar (A4) show what they share. */
+.scroll {
+  overflow-x: auto;
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-card, 12px);
+  background: hsl(var(--sl-color-surface));
+}
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 640px;
+  font-size: 0.86rem;
+}
+
+.caption {
+  text-align: left;
+  padding: var(--sl-spacing-sm, 8px) var(--sl-spacing-md, 16px);
+  color: hsl(var(--sl-color-text-secondary));
+  font-size: 0.8rem;
+}
+
+.cornerHead,
+.patrolHead,
+.weekHead {
+  position: sticky;
+  background: hsl(var(--sl-color-surface));
+  font-weight: 600;
+  color: hsl(var(--sl-color-text-primary));
+  text-align: left;
+  padding: 8px 12px;
+  border: 1px solid hsl(var(--sl-color-border));
+}
+
+/* The week column and the patrol header both stay put while scrolling — a term
+   is wider and longer than a screen, and losing either axis makes a cell
+   meaningless. */
+.cornerHead {
+  top: 0;
+  left: 0;
+  z-index: 3;
+}
+
+.patrolHead {
+  top: 0;
+  z-index: 2;
+}
+
+.weekHead {
+  left: 0;
+  z-index: 1;
+  white-space: nowrap;
+  color: hsl(var(--sl-color-text-secondary));
+  font-weight: 500;
+}
+
+.cell,
+.bandCell {
+  border: 1px solid hsl(var(--sl-color-border));
+  padding: 4px;
+  vertical-align: top;
+  min-width: 140px;
+}
+
+.bandRow .bandCell {
+  background: hsl(var(--sl-color-border) / 0.25);
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-left-width: 3px;
+  border-radius: 8px;
+  background: hsl(var(--sl-color-background));
+  color: hsl(var(--sl-color-text-primary));
+  font: inherit;
+  font-size: 0.84rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entry:hover {
+  border-color: hsl(var(--sl-color-border));
+}
+
+.entry:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-primary));
+  outline-offset: 1px;
+}
+
+.entryTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status reads off the left edge so a whole term can be scanned for gaps
+   without reading a single title. Refined by A8. */
+.statusConfirmed {
+  border-left-color: hsl(var(--sl-color-primary));
+}
+
+.statusDraft {
+  border-left-color: hsl(var(--sl-color-text-secondary));
+}
+
+.statusTentative {
+  border-left-color: hsl(var(--sl-color-border));
+  border-left-style: dashed;
+}
+
+.statusUnknown {
+  border-left-color: hsl(var(--sl-color-warning, 35 100% 64%));
+  background: hsl(var(--sl-color-warning, 35 100% 64%) / 0.08);
+}
+
+.mark {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: hsl(var(--sl-color-warning, 35 100% 64%));
+}
+
+.blank {
+  display: block;
+  min-height: 40px;
+}
+
+.empty {
+  padding: var(--sl-spacing-lg, 24px);
+  color: hsl(var(--sl-color-text-secondary));
+  margin: 0;
+}
