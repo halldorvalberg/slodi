@@ -94,6 +94,11 @@
    action strip is that button's sibling — see SplitGrid.tsx. */
 .gslot {
   position: absolute;
+  /* Without this the browser claims the gesture for panning, and TouchSensor
+     aborts the moment the finger moves — so on a phone dragging a verkefni
+     towards the next flokkur scrolls the sheet instead. Touch working at all is
+     the reason this surface was migrated off HTML5 drag. */
+  touch-action: none;
   left: 4px;
   right: 4px;
   display: flex;

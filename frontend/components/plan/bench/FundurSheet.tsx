@@ -1,13 +1,16 @@
 "use client";
 
 import { Fragment } from "react";
-import { BANDS, BAND_OF, type Fundur, type Patrol } from "@/services/plan.service";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { BANDS, BAND_OF, type BandId, type Fundur, type Patrol } from "@/services/plan.service";
 import type { BenchIntent } from "./benchState";
 import { count, takesSingular } from "../planEntries";
 import { bandMinutes, clockAt, fundurMinutes, startTimes } from "./benchState";
 import LidurEditor from "./LidurEditor";
 import LidurRow from "./LidurRow";
 import SplitGrid from "./SplitGrid";
+import { dragId } from "./dnd";
 import styles from "./bench.module.css";
 
 /**
@@ -159,13 +162,20 @@ export default function FundurSheet({
                 dispatch={dispatch}
               />
             ) : items.length === 0 ? (
-              // sc-141 BlankSlot: the unfilled frame, stated rather than hidden.
-              // The band's own name is not interpolated into the sentence — it
-              // would need the dative ("í setningu", not "í setning"), and the
-              // heading directly above already says which band this is.
-              <p className={styles.blank}>Ekkert skráð hér enn.</p>
+              // sc-141 BlankSlot: the unfilled frame, stated rather than hidden,
+              // and a drop target — an empty band is the most obvious place to
+              // aim a block from the bank. The band's own name is not
+              // interpolated into the sentence: it would need the dative ("í
+              // setningu", not "í setning"), and the heading above says it.
+              <BandRows fundurId={fundur.event_id} band={band.id} itemIds={[]}>
+                <p className={styles.blank}>Ekkert skráð hér enn.</p>
+              </BandRows>
             ) : (
-              <div role="list" className={styles.rows}>
+              <BandRows
+                fundurId={fundur.event_id}
+                band={band.id}
+                itemIds={items.map((item) => dragId.row(item.id))}
+              >
                 {items.map((lidur, positionInBand) => {
                   const index = fundur.items.findIndex((item) => item.id === lidur.id);
                   return (
@@ -202,7 +212,7 @@ export default function FundurSheet({
                     </Fragment>
                   );
                 })}
-              </div>
+              </BandRows>
             )}
           </div>
         );
@@ -223,5 +233,58 @@ export default function FundurSheet({
         </span>
       </footer>
     </section>
+  );
+}
+
+/**
+ * One band's rows: a sortable list, and a drop target for the bank.
+ *
+ * Split into its own component because `useDroppable` is a hook and the bands
+ * are a `map` — the alternative is a hook inside a loop, which React does not
+ * allow.
+ *
+ * The `SortableContext` is per band on purpose. It is what makes a drag stop at
+ * the band's edges: a liður cannot be dragged into Slit, because Slit is a
+ * different sorting context and simply is not a drop target for it. That is the
+ * same rule the reducer enforces for the button and keyboard paths — moving
+ * across bands is a change of *kind*, not a reorder.
+ */
+function BandRows({
+  fundurId,
+  band,
+  itemIds,
+  children,
+}: {
+  fundurId: string;
+  band: BandId;
+  itemIds: string[];
+  children: React.ReactNode;
+}) {
+  /**
+   * The band only catches drops when it has no rows of its own.
+   *
+   * A band and every row inside it are both droppables, so they always collide
+   * together and something has to arbitrate. Filtering by specificity in the
+   * collision detector *sounds* right and was not reliable: a block dropped
+   * squarely on the third row still landed at the end of the band, because the
+   * container kept winning. Removing the competition is simpler than refereeing
+   * it — rows fill a band completely, so when there are rows a drop always
+   * resolves to one of them, and the position it names is honoured. An empty
+   * band is the only case with nothing else to hit, and that is exactly when it
+   * needs to be a target.
+   */
+  const isEmpty = itemIds.length === 0;
+  const { setNodeRef, isOver } = useDroppable({
+    id: dragId.bandDrop(fundurId, band),
+    data: { kind: "band", fundurId, band },
+    disabled: !isEmpty,
+  });
+
+  return (
+    <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+      <div ref={setNodeRef} role="list" className={styles.rows} data-over={isOver || undefined}>
+        {children}
+      </div>
+    </SortableContext>
   );
 }

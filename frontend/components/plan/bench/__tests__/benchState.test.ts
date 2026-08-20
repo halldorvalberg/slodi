@@ -697,3 +697,76 @@ describe("Icelandic counts", () => {
     expect(count(0, "liður", "liðir")).toBe("0 liðir");
   });
 });
+
+describe("a drop names its own position", () => {
+  const block = {
+    name: "Stórfiskaleikur",
+    kind: "leikur" as const,
+    minutes: 15,
+    status: "draft" as const,
+    theme: null,
+    venue: null,
+    endurmat: null,
+  };
+
+  it("inserts where the drop landed, not at the end of the band", () => {
+    // The whole reason to drag rather than press "Bæta við" is to say where.
+    const next = benchReducer(state(SAME_BAND), {
+      t: "add",
+      fundurId: "f1",
+      lidur: block,
+      at: 1,
+    });
+
+    expect(next.data.fundir[0].items.map((i) => i.name)).toEqual([
+      "Fánastund",
+      "Stórfiskaleikur",
+      "Hnútar",
+      "Ratleikur",
+      "Slit",
+    ]);
+  });
+
+  it("falls back to the end of the band when no position is given", () => {
+    // Which is what the button does — it has no position to name.
+    const next = benchReducer(state(SAME_BAND), { t: "add", fundurId: "f1", lidur: block });
+
+    expect(next.data.fundir[0].items.map((i) => i.name)).toEqual([
+      "Fánastund",
+      "Hnútar",
+      "Ratleikur",
+      "Stórfiskaleikur",
+      "Slit",
+    ]);
+  });
+});
+
+describe("a drop must not interleave the bands", () => {
+  it("keeps items band-contiguous when a drop names a foreign position", () => {
+    // Every band's rows are droppables in one context, so a leikur can be
+    // released over a Setning row. Splicing there would put a kjarni item
+    // inside the opnun run — which is what inBandOrder exists to prevent, and
+    // what makes `move` announce reorders that change nothing on screen.
+    // BenchProvider drops the position in that case; this pins what happens if
+    // one ever gets through.
+    const next = benchReducer(state(SAME_BAND), {
+      t: "add",
+      fundurId: "f1",
+      lidur: {
+        name: "Stórfiskaleikur",
+        kind: "leikur",
+        minutes: 15,
+        status: "draft",
+        theme: null,
+        venue: null,
+        endurmat: null,
+      },
+    });
+
+    // Bands stay in order: opnun, then kjarni, then lok.
+    const bands = next.data.fundir[0].items.map((i) =>
+      i.kind === "setning" ? "opnun" : i.kind === "slit" ? "lok" : "kjarni"
+    );
+    expect(bands).toEqual(["opnun", "kjarni", "kjarni", "kjarni", "lok"]);
+  });
+});

@@ -1,9 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { BAND_KIND, type BandId, type Fundur, type Patrol } from "@/services/plan.service";
+import { useDndContext, useDraggable, useDroppable } from "@dnd-kit/core";
+import {
+  BAND_KIND,
+  type BandId,
+  type Fundur,
+  type Lidur,
+  type Patrol,
+} from "@/services/plan.service";
 import { accentVarFor } from "../planEntries";
 import { MIN_MINUTES, bandMinutes, bandOffset, clockAt, type BenchIntent } from "./benchState";
+import { dragId } from "./dnd";
 import styles from "./split.module.css";
 
 /**
@@ -28,13 +35,19 @@ import styles from "./split.module.css";
  * Three ways, all dispatching the same `laneMoveAcross` intent (SPEC §0: drag
  * is an accelerator, never the only path):
  *
- * - **drag** a block into another column, dropped at the time you release it;
+ * - **drag** a block into another column;
  * - **← →** on a focused block, which moves it one flokkur sideways;
  * - the **← →** buttons that appear on the selected block.
  *
- * The drag is the browser's own HTML5 drag-and-drop rather than a library. It
- * is enough for one grid of absolutely-positioned blocks, and it keeps the
- * dnd-kit decision (SPEC §5) unmade until the canvas actually needs it.
+ * The drag is dnd-kit, the same as everywhere else on the bench. It used to be
+ * the browser's own HTML5 drag, which worked — but two drag systems in one
+ * surface is a bug waiting for the first leader who drags a bench row towards a
+ * lane, and HTML5 drag never fired on touch at all.
+ *
+ * A dropped block joins the end of the lane rather than landing at the height
+ * it was released. The lanes do not share a row grid, so "level with 17:40" is
+ * not a position in the target lane — and appending is what the ← → buttons
+ * and the keyboard already do, so all three paths agree.
  */
 
 /** Pixels per minute. Tall enough that a 15-minute block is still readable. */
@@ -55,13 +68,7 @@ function laneMinutes(items: { minutes: number }[]): number {
   return items.reduce((sum, item) => sum + item.minutes, 0);
 }
 
-type Dragging = { laneIndex: number; id: string };
-
 export default function SplitGrid({ fundur, band, patrols, selected, dispatch }: Props) {
-  const [dragging, setDragging] = useState<Dragging | null>(null);
-  const [overLane, setOverLane] = useState<number | null>(null);
-  const laneRefs = useRef(new Map<number, HTMLDivElement>());
-
   const lanes = fundur.split?.[band];
   if (!lanes || lanes.length === 0) return null;
 
@@ -71,27 +78,6 @@ export default function SplitGrid({ fundur, band, patrols, selected, dispatch }:
 
   const ticks: number[] = [];
   for (let m = 0; m <= duration; m += TICK_MINUTES) ticks.push(m);
-
-  /**
-   * Which slot a drop at this Y lands in.
-   *
-   * Measured against the running total of the target lane rather than the
-   * clock, because the lanes do not share a row grid — a block released level
-   * with 17:40 belongs after whatever that flokkur is doing at 17:40, which is
-   * not necessarily the same block the neighbouring column has there.
-   */
-  const dropIndexFor = (laneIndex: number, clientY: number): number => {
-    const node = laneRefs.current.get(laneIndex);
-    const lane = lanes[laneIndex];
-    if (!node || !lane) return 0;
-    const y = clientY - node.getBoundingClientRect().top;
-    let running = 0;
-    for (let i = 0; i < lane.items.length; i++) {
-      running += lane.items[i].minutes;
-      if (y < running * PX_PER_MIN) return i;
-    }
-    return lane.items.length;
-  };
 
   /**
    * The flokkur in a given lane.
@@ -182,34 +168,12 @@ export default function SplitGrid({ fundur, band, patrols, selected, dispatch }:
           let running = 0;
 
           return (
-            <div
+            <Lane
               key={lane.patrol_id}
-              ref={(node) => {
-                if (node) laneRefs.current.set(laneIndex, node);
-                else laneRefs.current.delete(laneIndex);
-              }}
-              className={styles.glane}
-              data-over={overLane === laneIndex && dragging?.laneIndex !== laneIndex}
-              style={{ ["--c" as string]: accentVarFor(patrol, colourIndex) }}
-              onDragOver={(e) => {
-                if (!dragging) return;
-                // Without preventDefault the browser refuses the drop outright.
-                e.preventDefault();
-                setOverLane(laneIndex);
-              }}
-              onDragLeave={() => setOverLane((current) => (current === laneIndex ? null : current))}
-              onDrop={(e) => {
-                e.preventDefault();
-                setOverLane(null);
-                if (!dragging) return;
-                moveAcross(
-                  dragging.id,
-                  dragging.laneIndex,
-                  laneIndex,
-                  dropIndexFor(laneIndex, e.clientY)
-                );
-                setDragging(null);
-              }}
+              fundurId={fundur.event_id}
+              band={band}
+              laneIndex={laneIndex}
+              accent={accentVarFor(patrol, colourIndex)}
             >
               {lane.items.map((item, i) => {
                 const top = running * PX_PER_MIN;
@@ -218,27 +182,16 @@ export default function SplitGrid({ fundur, band, patrols, selected, dispatch }:
                 const tight = item.minutes < TIGHT_MINUTES;
 
                 return (
-                  <div
+                  <LaneBlock
                     key={item.id}
-                    className={`${styles.gslot} ${tight ? styles.tight : ""}`}
-                    style={{
-                      top: `${top}px`,
-                      height: `${Math.max(26, item.minutes * PX_PER_MIN - 3)}px`,
-                    }}
-                    data-on={selected === item.id || undefined}
-                    data-dragging={dragging?.id === item.id || undefined}
-                    draggable
-                    onDragStart={(e) => {
-                      // Firefox cancels a dragstart that sets no data at all,
-                      // so the drop handlers never fire there without this.
-                      e.dataTransfer.setData("text/plain", item.name);
-                      e.dataTransfer.effectAllowed = "move";
-                      setDragging({ laneIndex, id: item.id });
-                    }}
-                    onDragEnd={() => {
-                      setDragging(null);
-                      setOverLane(null);
-                    }}
+                    fundurId={fundur.event_id}
+                    band={band}
+                    laneIndex={laneIndex}
+                    item={item}
+                    tight={tight}
+                    top={top}
+                    height={Math.max(26, item.minutes * PX_PER_MIN - 3)}
+                    isSelected={selected === item.id}
                   >
                     <button
                       type="button"
@@ -352,7 +305,7 @@ export default function SplitGrid({ fundur, band, patrols, selected, dispatch }:
                         </button>
                       </span>
                     )}
-                  </div>
+                  </LaneBlock>
                 );
               })}
 
@@ -393,7 +346,7 @@ export default function SplitGrid({ fundur, band, patrols, selected, dispatch }:
                   + {duration - used} mín laus
                 </button>
               )}
-            </div>
+            </Lane>
           );
         })}
       </div>
@@ -408,6 +361,98 @@ export default function SplitGrid({ fundur, band, patrols, selected, dispatch }:
           . Lengsti flokkur ræður.
         </span>
       </div>
+    </div>
+  );
+}
+
+/** One flokkur's column: a drop target for blocks from other lanes and the bank. */
+function Lane({
+  fundurId,
+  band,
+  laneIndex,
+  accent,
+  children,
+}: {
+  fundurId: string;
+  band: BandId;
+  laneIndex: number;
+  accent: string;
+  children: React.ReactNode;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: dragId.laneDrop(fundurId, band, laneIndex),
+    data: { kind: "lane", fundurId, band, laneIndex },
+  });
+
+  // The lane a block came from is not a destination — `onDragEnd` refuses a
+  // same-lane drop — so it must not light up as one. A ring that promises
+  // something the handler will decline is worse than no feedback.
+  const { active } = useDndContext();
+  const from = active?.data.current;
+  const isSource = !!from && "kind" in from && from.kind === "lane" && from.laneIndex === laneIndex;
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={styles.glane}
+      data-over={(isOver && !isSource) || undefined}
+      style={{ ["--c" as string]: accent }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * One verkefni in a lane.
+ *
+ * The whole block is the drag handle here, unlike a bench row: it is a single
+ * button with nothing else competing for the pointer, so there is nothing to be
+ * ambiguous about. The action strip only appears once the block is selected,
+ * and by then the drag has already ended.
+ */
+function LaneBlock({
+  fundurId,
+  band,
+  laneIndex,
+  item,
+  tight,
+  top,
+  height,
+  isSelected,
+  children,
+}: {
+  fundurId: string;
+  band: BandId;
+  laneIndex: number;
+  item: Lidur;
+  tight: boolean;
+  top: number;
+  height: number;
+  isSelected: boolean;
+  children: React.ReactNode;
+}) {
+  // `listeners` only, never `attributes`. dnd-kit's attributes are
+  // `role="button"` + `tabIndex=0`, and this div wraps the block's own button
+  // and its ← → ↑ ✕ strip — so spreading them would make every lane block an
+  // ARIA button containing four real buttons, which is the nested-interactive
+  // shape this component was already fixed for once. It would also add a tab
+  // stop that does nothing, since there is no KeyboardSensor.
+  const { listeners, setNodeRef, isDragging } = useDraggable({
+    id: dragId.lane(item.id),
+    data: { kind: "lane", fundurId, band, laneIndex, lidur: item },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`${styles.gslot} ${tight ? styles.tight : ""}`}
+      style={{ top: `${top}px`, height: `${height}px` }}
+      data-on={isSelected || undefined}
+      data-dragging={isDragging || undefined}
+      {...listeners}
+    >
+      {children}
     </div>
   );
 }

@@ -1,10 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { KIND_LABEL, type SlotKind } from "@/services/plan.service";
+import { useDraggable } from "@dnd-kit/core";
+import { type SlotKind } from "@/services/plan.service";
 import { LIBRARY_FOLDERS, LIBRARY_KINDS } from "@/lib/mock/library.mock";
 import { useBlockLibrary } from "@/hooks/usePlan";
 import { useBench } from "./BenchProvider";
+import { blockAsLidur, dragId } from "./dnd";
+import type { LibraryBlock } from "@/lib/mock/library.mock";
 import styles from "./palette.module.css";
 
 /**
@@ -100,47 +103,20 @@ export default function BlockPalette() {
         ) : (
           <ul className={styles.list}>
             {results.map((block) => (
-              <li key={block.id} className={styles.item} data-kind={block.kind}>
-                <span className={styles.itemKind} aria-hidden="true" />
-                <span className={styles.itemBody}>
-                  <span className={styles.itemT}>{block.name}</span>
-                  <span className={styles.itemM}>
-                    <span className={styles.num}>{block.minutes} mín</span>
-                    <span className={styles.dot} aria-hidden="true" />
-                    <span>{block.theme}</span>
-                    <span className={styles.dot} aria-hidden="true" />
-                    <span className={styles.srOnly}>{KIND_LABEL[block.kind]}, </span>
-                    <span>notað {block.timesUsed}×</span>
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  className={styles.add}
-                  disabled={!activeFundur}
-                  title={activeFundur ? undefined : "Veldu fund á bekknum fyrst"}
-                  onClick={() =>
-                    activeFundur &&
-                    bench?.dispatch({
-                      t: "add",
-                      fundurId: activeFundur,
-                      lidur: {
-                        name: block.name,
-                        kind: block.kind,
-                        minutes: block.minutes,
-                        // A block arriving from the bank is a draft until the
-                        // leader has looked at it — never silently confirmed.
-                        status: "draft",
-                        // B3: a reused block brings its context with it.
-                        theme: block.theme,
-                        venue: null,
-                        endurmat: null,
-                      },
-                    })
-                  }
-                >
-                  Bæta við
-                </button>
-              </li>
+              <LibraryItem
+                key={block.id}
+                block={block}
+                onAdd={
+                  activeFundur
+                    ? () =>
+                        bench?.dispatch({
+                          t: "add",
+                          fundurId: activeFundur,
+                          lidur: blockAsLidur(block, null),
+                        })
+                    : undefined
+                }
+              />
             ))}
           </ul>
         )}
@@ -161,5 +137,52 @@ export default function BlockPalette() {
         </button>
       </div>
     </aside>
+  );
+}
+
+/**
+ * One block in the bank — draggable onto a sheet, and addable by button.
+ *
+ * sc-147. Its own component because `useDraggable` is a hook and the list is a
+ * `map`. The grip is the drag affordance, the same as on a bench row, so the
+ * "Bæta við" button stays clickable: without a dedicated handle a pointer-down
+ * on the button would be ambiguous between pressing it and starting a drag.
+ */
+function LibraryItem({ block, onAdd }: { block: LibraryBlock; onAdd?: () => void }) {
+  // See LidurRow on why `attributes` is dropped: it would add a focusable
+  // `role="button"` per item that responds to no key, described as "bil grípur,
+  // upp og niður færa" — which is not merely misplaced here but untrue, since a
+  // library block has no keyboard path at all beyond the "Bæta við" beside it.
+  const { listeners, setNodeRef, isDragging } = useDraggable({
+    id: dragId.library(block.id),
+    data: { kind: "library", block },
+  });
+
+  return (
+    <li className={styles.item} data-kind={block.kind} data-dragging={isDragging || undefined}>
+      <span ref={setNodeRef} className={styles.grip} aria-hidden="true" {...listeners}>
+        ⠿
+      </span>
+      <span className={styles.itemKind} aria-hidden="true" />
+      <span className={styles.itemBody}>
+        <span className={styles.itemT}>{block.name}</span>
+        <span className={styles.itemM}>
+          <span className={styles.num}>{block.minutes} mín</span>
+          <span className={styles.dot} aria-hidden="true" />
+          <span>{block.theme}</span>
+          <span className={styles.dot} aria-hidden="true" />
+          <span>notað {block.timesUsed}×</span>
+        </span>
+      </span>
+      <button
+        type="button"
+        className={styles.add}
+        disabled={!onAdd}
+        title={onAdd ? undefined : "Veldu fund á bekknum fyrst"}
+        onClick={onAdd}
+      >
+        Bæta við
+      </button>
+    </li>
   );
 }

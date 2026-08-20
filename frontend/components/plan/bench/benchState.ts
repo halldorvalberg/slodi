@@ -62,7 +62,13 @@ export type BenchIntent =
   | { t: "remove"; fundurId: string; id: string }
   | { t: "duration"; fundurId: string; id: string; minutes: number }
   | { t: "status"; fundurId: string; id: string; status: PlanStatus }
-  | { t: "add"; fundurId: string; lidur: Omit<Lidur, "id"> }
+  | {
+      t: "add";
+      fundurId: string;
+      lidur: Omit<Lidur, "id">;
+      /** Index within the fundur's items. Omitted means the end of its band. */
+      at?: number;
+    }
   | { t: "edit"; id: string | null }
   | { t: "patch"; fundurId: string; id: string; patch: Partial<Omit<Lidur, "id">> }
   | { t: "duplicate"; fundurId: string; id: string }
@@ -310,7 +316,9 @@ export function benchReducer(state: BenchState, intent: BenchIntent): BenchState
       const id = `lidur-${intent.fundurId}-${nextId()}`;
       const lidur: Lidur = { ...intent.lidur, id };
 
-      const at = insertIndexForBand(fundur.items, band);
+      // A drop names its own position; a button press does not, and lands at
+      // the end of the band.
+      const at = intent.at ?? insertIndexForBand(fundur.items, band);
       const items = [...fundur.items];
       items.splice(at, 0, lidur);
 

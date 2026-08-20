@@ -69,9 +69,12 @@ const one = (over: Partial<Fundur> = {}): PlanBenchData => ({
   fundir: [fundur(over)],
 });
 
-/** Everything the live regions currently hold. There are two, alternating. */
+/**
+ * Everything the bench's own live regions hold. There are two, alternating —
+ * and dnd-kit mounts one of its own, which is why this is not `[aria-live]`.
+ */
 function announced(container: HTMLElement) {
-  return [...container.querySelectorAll("[aria-live]")]
+  return [...container.querySelectorAll("[data-bench-announcer]")]
     .map((node) => node.textContent)
     .join(" ")
     .trim();
@@ -482,7 +485,7 @@ describe("PlanBench", () => {
     // an identical message only re-announces if the text differs from what
     // that region last held, which is what the second region is for.
     const { container } = renderBench(one());
-    const regions = container.querySelectorAll("[aria-live]");
+    const regions = container.querySelectorAll("[data-bench-announcer]");
     expect(regions).toHaveLength(2);
 
     const row = screen.getAllByRole("listitem")[1];
@@ -494,7 +497,7 @@ describe("PlanBench", () => {
     const second = [...regions].findIndex((r) => r.textContent);
 
     // Same nodes throughout — never remounted — and the message moved.
-    expect(container.querySelectorAll("[aria-live]")).toHaveLength(2);
+    expect(container.querySelectorAll("[data-bench-announcer]")).toHaveLength(2);
     expect(second).not.toBe(first);
   });
 
@@ -562,5 +565,36 @@ describe("PlanBench", () => {
 
     // 15 fits inside 30, so the band is unchanged at 50.
     expect(screen.getByText(/50 mín samhliða/)).toBeInTheDocument();
+  });
+
+  it("gives the drag grip no keyboard role of its own", () => {
+    // dnd-kit's attributes would make it a focusable role="button" that
+    // responds to no key — one dead tab stop per row, described with keyboard
+    // instructions that are false for it. The row is the keyboard surface.
+    const { container } = renderBench(one());
+    const grips = container.querySelectorAll("[class*='grip']");
+
+    expect(grips.length).toBeGreaterThan(0);
+    for (const grip of grips) {
+      expect(grip.getAttribute("aria-hidden")).toBe("true");
+      expect(grip.getAttribute("role")).toBeNull();
+      expect(grip.getAttribute("tabindex")).toBeNull();
+    }
+  });
+
+  it("does not nest interactive controls inside a lane block", () => {
+    // Spreading dnd-kit's attributes onto the positioned wrapper would make it
+    // an ARIA button containing the block's own button and its ← → ↑ ✕ strip.
+    renderBench(one({ scope: "troop-wide" }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Skipta á flokka/ })[1]);
+
+    const block = screen.getAllByRole("button", { name: /^Refir kl\./ })[0];
+    const wrapper = block.parentElement as HTMLElement;
+
+    expect(wrapper.getAttribute("role")).toBeNull();
+    expect(wrapper.getAttribute("tabindex")).toBeNull();
+    // Nothing above the block is a button, by element or by role.
+    expect(wrapper.closest("[role='button']")).toBeNull();
+    expect(wrapper.closest("button")).toBeNull();
   });
 });

@@ -154,6 +154,39 @@
 
 /* The same 3px kind accent the bench rows carry, so a block is recognisable
    before and after it is placed. */
+.grip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  padding: 0 2px;
+  color: hsl(var(--sl-color-text-tertiary));
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: grab;
+  opacity: 0.4;
+  touch-action: none;
+  user-select: none;
+}
+
+.item:hover .grip,
+.grip:focus-visible {
+  opacity: 1;
+}
+
+.grip:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-border-focus));
+  outline-offset: -2px;
+}
+
+.grip:active {
+  cursor: grabbing;
+}
+
+.item[data-dragging="true"] {
+  opacity: 0.4;
+}
+
 .itemKind {
   flex: none;
   width: 3px;
@@ -280,5 +313,10 @@
   .add,
   .create {
     min-height: 44px;
+  }
+
+  .grip {
+    opacity: 1;
+    min-width: 44px;
   }
 }

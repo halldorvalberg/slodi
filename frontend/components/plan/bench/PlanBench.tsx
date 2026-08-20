@@ -15,7 +15,11 @@ import styles from "./bench.module.css";
  * they came for should be the thing under the fold marker rather than something
  * they have to hunt for.
  *
- * Everything below dispatches into one reducer; see benchState.ts.
+ * Everything below dispatches into one reducer; see benchState.ts. The drag
+ * context lives in BenchProvider rather than here, because the dagskrárbankinn
+ * rail is a sibling of this component, not a child — a `DndContext` mounted
+ * here would leave the whole bank outside it, and dragging a block onto a sheet
+ * would silently do nothing.
  */
 
 interface Props {
@@ -105,10 +109,10 @@ export default function PlanBench({ today }: Props) {
        * which is what `seq` was for: repeating an identical message only
        * re-announces if the text differs from what that region last held.
        */}
-      <p aria-live="polite" className={styles.srOnly}>
+      <p aria-live="polite" className={styles.srOnly} data-bench-announcer>
         {state.announcement.seq % 2 === 0 ? state.announcement.text : ""}
       </p>
-      <p aria-live="polite" className={styles.srOnly}>
+      <p aria-live="polite" className={styles.srOnly} data-bench-announcer>
         {state.announcement.seq % 2 === 1 ? state.announcement.text : ""}
       </p>
 

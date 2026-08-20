@@ -2,7 +2,7 @@
 
 .redit {
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr);
+  grid-template-columns: 96px minmax(0, 1fr);
   border-bottom: 1px solid hsl(var(--sl-color-border));
   background: hsl(var(--sl-color-primary-subtle) / 0.4);
 }
@@ -304,6 +304,13 @@ select.in {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  /* Stays aligned with the row's wider grip column. */
+  .redit {
+    grid-template-columns: 118px minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 900px) {

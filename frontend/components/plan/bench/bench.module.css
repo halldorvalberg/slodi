@@ -274,11 +274,56 @@
   display: block;
 }
 
+/* A band lit up as a drop target for a block coming out of the bank. */
+.rows[data-over="true"] {
+  background: hsl(var(--sl-color-primary-subtle));
+  box-shadow: inset 0 0 0 2px hsl(var(--sl-color-primary));
+}
+
+/*
+ * sc-143 BlockGhost — what follows the pointer.
+ *
+ * Deliberately not a copy of the row: at the size of a 45-minute block it would
+ * be a slab covering half the sheet, and the only things worth reading mid-drag
+ * are what you are holding and how long it is. Tilted a couple of degrees so it
+ * reads as picked up rather than as another row in the list.
+ */
+.ghost {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 280px;
+  padding: 7px 11px;
+  border: 1px solid hsl(var(--sl-color-primary));
+  border-radius: var(--sl-radius-md);
+  background: hsl(var(--sl-color-surface));
+  box-shadow: var(--sl-shadow-modal, var(--sl-shadow-card));
+  cursor: grabbing;
+  transform: rotate(-1.5deg);
+}
+
+/* A block from the bank is copied, not moved — the bank keeps it. */
+.ghost[data-copy="true"] {
+  border-style: dashed;
+}
+
+.ghostTitle {
+  font-size: var(--sl-text-body-sm);
+  font-weight: var(--sl-font-weight-emphasis);
+  line-height: 1.15;
+}
+
+.ghostMeta {
+  font-size: var(--sl-text-overline);
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--sl-color-text-tertiary));
+}
+
 /* ── rows ──────────────────────────────────────────────────── */
 
 .row {
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr) auto;
+  grid-template-columns: 22px 74px minmax(0, 1fr) auto;
   position: relative;
   background: hsl(var(--sl-color-surface));
   border-bottom: 1px solid hsl(var(--sl-color-border));
@@ -312,6 +357,46 @@
 .row:focus-visible {
   outline: 2px solid hsl(var(--sl-color-border-focus));
   outline-offset: -2px;
+}
+
+/*
+ * sc-160. Muted at rest and full on hover or focus: it has to be findable
+ * without competing with the block's own name, which is what a leader is
+ * actually reading down the sheet.
+ */
+.grip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 9px 0 0;
+  border-right: 1px solid hsl(var(--sl-color-border));
+  color: hsl(var(--sl-color-text-tertiary));
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: grab;
+  opacity: 0.45;
+  /* Without this the browser starts a text selection instead of a drag. */
+  touch-action: none;
+  user-select: none;
+}
+
+.row:hover .grip,
+.grip:focus-visible {
+  opacity: 1;
+}
+
+.grip:focus-visible {
+  outline: 2px solid hsl(var(--sl-color-border-focus));
+  outline-offset: -2px;
+}
+
+.grip:active {
+  cursor: grabbing;
+}
+
+/* The row keeps its place in the list while its ghost follows the pointer. */
+.row[data-dragging="true"] {
+  opacity: 0.4;
 }
 
 .rowClock {
@@ -556,8 +641,15 @@
 /* The spec's 44px floor: on touch the actions are always visible, never hover-revealed. */
 @media (pointer: coarse) {
   .rowActs,
-  .bandsplit {
+  .bandsplit,
+  .grip {
     opacity: 1;
+  }
+
+  /* The grip is the primary drag affordance on the one input mode the library
+     was adopted to serve, so it gets a thumb-sized column of its own. */
+  .row {
+    grid-template-columns: 44px 74px minmax(0, 1fr) auto;
   }
 
   .ib {

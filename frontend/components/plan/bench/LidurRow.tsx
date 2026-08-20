@@ -1,14 +1,25 @@
 "use client";
 
 import { useRef } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { KIND_LABEL, STATUS_LABEL, type Fundur, type Lidur } from "@/services/plan.service";
 import type { BenchIntent } from "./benchState";
 import { clampMinutes } from "./benchState";
+import { dragId } from "./dnd";
 import styles from "./bench.module.css";
 
 /**
  * One liður on the bench — sc-140 `BlockCard`, sc-153 `StatusPill`,
  * sc-152 `TimingField` and sc-157 `MoveControls` in their in-row form.
+ *
+ * ## Dragging is on a handle, not the whole row
+ *
+ * sc-160. The row holds a title, a duration control and four buttons; making
+ * all of it draggable means a pointer-down anywhere is ambiguous — the browser
+ * cannot tell "I am about to press ✕" from "I am about to drag". A dedicated
+ * grip is unambiguous, it is a real focusable control with a label naming the
+ * block, and it leaves text selectable.
  *
  * ## The row is as tall as the time it takes
  *
@@ -62,6 +73,19 @@ export default function LidurRow({
   focusSibling,
 }: Props) {
   const rowRef = useRef<HTMLDivElement | null>(null);
+
+  // No `attributes`. dnd-kit's are `role="button"` + `tabIndex=0` plus an
+  // `aria-describedby` pointing at its keyboard instructions — and with no
+  // KeyboardSensor registered, none of that is true of this grip: Space and
+  // Enter do nothing on it, and the row's own handler ignores events that did
+  // not originate on the row. It would be one dead tab stop per row announcing
+  // a control that does not respond. The row is the keyboard surface; the grip
+  // is a pointer affordance and says so by being hidden from the tree.
+  const { listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
+    useSortable({
+      id: dragId.row(lidur.id),
+      data: { kind: "row", fundurId: fundur.event_id, lidur },
+    });
 
   const move = (to: number) => dispatch({ t: "move", fundurId: fundur.event_id, id: lidur.id, to });
 
@@ -136,12 +160,18 @@ export default function LidurRow({
       ref={(node) => {
         rowRef.current = node;
         registerRow(lidur.id, node);
+        setNodeRef(node);
       }}
       role="listitem"
       tabIndex={0}
       data-lidur-row={lidur.id}
       className={styles.row}
-      style={{ minHeight: `${rowHeight(lidur.minutes)}px` }}
+      style={{
+        minHeight: `${rowHeight(lidur.minutes)}px`,
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      data-dragging={isDragging || undefined}
       data-kind={lidur.kind}
       data-grabbed={isGrabbed}
       // `aria-current`, not `aria-selected`: selection is not a supported state
@@ -150,6 +180,11 @@ export default function LidurRow({
       aria-current={isSelected || undefined}
       onKeyDown={onKeyDown}
     >
+      {/* sc-160 DragHandle — the only draggable part of the row. */}
+      <span ref={setActivatorNodeRef} className={styles.grip} aria-hidden="true" {...listeners}>
+        ⠿
+      </span>
+
       <div className={styles.rowClock}>
         <span className={styles.rowAt}>{startsAt ?? "—"}</span>
         <button
