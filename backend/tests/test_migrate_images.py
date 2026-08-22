@@ -10,11 +10,14 @@ the parts where a mistake would either corrupt live data or redo finished work.
 
 from __future__ import annotations
 
+import csv
 import datetime as dt
+from pathlib import Path
 from uuid import uuid4
 
 import httpx
 import pytest
+from sqlalchemy import update
 
 import scripts.migrate_images_to_azure as script
 from app import models as m
@@ -186,6 +189,66 @@ async def test_fetch_image_rejects_empty_body() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Recorder — rollback record
+# ---------------------------------------------------------------------------
+
+
+def test_recorder_writes_header_and_rows(tmp_path: Path) -> None:
+    path = tmp_path / "rec.csv"
+    rec = script.Recorder(path)
+    cid = uuid4()
+    rec.write(cid, "https://old.example/a.png", "https://new.example/b.png")
+    rec.close()
+
+    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert len(rows) == 1
+    assert rows[0]["content_id"] == str(cid)
+    assert rows[0]["old_url"] == "https://old.example/a.png"
+    assert rows[0]["new_url"] == "https://new.example/b.png"
+
+
+def test_recorder_flushes_each_row_so_a_killed_run_keeps_its_record(tmp_path: Path) -> None:
+    """The record must survive a process that never closes the file."""
+    path = tmp_path / "rec.csv"
+    rec = script.Recorder(path)
+    rec.write(uuid4(), "https://old.example/a.png", "https://new.example/b.png")
+    # Deliberately no close() — simulate SIGKILL mid-run.
+    assert len(list(csv.DictReader(path.open(encoding="utf-8")))) == 1
+
+
+def test_recorder_appends_to_an_existing_file_without_a_second_header(tmp_path: Path) -> None:
+    """Re-running against the same --record path must not lose earlier rows."""
+    path = tmp_path / "rec.csv"
+    first = script.Recorder(path)
+    first.write(uuid4(), "https://old.example/1.png", "https://new.example/1.png")
+    first.close()
+
+    second = script.Recorder(path)
+    second.write(uuid4(), "https://old.example/2.png", "https://new.example/2.png")
+    second.close()
+
+    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert [r["old_url"] for r in rows] == [
+        "https://old.example/1.png",
+        "https://old.example/2.png",
+    ]
+    assert path.read_text().count("content_id") == 1
+
+
+def test_recorder_quotes_urls_containing_commas(tmp_path: Path) -> None:
+    """A comma in a query string must not shift the columns."""
+    path = tmp_path / "rec.csv"
+    rec = script.Recorder(path)
+    tricky = "https://old.example/a.png?sizes=1,2,3&name=x"
+    rec.write(uuid4(), tricky, "https://new.example/b.png")
+    rec.close()
+
+    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert rows[0]["old_url"] == tricky
+    assert rows[0]["new_url"] == "https://new.example/b.png"
+
+
+# ---------------------------------------------------------------------------
 # run() row selection — integration, real Postgres
 # ---------------------------------------------------------------------------
 
@@ -208,7 +271,9 @@ class _FakeSessionMaker:
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-async def test_run_selects_only_unmigrated_live_rows(db, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_run_selects_only_unmigrated_live_rows(
+    db, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Only live, non-Azure, HTTP image rows are picked up — and are rewritten."""
     user = m.User(name="Mig User", auth0_id=f"auth0|{uuid4()}", email=f"{uuid4()}@test.com")
     ws = m.Workspace(
@@ -263,7 +328,14 @@ async def test_run_selects_only_unmigrated_live_rows(db, monkeypatch: pytest.Mon
 
     monkeypatch.setattr(script, "upload_blob", fake_upload)
 
-    report = await script.run(dry_run=False, limit=None, max_bytes=1_000_000, include_deleted=False)
+    record_path = tmp_path / "record.csv"
+    report = await script.run(
+        dry_run=False,
+        limit=None,
+        max_bytes=1_000_000,
+        include_deleted=False,
+        record_path=record_path,
+    )
 
     # Soft-deleted, empty, and NULL images are never selected; the Azure row is
     # counted as already-migrated; the data: URL is skipped as non-HTTP.
@@ -282,6 +354,23 @@ async def test_run_selects_only_unmigrated_live_rows(db, monkeypatch: pytest.Mon
     assert external.image is not None
     assert external.image.startswith(script.azure_url_prefix())
     assert already.image == azure_url  # untouched — idempotent
+
+    # The rollback record holds the original URL — the only copy once the row is
+    # overwritten — and exactly one line per rewritten row.
+    assert report.record_path == record_path
+    rows = list(csv.DictReader(record_path.open(encoding="utf-8")))
+    assert len(rows) == 1
+    assert rows[0]["content_id"] == str(external.id)
+    assert rows[0]["old_url"] == "https://cdn.example.com/a.png"
+    assert rows[0]["new_url"] == external.image
+    assert rows[0]["migrated_at"]
+
+    # Rolling back is a plain UPDATE driven by that file.
+    await db.execute(
+        update(m.Content).where(m.Content.id == external.id).values(image=rows[0]["old_url"])
+    )
+    await db.refresh(external)
+    assert external.image == "https://cdn.example.com/a.png"
 
 
 class _FakeBlobService:

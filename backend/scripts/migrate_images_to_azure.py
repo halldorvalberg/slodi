@@ -11,6 +11,11 @@ locked to the storage account's hostname.
 The script is idempotent: rows whose image already points at our storage account
 are skipped, so it can be re-run safely after fixing individual failures.
 
+Every rewritten row is appended to a CSV (``--record``, timestamped by default)
+holding ``content_id,old_url,new_url``. Because the migration overwrites
+``content.image`` in place, that file is the only copy of the original URLs
+outside a full database dump — keep it until the migration is confirmed good.
+
 Usage:
     PYTHONPATH=. uv run python scripts/migrate_images_to_azure.py --dry-run
     PYTHONPATH=. uv run python scripts/migrate_images_to_azure.py
@@ -23,10 +28,13 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import csv
+import datetime as dt
 import ipaddress
 import logging
 import socket
 from dataclasses import dataclass, field
+from pathlib import Path
 from urllib.parse import urlparse
 from uuid import UUID, uuid4
 
@@ -79,6 +87,7 @@ class Report:
     skipped_already_azure: int = 0
     skipped_not_http: int = 0
     failures: list[tuple[UUID, str, str]] = field(default_factory=list)
+    record_path: Path | None = None
 
     def fail(self, content_id: UUID, url: str, reason: str) -> None:
         self.failures.append((content_id, url, reason))
@@ -89,12 +98,52 @@ class MigrationError(Exception):
     """A single row could not be migrated; the run continues."""
 
 
+class Recorder:
+    """Appends an ``id,old_url,new_url`` row per migration, for rollback.
+
+    The script overwrites ``content.image`` in place, so without this file the
+    original URL survives only inside a full database dump. Each row is flushed
+    immediately, so a killed or crashed run still leaves a usable record of
+    everything it actually changed.
+
+    To roll back, feed the file to::
+
+        UPDATE content SET image = :old_url WHERE id = :content_id;
+    """
+
+    HEADER = ("content_id", "old_url", "new_url", "migrated_at")
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        new_file = not path.exists() or path.stat().st_size == 0
+        self._handle = path.open("a", newline="", encoding="utf-8")
+        self._writer = csv.writer(self._handle)
+        if new_file:
+            self._writer.writerow(self.HEADER)
+            self._handle.flush()
+
+    def write(self, content_id: UUID, old_url: str, new_url: str) -> None:
+        self._writer.writerow(
+            [str(content_id), old_url, new_url, dt.datetime.now(dt.timezone.utc).isoformat()]
+        )
+        self._handle.flush()
+
+    def close(self) -> None:
+        self._handle.close()
+
+
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 
 def azure_url_prefix() -> str:
     """The URL prefix that marks an image as already migrated."""
     return f"https://{settings.azure_storage_account}.blob.core.windows.net/"
+
+
+def default_record_path() -> Path:
+    """A fresh timestamped record per run, so re-runs never clobber an older one."""
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d_%H%M%S")
+    return Path(f"image_migration_{stamp}.csv")
 
 
 def sniff_content_type(body: bytes) -> str:
@@ -215,6 +264,7 @@ async def migrate_row(
     *,
     max_bytes: int,
     dry_run: bool,
+    recorder: Recorder | None = None,
 ) -> str:
     """Migrate a single content row; returns the new blob URL."""
     body, content_type = await fetch_image(client, url, max_bytes)
@@ -240,6 +290,14 @@ async def migrate_row(
         raise MigrationError(f"blob URL exceeds column limit of {IMG_MAX} chars")
 
     await session.execute(update(Content).where(Content.id == content_id).values(image=blob_url))
+
+    # Record before committing. A crash between the two leaves a row that was
+    # never rewritten but is listed in the record — rolling that back is a
+    # harmless no-op. The reverse order could lose the only copy of the original
+    # URL, which is recoverable solely from a full database restore.
+    if recorder is not None:
+        recorder.write(content_id, url, blob_url)
+
     await session.commit()
     log.info("Migrated %s: %d bytes (%s) -> %s", content_id, len(body), content_type, blob_url)
     return blob_url
@@ -248,7 +306,14 @@ async def migrate_row(
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 
-async def run(*, dry_run: bool, limit: int | None, max_bytes: int, include_deleted: bool) -> Report:
+async def run(
+    *,
+    dry_run: bool,
+    limit: int | None,
+    max_bytes: int,
+    include_deleted: bool,
+    record_path: Path | None = None,
+) -> Report:
     report = Report()
     prefix = azure_url_prefix()
 
@@ -257,6 +322,14 @@ async def run(*, dry_run: bool, limit: int | None, max_bytes: int, include_delet
         account_url=f"https://{settings.azure_storage_account}.blob.core.windows.net",
         credential=settings.azure_storage_key,
     )
+
+    # A dry run changes nothing, so there is nothing to roll back and no record
+    # is opened — writing one would imply work that never happened.
+    recorder = None
+    if not dry_run:
+        recorder = Recorder(record_path or default_record_path())
+        report.record_path = recorder.path
+        log.info("Recording rollback data to %s", recorder.path)
 
     async with session_maker() as session:
         stmt = select(Content.id, Content.author_id, Content.image).where(
@@ -303,6 +376,7 @@ async def run(*, dry_run: bool, limit: int | None, max_bytes: int, include_delet
                         url,
                         max_bytes=max_bytes,
                         dry_run=dry_run,
+                        recorder=recorder,
                     )
                     report.migrated += 1
                 except MigrationError as exc:
@@ -312,6 +386,8 @@ async def run(*, dry_run: bool, limit: int | None, max_bytes: int, include_delet
                     await session.rollback()
                     report.fail(content_id, url, f"unexpected error: {exc!r}")
 
+    if recorder is not None:
+        recorder.close()
     await asyncio.to_thread(blob_service.close)
     return report
 
@@ -340,6 +416,16 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Also migrate soft-deleted content rows.",
     )
+    parser.add_argument(
+        "--record",
+        type=Path,
+        default=None,
+        help=(
+            "CSV file recording id,old_url,new_url for every rewritten row "
+            "(default: ./image_migration_<UTC timestamp>.csv). Appended to if it "
+            "already exists. Keep it — it is the only copy of the original URLs."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -353,6 +439,7 @@ async def main() -> None:
         limit=args.limit,
         max_bytes=args.max_bytes,
         include_deleted=args.include_deleted,
+        record_path=args.record,
     )
 
     log.info("─" * 60)
@@ -360,6 +447,10 @@ async def main() -> None:
     log.info("Already on Azure:      %d", report.skipped_already_azure)
     log.info("Skipped (not HTTP):    %d", report.skipped_not_http)
     log.info("Failed:                %d", len(report.failures))
+    if report.record_path is not None and report.migrated:
+        log.info("")
+        log.info("Rollback record: %s", report.record_path.resolve())
+        log.info("Keep it — it holds the only copy of the original image URLs.")
     if report.failures:
         log.info("")
         log.info("Failures (re-run after fixing, the script is idempotent):")
