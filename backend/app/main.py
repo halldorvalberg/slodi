@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from app.core.logging import configure_logging
 from app.routers import (
     comments_router,
+    content_router,
     email_list_router,
     email_router,
     events_router,
@@ -68,6 +69,7 @@ def create_app() -> FastAPI:
     app.include_router(programs_router.router)
     app.include_router(events_router.router)
     app.include_router(tasks_router.router)
+    app.include_router(content_router.router)
     app.include_router(tags_router.router)
     app.include_router(comments_router.router)
     app.include_router(likes_router.router)
