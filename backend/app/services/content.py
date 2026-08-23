@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.content import ContentRepository
+from app.schemas.content import ContentListOut, ContentOut
 
 
 class ContentService:
@@ -18,3 +19,26 @@ class ContentService:
         if author_id is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
         return author_id
+
+    async def count_for_workspace(self, workspace_id: UUID) -> int:
+        return await self.repo.count_by_workspace(workspace_id)
+
+    async def list_for_workspace(
+        self,
+        workspace_id: UUID,
+        current_user_id: UUID | None = None,
+        *,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[ContentListOut]:
+        rows = await self.repo.list_by_workspace(
+            workspace_id, current_user_id, limit=limit, offset=offset
+        )
+        return [ContentListOut.from_row(item, stats) for item, stats in rows]
+
+    async def get(self, content_id: UUID, current_user_id: UUID | None = None) -> ContentOut:
+        row = await self.repo.get(content_id, current_user_id)
+        if not row:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Content not found")
+        item, stats = row
+        return ContentOut.from_row(item, stats)
