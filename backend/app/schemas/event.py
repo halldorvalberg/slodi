@@ -60,6 +60,7 @@ class EventUpdate(ContentUpdate):
 
 class EventListOut(ContentListOut):
     model_config = ConfigDict(from_attributes=True)
+    content_type: ContentType = ContentType.event
 
     start_dt: dt.datetime
     end_dt: dt.datetime | None = None
@@ -68,6 +69,7 @@ class EventListOut(ContentListOut):
 
 class EventOut(ContentOut):
     model_config = ConfigDict(from_attributes=True)
+    content_type: ContentType = ContentType.event
 
     start_dt: dt.datetime
     end_dt: dt.datetime | None = None

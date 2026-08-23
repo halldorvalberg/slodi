@@ -20,11 +20,12 @@ class TaskUpdate(ContentUpdate):
 
 class TaskListOut(ContentListOut):
     model_config = ConfigDict(from_attributes=True)
-
+    content_type: ContentType = ContentType.task
     event_id: UUID | None = None
 
 
 class TaskOut(ContentOut):
     model_config = ConfigDict(from_attributes=True)
+    content_type: ContentType = ContentType.task
 
     event_id: UUID | None = None

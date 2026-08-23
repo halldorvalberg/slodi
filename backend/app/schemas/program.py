@@ -37,9 +37,11 @@ class ProgramUpdate(ContentUpdate):
 
 class ProgramListOut(ContentListOut):
     model_config = ConfigDict(from_attributes=True)
+    content_type: ContentType = ContentType.program
     pass
 
 
 class ProgramOut(ContentOut):
     model_config = ConfigDict(from_attributes=True)
+    content_type: ContentType = ContentType.program
     events: list[EventListOut] = []
