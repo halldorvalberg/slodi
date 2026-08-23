@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import datetime as dt
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import pytest
+from fastapi import HTTPException, status
 
 from app import models as m
+from app.domain.enums import ContentType
 from app.models.like import UserLikedContent
 from app.repositories.content import ContentRepository
+from app.schemas.content import ContentListOut, ContentOut
+from app.schemas.user import UserOutLimited
+from app.schemas.workspace import WorkspaceNested
 from app.utils import get_current_datetime
 
 
@@ -179,3 +185,82 @@ async def test_get_resolves_any_type_and_skips_deleted(db):
 
     assert await repo.get(gone.id, user.id) is None
     assert await repo.get(uuid4(), user.id) is None
+
+
+# ── Router ────────────────────────────────────────────────────────────────────
+
+
+def _list_out(workspace_id, name, content_type):
+    return ContentListOut(
+        id=uuid4(),
+        content_type=content_type,
+        workspace_id=workspace_id,
+        name=name,
+        author_id=uuid4(),
+        author_name="Test User",
+        created_at=dt.datetime.now(),
+        workspace=WorkspaceNested(id=workspace_id, name="Test Workspace"),
+    )
+
+
+def test_list_workspace_content_returns_every_type(client, sample_workspace):
+    ws_id = sample_workspace.id
+    items = [
+        _list_out(ws_id, "A Program", ContentType.program),
+        _list_out(ws_id, "An Event", ContentType.event),
+        _list_out(ws_id, "A Task", ContentType.task),
+    ]
+
+    with (
+        patch(
+            "app.services.content.ContentService.list_for_workspace", new_callable=AsyncMock
+        ) as mock_list,
+        patch(
+            "app.services.content.ContentService.count_for_workspace", new_callable=AsyncMock
+        ) as mock_count,
+    ):
+        mock_list.return_value = items
+        mock_count.return_value = 3
+
+        response = client.get(f"/workspaces/{ws_id}/content")
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert [d["name"] for d in data] == ["A Program", "An Event", "A Task"]
+    # The discriminator is what lets the client tell them apart and filter.
+    assert [d["content_type"] for d in data] == ["program", "event", "task"]
+
+
+def test_get_content_resolves_any_type(client, sample_workspace):
+    item = ContentOut(
+        id=uuid4(),
+        content_type=ContentType.task,
+        workspace_id=sample_workspace.id,
+        name="A Task",
+        author_id=uuid4(),
+        author_name="Test User",
+        created_at=dt.datetime.now(),
+        author=UserOutLimited(id=uuid4(), name="Test User"),
+        workspace=WorkspaceNested(id=sample_workspace.id, name="Test Workspace"),
+    )
+
+    with patch("app.services.content.ContentService.get", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = item
+
+        response = client.get(f"/content/{item.id}")
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert data["content_type"] == "task"
+    assert data["author"] == {"id": str(item.author.id), "name": "Test User"}
+
+
+def test_get_content_404_propagates(client):
+    with patch("app.services.content.ContentService.get", new_callable=AsyncMock) as mock_get:
+        mock_get.side_effect = HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Content not found"
+        )
+
+        response = client.get(f"/content/{uuid4()}")
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND

@@ -28,7 +28,7 @@ def _ws_id():
 
 def _prog(workspace_id=None):
     from app.schemas.program import ProgramOut
-    from app.schemas.user import UserOut
+    from app.schemas.user import UserOutLimited
     from app.schemas.workspace import WorkspaceNested
 
     wid = workspace_id or uuid4()
@@ -39,7 +39,7 @@ def _prog(workspace_id=None):
         author_id=uuid4(),
         author_name="Author",
         created_at=dt.datetime.now(dt.timezone.utc),
-        author=UserOut(id=uuid4(), name="Author", email="a@b.com", auth0_id="auth0|x"),
+        author=UserOutLimited(id=uuid4(), name="Author"),
         workspace=WorkspaceNested(id=wid, name="WS"),
     )
 

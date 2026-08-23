@@ -8,7 +8,7 @@ from fastapi import HTTPException, status
 
 from app.schemas.group import GroupOut
 from app.schemas.program import ProgramOut
-from app.schemas.user import UserOut
+from app.schemas.user import UserOutLimited
 from app.schemas.workspace import WorkspaceNested
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -22,9 +22,7 @@ def _make_program(workspace_id):
         author_id=uuid4(),
         author_name="Test User",
         created_at=datetime.now(),
-        author=UserOut(
-            id=uuid4(), name="Test User", email="test_email@gmail.com", auth0_id="auth0|123"
-        ),
+        author=UserOutLimited(id=uuid4(), name="Test User"),
         workspace=WorkspaceNested(id=workspace_id, name="Test Workspace"),
     )
 
