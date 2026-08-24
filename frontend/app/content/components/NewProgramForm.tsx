@@ -81,6 +81,12 @@ type Props = {
   /**
    * What is being created.
    *
+   * No date fields for an Event, deliberately. The bank is a library of ideas,
+   * not a calendar: a útilega in the bank has a *length*, not a date, and the
+   * length is `duration_min`/`duration_max` which every type already collects
+   * under UPPLÝSINGAR. A concrete date only exists once the item is placed in a
+   * plan, and belongs to that placement rather than to the bank entry.
+   *
    * One form rather than three: every field below is a `ContentBase` field that
    * all three types share, so a `NewTaskForm` and a `NewEventForm` would be
    * near-identical copies of six hundred lines — and would drift the moment a
@@ -114,10 +120,6 @@ export default function NewProgramForm({
   const [equipmentInput, setEquipmentInput] = useState("");
   const [openSections, setOpenSections] = useState<SectionId[]>(["basic"]);
   const [showDraftBanner, setShowDraftBanner] = useState(false);
-  // Only an Event has these. `events.start_dt` is NOT NULL, so it is required
-  // here rather than letting the backend pick a default nobody chose.
-  const [startDt, setStartDt] = useState("");
-  const [endDt, setEndDt] = useState("");
 
   // Show draft-restored banner if localStorage had meaningful content on mount
   useEffect(() => {
@@ -236,13 +238,6 @@ export default function NewProgramForm({
       return;
     }
 
-    // An Event without a start is not representable — the column is NOT NULL.
-    if (contentType === "event" && !startDt) {
-      setError("Viðburður þarf upphafstíma");
-      if (!openSections.includes("basic")) setOpenSections((prev) => [...prev, "basic"]);
-      return;
-    }
-
     setLoading(true);
     try {
       const shared = {
@@ -269,10 +264,7 @@ export default function NewProgramForm({
 
       const item =
         contentType === "event"
-          ? await createEvent(
-              { ...shared, start_dt: startDt, end_dt: endDt || undefined },
-              getToken
-            )
+          ? await createEvent(shared, getToken)
           : contentType === "program"
             ? await createProgram(shared, getToken)
             : await createTask(shared, getToken);
@@ -348,17 +340,7 @@ export default function NewProgramForm({
             >
               <div className={styles.accordionContentInner}>
                 <div className={styles.accordionBody}>
-                  {id === "basic" && (
-                    <SectionBasic
-                      draft={draft}
-                      updateDraft={updateDraft}
-                      contentType={contentType}
-                      startDt={startDt}
-                      endDt={endDt}
-                      setStartDt={setStartDt}
-                      setEndDt={setEndDt}
-                    />
-                  )}
+                  {id === "basic" && <SectionBasic draft={draft} updateDraft={updateDraft} />}
                   {id === "info" && <SectionInfo draft={draft} updateDraft={updateDraft} />}
                   {id === "equipment" && (
                     <SectionEquipment
@@ -434,21 +416,7 @@ type DraftProps = {
   updateDraft: (patch: Partial<ProgramDraft> | ((prev: ProgramDraft) => ProgramDraft)) => void;
 };
 
-function SectionBasic({
-  draft,
-  updateDraft,
-  contentType,
-  startDt,
-  endDt,
-  setStartDt,
-  setEndDt,
-}: DraftProps & {
-  contentType: ContentType;
-  startDt: string;
-  endDt: string;
-  setStartDt: (v: string) => void;
-  setEndDt: (v: string) => void;
-}) {
+function SectionBasic({ draft, updateDraft }: DraftProps) {
   return (
     <>
       <div className={styles.field}>
@@ -482,40 +450,6 @@ function SectionBasic({
         />
         <p className={styles.hint}>{draft.description.length}/1000</p>
       </div>
-
-      {/* Only an Event happens at a time. `events.start_dt` is NOT NULL. */}
-      {contentType === "event" && (
-        <div className={styles.grid2}>
-          <div className={styles.field}>
-            <label htmlFor="event-start" className={styles.label}>
-              Hefst <span className={styles.required}>*</span>
-            </label>
-            <input
-              id="event-start"
-              type="datetime-local"
-              className={styles.input}
-              value={startDt}
-              onChange={(e) => setStartDt(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="event-end" className={styles.label}>
-              Lýkur
-            </label>
-            <input
-              id="event-end"
-              type="datetime-local"
-              className={styles.input}
-              value={endDt}
-              onChange={(e) => setEndDt(e.target.value)}
-              min={startDt || undefined}
-            />
-            <p className={styles.hint}>Valfrjálst</p>
-          </div>
-        </div>
-      )}
     </>
   );
 }
