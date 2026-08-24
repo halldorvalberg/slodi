@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import type { Program, ProgramUpdateInput } from "@/services/programs.service";
 import { useTags } from "@/hooks/useTags";
+import ImageUpload from "@/components/ImageUpload/ImageUpload";
 import styles from "./ProgramDetailEdit.module.css";
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -83,7 +83,6 @@ export default function ProgramDetailEdit({
 
   const [equipmentInput, setEquipmentInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isDisabled = isSaving || isDeleting;
@@ -482,57 +481,13 @@ export default function ProgramDetailEdit({
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="edit-image" className={styles.label}>
-              Mynd (URL)
-            </label>
-
-            {form.image && (
-              <div className={styles.imagePreviewContainer}>
-                {!imageError ? (
-                  <Image
-                    src={form.image}
-                    alt="Forskoðun myndar"
-                    className={styles.imagePreview}
-                    width={600}
-                    height={300}
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <div className={styles.imagePreviewError}>
-                    <span className={styles.imagePreviewErrorIcon}>⚠️</span>
-                    <span className={styles.imagePreviewErrorText}>
-                      Ekki tókst að hlaða mynd — athugaðu slóðina
-                    </span>
-                  </div>
-                )}
-                <button
-                  type="button"
-                  className={styles.imageClearButton}
-                  onClick={() => {
-                    patch({ image: "" });
-                    setImageError(false);
-                  }}
-                  disabled={isDisabled}
-                  aria-label="Fjarlægja mynd"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-
-            <input
+            <ImageUpload
               id="edit-image"
-              type="url"
-              className={styles.input}
               value={form.image}
-              onChange={(e) => {
-                setImageError(false);
-                patch({ image: e.target.value });
-              }}
+              onChange={(url) => patch({ image: url })}
               disabled={isDisabled}
-              placeholder="https://example.com/mynd.jpg"
+              hint="Mynd sem birtist á dagskránni — JPG, PNG eða WebP, mest 5 MB"
             />
-            <p className={styles.helpText}>Settu inn slóð á mynd til að sýna á dagskránni</p>
           </div>
         </section>
 
