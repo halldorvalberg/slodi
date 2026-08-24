@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import styles from "./NewProgramForm.module.css";
-import type { Program } from "@/services/programs.service";
 import { createProgram } from "@/services/programs.service";
+import { createTask } from "@/services/tasks.service";
+import { createEvent } from "@/services/events.service";
+import type { ContentItem, ContentType } from "@/services/content.service";
 import { useTags } from "@/hooks/useTags";
 import { useDraft } from "@/hooks/useDraft";
 import { handleApiErrorIs } from "@/lib/api-utils";
@@ -76,19 +78,34 @@ const AGE_GROUPS = [
 
 type Props = {
   workspaceId: string;
-  onCreated?: (program: Program) => void;
+  /**
+   * What is being created.
+   *
+   * One form rather than three: every field below is a `ContentBase` field that
+   * all three types share, so a `NewTaskForm` and a `NewEventForm` would be
+   * near-identical copies of six hundred lines — and would drift the moment a
+   * field is added to the model. Only the submit target and the Event's dates
+   * differ, and both are small enough to branch on here.
+   */
+  contentType?: ContentType;
+  onCreated?: (item: ContentItem) => void;
   onCancel?: () => void;
 };
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Props) {
+export default function NewProgramForm({
+  workspaceId,
+  contentType = "task",
+  onCreated,
+  onCancel,
+}: Props) {
   const { getToken } = useAuth();
   const { tagNames: availableTags } = useTags();
   const displayTags = availableTags ?? [];
 
   // Draft state — workspace-scoped key so drafts don't bleed between workspaces
-  const draftKey = `prog-draft-${workspaceId}`;
+  const draftKey = `content-draft-${contentType}-${workspaceId}`;
   const { draft, updateDraft, clearDraft } = useDraft<ProgramDraft>(draftKey, INITIAL_DRAFT);
 
   // Transient UI state (not persisted)
@@ -97,6 +114,10 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
   const [equipmentInput, setEquipmentInput] = useState("");
   const [openSections, setOpenSections] = useState<SectionId[]>(["basic"]);
   const [showDraftBanner, setShowDraftBanner] = useState(false);
+  // Only an Event has these. `events.start_dt` is NOT NULL, so it is required
+  // here rather than letting the backend pick a default nobody chose.
+  const [startDt, setStartDt] = useState("");
+  const [endDt, setEndDt] = useState("");
 
   // Show draft-restored banner if localStorage had meaningful content on mount
   useEffect(() => {
@@ -215,37 +236,51 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
       return;
     }
 
+    // An Event without a start is not representable — the column is NOT NULL.
+    if (contentType === "event" && !startDt) {
+      setError("Viðburður þarf upphafstíma");
+      if (!openSections.includes("basic")) setOpenSections((prev) => [...prev, "basic"]);
+      return;
+    }
+
     setLoading(true);
     try {
-      const program = await createProgram(
-        {
-          name: draft.name.trim(),
-          description: draft.description.trim() || undefined,
-          image: draft.image.trim() || undefined,
-          instructions: draft.instructions.trim() || undefined,
-          equipment: draft.equipment.length > 0 ? draft.equipment : undefined,
-          duration_min: draft.durationMin !== "" ? Number(draft.durationMin) : undefined,
-          duration_max: draft.durationMax !== "" ? Number(draft.durationMax) : undefined,
-          prep_time_min: draft.prepTimeMin !== "" ? Number(draft.prepTimeMin) : undefined,
-          prep_time_max: draft.prepTimeMax !== "" ? Number(draft.prepTimeMax) : undefined,
-          age:
-            draft.selectedAgeGroups.filter((g) => AGE_GROUPS.includes(g)).length > 0
-              ? draft.selectedAgeGroups.filter((g) => AGE_GROUPS.includes(g))
-              : undefined,
-          location: draft.location.trim() || undefined,
-          count_min: draft.countMin !== "" ? Number(draft.countMin) : undefined,
-          count_max: draft.countMax !== "" ? Number(draft.countMax) : undefined,
-          price: draft.price !== "" ? Number(draft.price) : undefined,
-          tagNames: draft.selectedTags.length > 0 ? draft.selectedTags : undefined,
-          workspaceId,
-        },
-        getToken
-      );
+      const shared = {
+        name: draft.name.trim(),
+        description: draft.description.trim() || undefined,
+        image: draft.image.trim() || undefined,
+        instructions: draft.instructions.trim() || undefined,
+        equipment: draft.equipment.length > 0 ? draft.equipment : undefined,
+        duration_min: draft.durationMin !== "" ? Number(draft.durationMin) : undefined,
+        duration_max: draft.durationMax !== "" ? Number(draft.durationMax) : undefined,
+        prep_time_min: draft.prepTimeMin !== "" ? Number(draft.prepTimeMin) : undefined,
+        prep_time_max: draft.prepTimeMax !== "" ? Number(draft.prepTimeMax) : undefined,
+        age:
+          draft.selectedAgeGroups.filter((g) => AGE_GROUPS.includes(g)).length > 0
+            ? draft.selectedAgeGroups.filter((g) => AGE_GROUPS.includes(g))
+            : undefined,
+        location: draft.location.trim() || undefined,
+        count_min: draft.countMin !== "" ? Number(draft.countMin) : undefined,
+        count_max: draft.countMax !== "" ? Number(draft.countMax) : undefined,
+        price: draft.price !== "" ? Number(draft.price) : undefined,
+        tagNames: draft.selectedTags.length > 0 ? draft.selectedTags : undefined,
+        workspaceId,
+      };
+
+      const item =
+        contentType === "event"
+          ? await createEvent(
+              { ...shared, start_dt: startDt, end_dt: endDt || undefined },
+              getToken
+            )
+          : contentType === "program"
+            ? await createProgram(shared, getToken)
+            : await createTask(shared, getToken);
       clearDraft();
       setEquipmentInput("");
       setShowDraftBanner(false);
       setOpenSections(["basic"]);
-      onCreated?.(program);
+      onCreated?.(item);
     } catch (err) {
       setError(handleApiErrorIs(err));
     } finally {
@@ -313,7 +348,17 @@ export default function NewProgramForm({ workspaceId, onCreated, onCancel }: Pro
             >
               <div className={styles.accordionContentInner}>
                 <div className={styles.accordionBody}>
-                  {id === "basic" && <SectionBasic draft={draft} updateDraft={updateDraft} />}
+                  {id === "basic" && (
+                    <SectionBasic
+                      draft={draft}
+                      updateDraft={updateDraft}
+                      contentType={contentType}
+                      startDt={startDt}
+                      endDt={endDt}
+                      setStartDt={setStartDt}
+                      setEndDt={setEndDt}
+                    />
+                  )}
                   {id === "info" && <SectionInfo draft={draft} updateDraft={updateDraft} />}
                   {id === "equipment" && (
                     <SectionEquipment
@@ -389,7 +434,21 @@ type DraftProps = {
   updateDraft: (patch: Partial<ProgramDraft> | ((prev: ProgramDraft) => ProgramDraft)) => void;
 };
 
-function SectionBasic({ draft, updateDraft }: DraftProps) {
+function SectionBasic({
+  draft,
+  updateDraft,
+  contentType,
+  startDt,
+  endDt,
+  setStartDt,
+  setEndDt,
+}: DraftProps & {
+  contentType: ContentType;
+  startDt: string;
+  endDt: string;
+  setStartDt: (v: string) => void;
+  setEndDt: (v: string) => void;
+}) {
   return (
     <>
       <div className={styles.field}>
@@ -423,6 +482,40 @@ function SectionBasic({ draft, updateDraft }: DraftProps) {
         />
         <p className={styles.hint}>{draft.description.length}/1000</p>
       </div>
+
+      {/* Only an Event happens at a time. `events.start_dt` is NOT NULL. */}
+      {contentType === "event" && (
+        <div className={styles.grid2}>
+          <div className={styles.field}>
+            <label htmlFor="event-start" className={styles.label}>
+              Hefst <span className={styles.required}>*</span>
+            </label>
+            <input
+              id="event-start"
+              type="datetime-local"
+              className={styles.input}
+              value={startDt}
+              onChange={(e) => setStartDt(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="event-end" className={styles.label}>
+              Lýkur
+            </label>
+            <input
+              id="event-end"
+              type="datetime-local"
+              className={styles.input}
+              value={endDt}
+              onChange={(e) => setEndDt(e.target.value)}
+              min={startDt || undefined}
+            />
+            <p className={styles.hint}>Valfrjálst</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }

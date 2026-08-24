@@ -13,7 +13,7 @@ import FilterSidebar, { FilterDrawer } from "@/components/filters/FilterSidebar"
 import ActiveFilterBar from "@/components/filters/ActiveFilterBar";
 import styles from "./programs.module.css";
 import useContent from "@/hooks/useContent";
-import type { ContentItem } from "@/services/content.service";
+import { CONTENT_TYPE_LABEL, type ContentItem, type ContentType } from "@/services/content.service";
 import { useUserWorkspace } from "@/hooks/useUserWorkspace";
 import { useProgramFilters } from "@/hooks/useProgramFilters";
 import type { FilterState } from "@/hooks/useProgramFilters";
@@ -50,6 +50,9 @@ const LEGACY_TO_SORT: Record<SortOption, FilterState["sortBy"]> = {
  */
 function ProgramsPageInner() {
   const [showNewProgram, setShowNewProgram] = useState(false);
+  // Which type the "+" chooser landed on. The modal title and the form both
+  // read it, so a leader always sees what they are creating.
+  const [newType, setNewType] = useState<ContentType>("task");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const filterToggleRef = useRef<HTMLButtonElement>(null);
 
@@ -126,6 +129,9 @@ function ProgramsPageInner() {
 
   // ── Shared filter sidebar props ────────────────────────────────────────
   const filterSidebarProps = {
+    selectedTypes: filters.types,
+    onTypesChange: (types: ContentType[]) => setFilters({ types }),
+
     selectedAges: filters.ages,
     onAgesChange: (ages: string[]) => setFilters({ ages }),
 
@@ -169,15 +175,24 @@ function ProgramsPageInner() {
   return (
     <div className={styles.page}>
       {/* Header with FAB button */}
-      <ProgramsHeader onNewProgram={() => setShowNewProgram(true)} />
+      <ProgramsHeader
+        onNewContent={(type) => {
+          setNewType(type);
+          setShowNewProgram(true);
+        }}
+      />
 
-      {/* New Program Modal */}
       <Modal
         open={showNewProgram}
         onClose={() => setShowNewProgram(false)}
-        title="Bæta hugmynd í bankann"
+        title={`Bæta við — ${CONTENT_TYPE_LABEL[newType].toLowerCase()}`}
       >
-        <NewProgramForm workspaceId={postWorkspaceId} onCreated={handleProgramCreated} />
+        <NewProgramForm
+          key={newType}
+          workspaceId={postWorkspaceId}
+          contentType={newType}
+          onCreated={handleProgramCreated}
+        />
       </Modal>
 
       {/* Top bar: Search + mobile filter toggle + Sort */}

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useCallback } from "react";
 import AgeGroupFilter from "./AgeGroupFilter";
+import ContentTypeFilter from "./ContentTypeFilter";
+import type { ContentType } from "@/services/content.service";
 import TagFilter from "./TagFilter";
 import EquipmentFilter from "./EquipmentFilter";
 import AuthorFilter from "./AuthorFilter";
@@ -13,6 +15,8 @@ import LocationFilter from "./LocationFilter";
 import styles from "./FilterSidebar.module.css";
 
 export interface FilterSidebarProps {
+  selectedTypes: ContentType[];
+  onTypesChange: (types: ContentType[]) => void;
   // Age group filter
   selectedAges: string[];
   onAgesChange: (ages: string[]) => void;
@@ -65,6 +69,11 @@ export interface FilterSidebarProps {
 export default function FilterSidebar(props: FilterSidebarProps) {
   return (
     <aside className={styles.sidebar} aria-label="Síur">
+      <ContentTypeFilter
+        selected={props.selectedTypes}
+        onChange={props.onTypesChange}
+        defaultOpen={true}
+      />
       <AgeGroupFilter
         selected={props.selectedAges}
         onChange={props.onAgesChange}

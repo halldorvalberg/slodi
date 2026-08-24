@@ -684,3 +684,16 @@
     font-weight: var(--sl-font-weight-emphasis);
   }
 }
+
+/* Two fields side by side — used for an Event's start and end. */
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sl-spacing-gap-md, 16px);
+}
+
+@media (max-width: 600px) {
+  .grid2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
