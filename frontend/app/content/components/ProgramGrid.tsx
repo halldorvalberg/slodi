@@ -3,22 +3,22 @@
 import React from "react";
 import SkeletonCard from "@/components/ui/SkeletonCard";
 import ProgramCard from "./ProgramCard";
-import type { Program } from "@/services/programs.service";
+import type { ContentItem } from "@/services/content.service";
 import styles from "./ProgramGrid.module.css";
 
 interface ProgramGridProps {
-  programs: Program[];
+  programs: ContentItem[];
   isLoading: boolean;
   error?: string | null;
   onRetry?: () => void;
   /** Called when the user selects "Edit" on a card. */
-  onEdit?: (program: Program) => void;
+  onEdit?: (program: ContentItem) => void;
   /** Called when the user selects "Delete" on a card. */
-  onDelete?: (program: Program) => void;
+  onDelete?: (program: ContentItem) => void;
   /** Returns true if the user can edit the given program. */
-  canEdit?: (program: Program) => boolean;
+  canEdit?: (program: ContentItem) => boolean;
   /** Returns true if the user can delete the given program. */
-  canDelete?: (program: Program) => boolean;
+  canDelete?: (program: ContentItem) => boolean;
 }
 
 /**
@@ -148,6 +148,7 @@ export default function ProgramGrid({
               price={program.price}
               location={program.location}
               age={program.age}
+              content_type={program.content_type}
               canEdit={canEdit ? canEdit(program) : false}
               canDelete={canDelete ? canDelete(program) : false}
               onEdit={onEdit ? () => onEdit(program) : undefined}

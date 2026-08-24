@@ -4,13 +4,16 @@
  */
 
 import type { User } from "@/services/users.service";
-import type { Program } from "@/services/programs.service";
+// Typed on the bank item rather than on Program: ownership and workspace
+// role are Content-level facts, identical for a task, an event and a
+// programme. The bank holds all three now.
+import type { ContentItem } from "@/services/content.service";
 import { type WorkspaceRole, hasWorkspaceRole } from "@/services/workspaces.service";
 
 /**
  * Check if the current user is the author/owner of a program
  */
-export function isOwner(user: User | null, program: Program): boolean {
+export function isOwner(user: User | null, program: ContentItem): boolean {
   if (!user || !program) return false;
   return user.id === program.author_id;
 }
@@ -28,7 +31,7 @@ export function isOwner(user: User | null, program: Program): boolean {
  */
 export function canEditProgram(
   user: User | null,
-  program: Program,
+  program: ContentItem,
   workspaceRole: WorkspaceRole | null | undefined = null
 ): boolean {
   if (!user || !program) return false;
@@ -48,7 +51,7 @@ export function canEditProgram(
  */
 export function canDeleteProgram(
   user: User | null,
-  program: Program,
+  program: ContentItem,
   workspaceRole: WorkspaceRole | null | undefined = null
 ): boolean {
   if (!user || !program) return false;
@@ -73,7 +76,7 @@ export function canCreateProgram(workspaceRole: WorkspaceRole | null | undefined
  */
 export function canViewProgram(
   user: User | null,
-  program: Program,
+  program: ContentItem,
   workspaceRole: WorkspaceRole | null | undefined = null
 ): boolean {
   if (program.public) return true;

@@ -15,6 +15,7 @@ import {
   formatAgeGroup,
   getAgeGroupPatrol,
 } from "@/lib/format";
+import { CONTENT_TYPE_LABEL, type ContentType } from "@/services/content.service";
 import styles from "./ProgramCard.module.css";
 
 export interface ProgramCardProps {
@@ -52,6 +53,15 @@ export interface ProgramCardProps {
   location?: string | null;
   /** Age group enum values. */
   age?: string[] | null;
+  /**
+   * Which kind of bank item this is.
+   *
+   * Optional so the card keeps working where the type is not known or not
+   * interesting; the badge simply does not render. Once the bank holds tasks,
+   * events and programmes together, the type filter is unreadable without it —
+   * you cannot tell what you filtered to.
+   */
+  content_type?: ContentType;
 }
 
 const MAX_VISIBLE_TAGS = 4;
@@ -78,6 +88,7 @@ export default function ProgramCard({
   price,
   location,
   age,
+  content_type,
 }: ProgramCardProps) {
   const { likeCount, isLiked, toggleLike } = useLikes(id, like_count, liked_by_me);
   const { isFavorite, toggleFavorite } = useFavorite(id);
@@ -222,7 +233,7 @@ export default function ProgramCard({
       </div>
 
       {/* ── Stretched link (covers entire card) ─────────────────── */}
-      <Link href={`/programs/${id}`} className={styles.stretchedLink}>
+      <Link href={`/content/${id}`} className={styles.stretchedLink}>
         <span className="sl-sr-only">Opna {name}</span>
       </Link>
 
@@ -335,6 +346,13 @@ export default function ProgramCard({
               </div>
             )}
           </dl>
+        )}
+
+        {/* ── Content type ────────────────────────────────────── */}
+        {content_type && (
+          <span className={`${styles.typeBadge} ${styles[`type${content_type}`]}`}>
+            {CONTENT_TYPE_LABEL[content_type]}
+          </span>
         )}
 
         {/* ── Age group badges ────────────────────────────────── */}

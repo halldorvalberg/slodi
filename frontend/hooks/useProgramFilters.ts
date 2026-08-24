@@ -2,13 +2,20 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import type { Program } from "@/services/programs.service";
+import {
+  CONTENT_TYPES,
+  CONTENT_TYPE_LABEL,
+  type ContentItem,
+  type ContentType,
+} from "@/services/content.service";
 import { formatDuration, formatPrepTime, formatParticipants, formatPrice } from "@/lib/format";
 
 // ── FilterState type ────────────────────────────────────────────────────────────
 
 export interface FilterState {
   search: string;
+  /** Which content types to show. Empty means all of them, not none. */
+  types: ContentType[];
   ages: string[];
   tags: string[];
   equipment: string[];
@@ -27,6 +34,7 @@ export interface FilterState {
 
 export const DEFAULT_FILTERS: FilterState = {
   search: "",
+  types: [],
   ages: [],
   tags: [],
   equipment: [],
@@ -63,6 +71,7 @@ export function filtersToParams(f: FilterState): URLSearchParams {
   const params = new URLSearchParams();
 
   if (f.search) params.set("search", f.search);
+  if (f.types.length > 0) params.set("types", f.types.join(","));
   if (f.ages.length > 0) params.set("ages", f.ages.join(","));
   if (f.tags.length > 0) params.set("tags", f.tags.join(","));
   if (f.equipment.length > 0) params.set("equipment", f.equipment.join(","));
@@ -99,6 +108,9 @@ export function paramsToFilters(p: URLSearchParams): FilterState {
 
   return {
     search: p.get("search") ?? "",
+    types: parseArray("types").filter((t): t is ContentType =>
+      (CONTENT_TYPES as string[]).includes(t)
+    ),
     ages: parseArray("ages"),
     tags: parseArray("tags"),
     equipment: parseArray("equipment"),
@@ -118,12 +130,19 @@ export function paramsToFilters(p: URLSearchParams): FilterState {
 
 // ── Client-side filtering ───────────────────────────────────────────────────────
 
-function getAuthorName(program: Program): string {
+function getAuthorName(program: ContentItem): string {
   return program.author_name ?? program.author?.name ?? "";
 }
 
-function applyFilters(programs: Program[], f: FilterState): Program[] {
+function applyFilters(programs: ContentItem[], f: FilterState): ContentItem[] {
+  // An empty `types` means "no type filter", not "show nothing" — the same
+  // convention every other array filter here uses.
   let result = programs;
+
+  // 0. Content type: OR logic, like every other multi-select here.
+  if (f.types.length > 0) {
+    result = result.filter((p) => f.types.includes(p.content_type));
+  }
 
   // 1. Text search: case-insensitive on name, description, author name
   if (f.search) {
@@ -240,6 +259,14 @@ function deriveChips(f: FilterState, patch: (next: Partial<FilterState>) => void
     });
   }
 
+  for (const type of f.types) {
+    chips.push({
+      key: `type:${type}`,
+      label: CONTENT_TYPE_LABEL[type],
+      remove: () => patch({ types: f.types.filter((t) => t !== type) }),
+    });
+  }
+
   for (const age of f.ages) {
     chips.push({
       key: `age-${age}`,
@@ -328,7 +355,7 @@ function deriveChips(f: FilterState, patch: (next: Partial<FilterState>) => void
 
 // ── Unique value extraction ─────────────────────────────────────────────────────
 
-function extractUniqueLocations(programs: Program[]): string[] {
+function extractUniqueLocations(programs: ContentItem[]): string[] {
   const locations = new Set<string>();
   for (const p of programs) {
     if (p.location) locations.add(p.location);
@@ -336,7 +363,7 @@ function extractUniqueLocations(programs: Program[]): string[] {
   return Array.from(locations).sort((a, b) => a.localeCompare(b, "is"));
 }
 
-function extractUniqueAuthors(programs: Program[]): string[] {
+function extractUniqueAuthors(programs: ContentItem[]): string[] {
   const authors = new Set<string>();
   for (const p of programs) {
     const name = getAuthorName(p);
@@ -345,7 +372,7 @@ function extractUniqueAuthors(programs: Program[]): string[] {
   return Array.from(authors).sort((a, b) => a.localeCompare(b, "is"));
 }
 
-function extractUniqueTags(programs: Program[]): string[] {
+function extractUniqueTags(programs: ContentItem[]): string[] {
   const tags = new Set<string>();
   for (const p of programs) {
     for (const t of p.tags ?? []) {
@@ -355,7 +382,7 @@ function extractUniqueTags(programs: Program[]): string[] {
   return Array.from(tags).sort((a, b) => a.localeCompare(b, "is"));
 }
 
-function extractUniqueEquipment(programs: Program[]): string[] {
+function extractUniqueEquipment(programs: ContentItem[]): string[] {
   const items = new Set<string>();
   for (const p of programs) {
     for (const e of p.equipment ?? []) {
@@ -367,7 +394,7 @@ function extractUniqueEquipment(programs: Program[]): string[] {
 
 // ── Hook ────────────────────────────────────────────────────────────────────────
 
-export function useProgramFilters(allPrograms: Program[]) {
+export function useProgramFilters(allPrograms: ContentItem[]) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();

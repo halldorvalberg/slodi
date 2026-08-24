@@ -110,7 +110,7 @@ export default function ProgramQuickInfo({ program }: ProgramQuickInfoProps) {
             {program.tags.map((tag) => (
               <a
                 key={tag.id}
-                href={`/programs?tags=${encodeURIComponent(tag.name)}`}
+                href={`/content?tags=${encodeURIComponent(tag.name)}`}
                 className={styles.tag}
               >
                 {tag.name}

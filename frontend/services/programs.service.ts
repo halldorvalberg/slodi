@@ -237,10 +237,14 @@ export async function unlikeProgram(
 }
 
 /**
- * Extract unique tags from programs list
+ * The unique tag names across a list of bank items.
+ *
+ * Typed on the one field it reads rather than on `Program`, so it also serves
+ * the content list — which holds tasks and events as well, and would otherwise
+ * need a copy of this three-line function.
  */
-export function extractTags(programs: Program[]): string[] {
-  const tagNames = programs.flatMap((p) => (p.tags || []).map((t) => t.name));
+export function extractTags(items: Array<{ tags?: Array<{ name: string }> }>): string[] {
+  const tagNames = items.flatMap((item) => (item.tags || []).map((t) => t.name));
   return Array.from(new Set(tagNames));
 }
 

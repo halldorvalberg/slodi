@@ -1,6 +1,6 @@
-import ProgramSearch from "@/app/programs/components/ProgramSearch";
-import ProgramFilters from "@/app/programs/components/ProgramFilters";
-import ProgramSort, { type SortOption } from "@/app/programs/components/ProgramSort";
+import ProgramSearch from "@/app/content/components/ProgramSearch";
+import ProgramFilters from "@/app/content/components/ProgramFilters";
+import ProgramSort, { type SortOption } from "@/app/content/components/ProgramSort";
 import styles from "./ProgramsToolbar.module.css";
 
 interface ProgramsToolbarProps {

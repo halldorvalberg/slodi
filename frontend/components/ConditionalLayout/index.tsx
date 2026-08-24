@@ -19,7 +19,7 @@ import DashboardLayout from "@/components/DashboardLayout";
  *
  * 2. Dashboard Layout (Sidebar + Content, no Header/Footer)
  *    - Dashboard: /dashboard
- *    - Programs: /programs
+ *    - Content bank: /content
  *    - Builder: /builder
  *    - Social: /social
  *    - Analytics: /analytics
@@ -47,6 +47,7 @@ const PUBLIC_ROUTES = [
 // Dashboard/app routes that should use sidebar-only layout
 const DASHBOARD_ROUTES = [
   "/dashboard",
+  "/content",
   "/programs",
   "/builder",
   "/social",

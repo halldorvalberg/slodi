@@ -3,6 +3,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      // The bank moved from /programs to /content when it stopped being a
+      // list of Programs and became a list of every content type. Permanent,
+      // because links to individual items are shared between leaders and
+      // pasted into Drive docs — they have to keep resolving.
+      { source: "/programs", destination: "/content", permanent: true },
+      { source: "/programs/:id", destination: "/content/:id", permanent: true },
+      { source: "/programs/:id/:path*", destination: "/content/:id/:path*", permanent: true },
+
       // Permanent redirects for the old /skatathing game hub and its sub-routes.
       // These exist so that any bookmarked or shared links continue to work after
       // the hub moved to /leikir.

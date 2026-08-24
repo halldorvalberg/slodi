@@ -23,7 +23,7 @@ vi.mock("next/navigation", () => ({
     refresh: vi.fn(),
     prefetch: vi.fn(),
   }),
-  usePathname: () => "/programs",
+  usePathname: () => "/content",
 }));
 
 // ── Mock program fixtures ────────────────────────────────────────────────────

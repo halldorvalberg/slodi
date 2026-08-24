@@ -1,10 +1,11 @@
 // hooks/useProgramActions.ts
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
-import type { Program } from "@/services/programs.service";
+// Share and back work off name/description, which every content type has.
+import type { ContentItem } from "@/services/content.service";
 import { ROUTES } from "@/constants/routes";
 
-export function useProgramActions(program: Program | null) {
+export function useProgramActions(program: ContentItem | null) {
   const router = useRouter();
 
   const handleShare = useCallback(async () => {

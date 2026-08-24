@@ -540,3 +540,37 @@
     border-width: 2px;
   }
 }
+
+/*
+ * Content type badge.
+ *
+ * Neutral by default and only tinted per type — the card already carries age
+ * badges in the patrol ramps, and a second set of saturated colours next to
+ * them would compete for the same glance.
+ */
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border: 1px solid hsl(var(--sl-color-border));
+  border-radius: var(--sl-radius-chip);
+  background: hsl(var(--sl-color-background-secondary));
+  font-size: var(--sl-text-overline);
+  font-weight: var(--sl-font-weight-emphasis);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: hsl(var(--sl-color-text-secondary));
+}
+
+/* A programme is a collection; a task is the smallest unit. Tinting only the
+   programme keeps that distinction visible without shouting. */
+.typeprogram {
+  border-color: hsl(var(--sl-color-primary));
+  color: hsl(var(--sl-color-primary));
+}
+
+.typeevent {
+  border-color: hsl(var(--sl-color-patrol-falkar));
+  color: hsl(var(--sl-color-patrol-falkar));
+}

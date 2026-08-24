@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, Suspense } from "react";
 import Modal from "@/components/Modal/Modal";
-import NewProgramForm from "@/app/programs/components/NewProgramForm";
+import NewProgramForm from "@/app/content/components/NewProgramForm";
 import ProgramGrid from "./components/ProgramGrid";
 import ProgramSort from "./components/ProgramSort";
 import type { SortOption } from "./components/ProgramSort";
@@ -12,7 +12,8 @@ import SearchInput from "@/components/filters/SearchInput";
 import FilterSidebar, { FilterDrawer } from "@/components/filters/FilterSidebar";
 import ActiveFilterBar from "@/components/filters/ActiveFilterBar";
 import styles from "./programs.module.css";
-import usePrograms from "@/hooks/usePrograms";
+import useContent from "@/hooks/useContent";
+import type { ContentItem } from "@/services/content.service";
 import { useUserWorkspace } from "@/hooks/useUserWorkspace";
 import { useProgramFilters } from "@/hooks/useProgramFilters";
 import type { FilterState } from "@/hooks/useProgramFilters";
@@ -22,13 +23,8 @@ import { useWorkspaceRole } from "@/hooks/useWorkspaceRole";
 import { PROGRAMS_PER_PAGE } from "@/constants/config";
 import { useDefaultWorkspaceId } from "@/hooks/useDefaultWorkspaceId";
 import { canEditProgram, canDeleteProgram } from "@/lib/permissions";
-import {
-  updateProgram,
-  deleteProgram,
-  type Program,
-  type ProgramUpdateInput,
-} from "@/services/programs.service";
-import ProgramDetailEdit from "@/app/programs/[id]/components/ProgramDetailEdit";
+import { updateProgram, deleteProgram, type ProgramUpdateInput } from "@/services/programs.service";
+import ProgramDetailEdit from "@/app/content/[id]/components/ProgramDetailEdit";
 import { DeleteConfirmModal } from "@/components/DeleteConfirmModal/DeleteConfirmModal";
 
 /**
@@ -62,11 +58,11 @@ function ProgramsPageInner() {
 
   // Fetch data
   const {
-    programs,
+    content: programs,
     loading: programsLoading,
     error: programsError,
     refetch,
-  } = usePrograms(defaultWorkspaceId);
+  } = useContent(defaultWorkspaceId);
 
   // User's private workspace (retained for future toggle)
   const { workspaceId: userWorkspaceId } = useUserWorkspace();
@@ -76,8 +72,8 @@ function ProgramsPageInner() {
   const { role } = useWorkspaceRole(defaultWorkspaceId);
 
   // ── Edit / delete modal state ──────────────────────────────────────────
-  const [editingProgram, setEditingProgram] = useState<Program | null>(null);
-  const [pendingDeleteProgram, setPendingDeleteProgram] = useState<Program | null>(null);
+  const [editingProgram, setEditingProgram] = useState<ContentItem | null>(null);
+  const [pendingDeleteProgram, setPendingDeleteProgram] = useState<ContentItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // ── WHERE TO POST new programs ──────────────────────────────────────────

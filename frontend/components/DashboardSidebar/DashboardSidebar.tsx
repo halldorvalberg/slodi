@@ -97,7 +97,7 @@ const NAV_ITEMS: NavItem[] = [
   // Primary navigation - core features accessible to most users
   {
     label: "Dagskrárbankinn",
-    path: "/programs",
+    path: "/content",
     icon: Calendar,
     group: "primary",
   },
