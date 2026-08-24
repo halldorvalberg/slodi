@@ -1,0 +1,45 @@
+name: Backup Database
+
+# On-demand database backup, for when you want one outside the scheduled run —
+# before a migration, ahead of a risky deploy, or after an incident.
+#
+# It has to run on the VM rather than from a runner: scripts/backup.sh reaches
+# the database with `docker exec slodi-postgres pg_dump`, and uploads via the
+# VM's Azure managed identity, which cannot authenticate from anywhere else.
+# So this SSHes in and runs the same script the cron job does — one code path,
+# no second implementation to drift.
+#
+# Trigger from the Actions tab, or: gh workflow run "Backup Database"
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why this backup is being taken (shown in the Discord notice)"
+        required: false
+        default: "Manual backup"
+
+jobs:
+  backup:
+    name: Back up Postgres on the Azure VM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run backup via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.AZURE_VM_IP }}
+          username: ${{ secrets.AZURE_VM_USER }}
+          key: ${{ secrets.AZURE_SSH_KEY }}
+          # The script sets -euo pipefail and verifies the dump is non-empty, so
+          # a failure here is a genuine failure rather than a silent empty file.
+          script: |
+            cd ~/slodi
+            bash scripts/backup.sh
+      - name: Notify Discord
+        if: always()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          title: "Manual DB Backup"
+          description: "${{ inputs.reason }} — triggered by `${{ github.actor }}`"
