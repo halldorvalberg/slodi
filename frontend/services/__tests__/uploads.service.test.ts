@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach, type MockInstance } from "vitest";
 import { getUploadUrl, putToBlob, uploadFile } from "../uploads.service";
 
 const FAKE_TOKEN = "fake-token";
@@ -21,7 +21,10 @@ const sasBody = {
 };
 
 describe("uploads service — getUploadUrl", () => {
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  // Typed against fetch itself. The bare `ReturnType<typeof vi.spyOn>` resolves
+  // to a generic MockInstance that fetch's overloaded signature is not
+  // assignable to, which fails `npm run typecheck`.
+  let fetchSpy: MockInstance<typeof fetch>;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(globalThis, "fetch");
@@ -164,7 +167,10 @@ describe("uploads service — putToBlob", () => {
 });
 
 describe("uploads service — uploadFile", () => {
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  // Typed against fetch itself. The bare `ReturnType<typeof vi.spyOn>` resolves
+  // to a generic MockInstance that fetch's overloaded signature is not
+  // assignable to, which fails `npm run typecheck`.
+  let fetchSpy: MockInstance<typeof fetch>;
 
   beforeEach(() => {
     fetchSpy = vi.spyOn(globalThis, "fetch");
