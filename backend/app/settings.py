@@ -29,11 +29,18 @@ class Settings(BaseSettings):
     # Seed: emails that are always promoted to admin on `make seed`
     admin_emails: str = Field("", alias="ADMIN_EMAILS")
 
-    # HMAC key for signed game run tokens. Optional: when unset a key is derived
-    # from DB_PASSWORD so every worker agrees.
+    # HMAC key for signed game run tokens. REQUIRED outside development —
+    # run_tokens._secret() raises when it is unset and ENV is not a dev value.
     #
-    # Changing it — or setting it for the first time, or rotating DB_PASSWORD
-    # while it is unset — invalidates every run token still parked in a player's
+    # It is deliberately NOT derived from another credential. An earlier version
+    # derived it from DB_PASSWORD, which made every token handed out by the
+    # unauthenticated /games/{slug}/runs endpoint a free offline oracle for
+    # brute-forcing the database password. See run_tokens._secret().
+    #
+    # Production sets itself: deploy-backend.yml generates a value into
+    # backend/.env.docker when that file has none, and never overwrites one.
+    #
+    # Changing it invalidates every run token still parked in a player's
     # sessionStorage, up to the 12h TTL. Those runs come back as a rejected
     # signature and are retried rather than lost, but the players affected will
     # see an error. The same applies mid-rolling-deploy if one worker has the
