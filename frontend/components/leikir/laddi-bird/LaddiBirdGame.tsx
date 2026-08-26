@@ -2,21 +2,24 @@
 
 import { useEffect, useRef } from "react";
 import { createGameEngine } from "./gameEngine";
-import styles from "./HorpuhoppGame.module.css";
+import styles from "./LaddiBirdGame.module.css";
 
 interface Props {
   onGameOver: (score: number) => void;
   onRestart: () => void;
+  onRunStart: () => void;
 }
 
-export default function HorpuhoppGame({ onGameOver, onRestart }: Props) {
+export default function LaddiBirdGame({ onGameOver, onRestart, onRunStart }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Keep stable refs to the latest callbacks so the engine never stales.
   const onGameOverRef = useRef(onGameOver);
   const onRestartRef = useRef(onRestart);
+  const onRunStartRef = useRef(onRunStart);
   useEffect(() => {
     onGameOverRef.current = onGameOver;
     onRestartRef.current = onRestart;
+    onRunStartRef.current = onRunStart;
   });
 
   useEffect(() => {
@@ -25,6 +28,7 @@ export default function HorpuhoppGame({ onGameOver, onRestart }: Props) {
     return createGameEngine(canvas, {
       onGameOver: (score) => onGameOverRef.current(score),
       onRestart: () => onRestartRef.current(),
+      onRunStart: () => onRunStartRef.current(),
     });
   }, []); // engine starts once; callbacks are kept fresh via refs
 
@@ -32,12 +36,11 @@ export default function HorpuhoppGame({ onGameOver, onRestart }: Props) {
     <canvas
       ref={canvasRef}
       className={styles.canvas}
-      // Focusable so a keyboard player can Tab back to the game. The engine
-      // ignores keys aimed at real controls, so without this there would be no
-      // route back once focus moved into the leaderboard or the header nav.
+      // The canvas is the whole game, so it has to be reachable and operable
+      // without a mouse. Space and ↑ are handled on document by the engine.
       tabIndex={0}
       role="application"
-      aria-label="Hörpuhopp — notaðu ör-takkana eða A og D til að hreyfa þig"
+      aria-label="Laddí-bird — ýttu á bilslá eða upp-ör til að fljúga"
     />
   );
 }

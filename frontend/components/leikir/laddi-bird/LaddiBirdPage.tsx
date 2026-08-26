@@ -1,18 +1,19 @@
 "use client";
 
-import HorpuhoppGame from "@/components/leikir/horpuhopp/HorpuhoppGame";
+import LaddiBirdGame from "@/components/leikir/laddi-bird/LaddiBirdGame";
 import GameLeaderboard from "@/components/leikir/hub/GameLeaderboard";
 import { useGameScores } from "@/hooks/useGameScores";
-import styles from "./horpuhopp.module.css";
+import styles from "./laddiBird.module.css";
 
-const GAME = "horpuhopp";
+const GAME = "laddi-bird";
 
-export default function HorpuhoppPage() {
+export default function LaddiBirdPage() {
   const {
     scores,
     leaderboardVisible,
     loginHref,
     scoreError,
+    startRun,
     handleGameOver,
     handleRestart,
     hideLeaderboard,
@@ -21,7 +22,11 @@ export default function HorpuhoppPage() {
   return (
     <div className={styles.root}>
       <div className={styles.gameArea}>
-        <HorpuhoppGame onGameOver={handleGameOver} onRestart={handleRestart} />
+        <LaddiBirdGame
+          onGameOver={handleGameOver}
+          onRestart={handleRestart}
+          onRunStart={startRun}
+        />
         <GameLeaderboard
           entries={scores}
           visible={leaderboardVisible}
