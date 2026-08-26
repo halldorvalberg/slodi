@@ -10,6 +10,7 @@ import { useDraft } from "@/hooks/useDraft";
 import { handleApiErrorIs } from "@/lib/api-utils";
 import { useAuth } from "@/hooks/useAuth";
 import { safeLocalStorage } from "@/lib/safe-storage";
+import ImageUpload from "@/components/ImageUpload/ImageUpload";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -706,18 +707,12 @@ function SectionExtras({ draft, updateDraft, displayTags }: SectionExtrasProps) 
       </div>
 
       <div className={styles.field}>
-        <label htmlFor="program-image" className={styles.label}>
-          Vefslóð myndar
-        </label>
-        <input
+        <ImageUpload
           id="program-image"
-          type="url"
-          className={styles.input}
           value={draft.image}
-          onChange={(e) => updateDraft({ image: e.target.value })}
-          placeholder="https://example.com/mynd.jpg"
+          onChange={(url) => updateDraft({ image: url })}
+          hint="Mynd sem lýsir hugmyndinni — JPG, PNG eða WebP, mest 5 MB"
         />
-        <p className={styles.hint}>Slóð á mynd sem lýsir hugmyndinni</p>
       </div>
     </>
   );
