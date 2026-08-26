@@ -319,10 +319,10 @@ export const BAND_KIND: Record<BandId, SlotKind> = {
   lok: "slit",
 };
 
-export const BANDS: { id: BandId; label: string; hint: string }[] = [
-  { id: "opnun", label: "Setning", hint: "Rammar fundinn inn" },
-  { id: "kjarni", label: "Verkefni fundar", hint: "Þar sem þemað lifir" },
-  { id: "lok", label: "Slit", hint: "Skilar þeim heim með eitthvað" },
+export const BANDS: { id: BandId; label: string }[] = [
+  { id: "opnun", label: "Setning" },
+  { id: "kjarni", label: "Verkefni fundar" },
+  { id: "lok", label: "Slit" },
 ];
 
 /** Which band a liður kind belongs to. */

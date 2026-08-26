@@ -33,6 +33,12 @@
 
 /* ── the fold: where the past ends ─────────────────────────── */
 
+/*
+ * The bench opens scrolled to this marker rather than to the top of the season
+ * (see PlanBench), so it needs room above it: landing flush against the
+ * masthead reads as "this is the top of the list", which is the exact
+ * impression the marker exists to correct.
+ */
 .daymark {
   display: flex;
   align-items: center;
@@ -41,6 +47,12 @@
   width: 100%;
   margin: 0 auto;
   padding: 2px 0 10px;
+  scroll-margin-top: var(--sl-spacing-inset-md, 20px);
+}
+
+/* The same room for the all-past case, where the last sheet is the anchor. */
+.fold {
+  scroll-margin-top: var(--sl-spacing-inset-md, 20px);
 }
 
 .daymark::after {
@@ -191,11 +203,6 @@
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-weight: var(--sl-font-weight-heading);
-}
-
-.bandHint {
-  font-size: var(--sl-text-overline);
-  color: hsl(var(--sl-color-text-tertiary));
 }
 
 /*

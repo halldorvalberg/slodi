@@ -64,6 +64,25 @@ export default function PlanBench({ today }: Props) {
     if (at >= 0) nodes[at + delta]?.focus();
   }, []);
 
+  /**
+   * Open on today, not on the top of the year.
+   *
+   * The fold marker is the bench's navigational idea, but rendering it is only
+   * half of it: a leader landing at the top of a twenty-week scroll has to hunt
+   * for the fundur they came to work on, and the marker they are hunting for is
+   * the thing that was supposed to save them the hunt. So the marker is also
+   * the scroll anchor — history above, what is coming below.
+   *
+   * Once per load, not once per render: `anchored` is what stops the view
+   * yanking back to today after every reorder and duration nudge.
+   *
+   * When nothing is ahead the anchor moves to the last sheet, because the most
+   * recent fundur is the useful end of an all-past season — the oldest one is
+   * the least useful place the scroll could possibly stop.
+   */
+  const anchor = useRef<HTMLDivElement | null>(null);
+  const anchored = useRef(false);
+
   const grabbed = bench?.state.grabbed ?? null;
   const data = bench?.state.data;
   useEffect(() => {
@@ -84,6 +103,16 @@ export default function PlanBench({ today }: Props) {
     const day = entryDay(fundur.starts_at);
     return day ? day.getTime() >= startOfDay(now).getTime() : false;
   });
+
+  useEffect(() => {
+    if (anchored.current || ordered.length === 0) return;
+    const node = anchor.current;
+    if (!node) return;
+    anchored.current = true;
+    // Optional call: jsdom has no scrollIntoView, and a test that renders the
+    // bench should not fail over where the scrollbar ended up.
+    node.scrollIntoView?.({ block: "start", behavior: "auto" });
+  }, [ordered.length]);
 
   if (!bench) return null;
   const { state, dispatch } = bench;
@@ -125,9 +154,16 @@ export default function PlanBench({ today }: Props) {
         const day = entryDay(fundur.starts_at);
         const isPast = day ? day.getTime() < startOfDay(now).getTime() : false;
         return (
-          <div key={fundur.event_id}>
+          <div
+            key={fundur.event_id}
+            className={styles.fold}
+            ref={firstAhead === -1 && i === ordered.length - 1 ? anchor : undefined}
+          >
             {i === firstAhead && (
-              <div className={`${styles.daymark} ${isToday(day, now) ? styles.daymarkToday : ""}`}>
+              <div
+                ref={anchor}
+                className={`${styles.daymark} ${isToday(day, now) ? styles.daymarkToday : ""}`}
+              >
                 <span className={styles.daymarkL}>
                   {isToday(day, now) ? "Í dag" : "Héðan í frá"}
                 </span>

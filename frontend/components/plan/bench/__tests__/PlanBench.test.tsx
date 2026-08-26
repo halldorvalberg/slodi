@@ -214,10 +214,11 @@ describe("PlanBench", () => {
     expect(screen.getByText(/Engir fundir á þessu starfsári enn/)).toBeInTheDocument();
   });
 
-  it("does not offer the split on a flokksfundur", () => {
-    // One flokkur is in the room, so lanes would be columns nobody stands in.
+  it("offers the split on a flokksfundur too", () => {
+    // It was once gated to troop-wide fundir, which hid it on exactly the
+    // sheets a leader opens the bench to work on — today's and the next few.
     renderBench(one());
-    expect(screen.queryByRole("button", { name: /Skipta á flokka/ })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Skipta á flokka/ }).length).toBeGreaterThan(0);
   });
 
   it("offers the split on a fundur the whole sveit is at", () => {

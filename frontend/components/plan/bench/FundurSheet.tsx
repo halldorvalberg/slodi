@@ -119,34 +119,40 @@ export default function FundurSheet({
           <div key={band.id}>
             <div className={styles.band}>
               <span className={styles.bandL}>{band.label}</span>
-              <span className={styles.bandHint}>{band.hint}</span>
 
               {/*
-               * Splitting only makes sense for a fundur the whole sveit is at:
-               * a flokksfundur has one flokkur in the room, so dealing it into
-               * lanes would produce columns nobody is standing in.
+               * Offered on every fundur, not only troop-wide ones.
+               *
+               * It used to be gated on `scope === "troop-wide"`, on the
+               * reasoning that a flokksfundur has one flokkur in the room so
+               * lanes would be columns nobody stands in. In practice that made
+               * the capability look broken: today's fundur and the next ones
+               * are usually flokksfundir, so a leader met the bench with the
+               * split nowhere in sight and no hint it existed at all.
+               *
+               * The lanes are dealt from the sveit's flokkar either way, so on
+               * a flokksfundur some columns will stand empty — visible and
+               * ignorable, which is the better failure than a hidden feature.
                */}
-              {fundur.scope === "troop-wide" && (
-                <button
-                  type="button"
-                  className={styles.bandsplit}
-                  aria-pressed={Boolean(lanes)}
-                  title={
-                    lanes
-                      ? "Hver flokkur hefur sinn eigin tíma. Smelltu til að sameina í eina röð."
-                      : "Hver flokkur fær sinn eigin tíma í rist, með tímaás og einni súlu á flokk."
-                  }
-                  onClick={() =>
-                    dispatch({
-                      t: lanes ? "mergeBand" : "splitBand",
-                      fundurId: fundur.event_id,
-                      band: band.id,
-                    })
-                  }
-                >
-                  {lanes ? "Sameina í eitt" : "Skipta á flokka"}
-                </button>
-              )}
+              <button
+                type="button"
+                className={styles.bandsplit}
+                aria-pressed={Boolean(lanes)}
+                title={
+                  lanes
+                    ? "Hver flokkur hefur sinn eigin tíma. Smelltu til að sameina í eina röð."
+                    : "Hver flokkur fær sinn eigin tíma í rist, með tímaás og einni súlu á flokk."
+                }
+                onClick={() =>
+                  dispatch({
+                    t: lanes ? "mergeBand" : "splitBand",
+                    fundurId: fundur.event_id,
+                    band: band.id,
+                  })
+                }
+              >
+                {lanes ? "Sameina í eitt" : "Skipta á flokka"}
+              </button>
 
               <span className={`${styles.bandN} ${styles.num}`}>
                 {minutes ? `${minutes} mín${lanes ? " samhliða" : ""}` : "—"}
